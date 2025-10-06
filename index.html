@@ -1,1 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setton Source | Web Development Agency</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide icons for a sleek look -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a1a2e; /* Deep Navy */
+            --accent-color: #00d2ff; /* Electric Blue */
+            --text-color: #e4e4e7;  /* Light Gray */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            scroll-behavior: smooth;
+        }
 
+        /* Custom utility for smooth transitions */
+        .transition-default {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Header backdrop effect */
+        .header-scrolled {
+            background-color: rgba(26, 26, 46, 0.95); /* Slightly opaque dark navy */
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Hero text animation */
+        @keyframes fadeInSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animated-hero {
+            animation: fadeInSlideUp 1s ease-out both;
+        }
+        
+        /* Ensure animations are staggered */
+        .animated-hero:nth-child(1) { animation-delay: 0.1s; }
+        .animated-hero:nth-child(2) { animation-delay: 0.3s; }
+        .animated-hero:nth-child(3) { animation-delay: 0.5s; }
+
+        /* Background Blob Animation */
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        /* Quote Modal Styles: Digital Spawn Animation */
+        
+        /* 1. Define the inner content box appearance transition */
+        .modal-content-box {
+            /* Aggressive cubic-bezier for a sharp pop-in effect */
+            transition: all 0.3s cubic-bezier(0.1, 0.9, 0.3, 1.2); 
+        }
+
+        /* 2. Outer container controls backdrop fade and sets initial state for inner box */
+        .modal-enter {
+            opacity: 0;
+            transform: none; 
+            transition: opacity 0.3s; /* Only opacity for the backdrop */
+        }
+        .modal-enter-active, .modal-exit {
+            opacity: 1;
+            transform: none;
+            transition: opacity 0.3s; 
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: none;
+            transition: opacity 0.3s;
+        }
+
+        /* 3. Initial State (before enter) for inner box */
+        .modal-enter .modal-content-box {
+            opacity: 0;
+            transform: scale(0.75); /* Smaller start for sharper pop */
+        }
+        
+        /* 4. Active Enter State (CSS transition handles move to final state) for inner box */
+        .modal-enter-active .modal-content-box {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* 5. Exit State for inner box */
+        .modal-exit-active .modal-content-box {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.2s ease-in;
+        }
+
+
+        /* Custom radio button styling */
+        .custom-radio input:checked + label {
+            border-color: var(--accent-color);
+            background-color: rgba(0, 210, 255, 0.1);
+        }
+
+        /* New Typing Cursor Animation */
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+        #typewriter-text {
+            border-right-color: white !important; /* Ensure cursor is visible */
+            animation: blink 0.7s step-end infinite;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        /* Input Focus Styling */
+        .input-text:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.5);
+            outline: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header: Transparent and Fixed -->
+    <header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-default py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <!-- Agency Logo/Brand Name -->
+            <a href="#hero" class="text-2xl font-black text-white hover:text-cyan-400 transition-default">Setton Source<span class="text-[var(--accent-color)]">.</span></a>
+            <nav class="hidden md:flex space-x-8 font-medium">
+                <a href="#hero" class="text-zinc-300 hover:text-white transition-default">Home</a>
+                <a href="#work" class="text-zinc-300 hover:text-white transition-default">My Work</a>
+                <a href="#contact" class="text-zinc-300 hover:text-white transition-default">Contact</a>
+            </nav>
+            <button id="open-quote-modal" class="py-2 px-6 bg-[var(--accent-color)] text-[var(--primary-color)] font-bold rounded-full shadow-lg hover:shadow-[0_0_15px_rgba(0,210,255,0.7)] transition-default transform hover:scale-105">
+                Get Instant Quote
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="relative min-h-screen flex items-center justify-center p-6 pt-32 overflow-hidden">
+            <!-- Background Gradient/Blob Effect for visual interest -->
+            <div class="absolute inset-0 bg-gradient-to-br from-[var(--primary-color)] to-[#11111f] opacity-90"></div>
+            <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-[var(--accent-color)] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+
+            <div class="z-10 text-center max-w-4xl space-y-8">
+                <p class="text-xl text-zinc-400 animated-hero">— Your Foundation for Digital Growth</p>
+                <!-- Hero Heading -->
+                <h1 class="6xl sm:text-7xl lg:text-9xl font-extrabold text-white leading-tight animated-hero">
+                    SETTON <span class="text-[var(--accent-color)] block md:inline-block">SOURCE</span>
+                </h1>
+                
+                <!-- Typing Indicator Text Area -->
+                <div class="h-10 text-2xl font-semibold text-zinc-300 animated-hero mx-auto max-w-full overflow-hidden">
+                    <span id="typewriter-text" class="border-r-2 border-zinc-300 pr-1"></span>
+                </div>
+
+                <button id="hero-quote-button" class="mt-8 py-3 px-10 text-lg bg-white text-[var(--primary-color)] font-extrabold rounded-lg shadow-xl hover:bg-[var(--accent-color)] hover:text-white transition-default transform hover:scale-105 animated-hero">
+                    Launch Your Project — Get Instant Quote
+                </button>
+            </div>
+        </section>
+
+        <!-- My Work Section -->
+        <section id="work" class="py-20 lg:py-32 px-6">
+            <div class="container mx-auto">
+                <h2 class="text-4xl lg:text-5xl font-extrabold text-center mb-16 text-white">My Work</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+                    <!-- Project 1: Second Hand Cell -->
+                    <a href="https://secondhandcell.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://placehold.co/800x480/1E3A8A/ffffff?text=E-commerce+Platform" 
+                                 class="w-full h-full object-cover transition-default group-hover:scale-110" 
+                                 alt="Preview of Second Hand Cell website">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Second Hand Cell</h3>
+                            <p class="text-zinc-400 text-sm mt-2">Mobile E-commerce Platform</p>
+                            <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
+                                Visit Site <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Project 2: YDE Seniors -->
+                    <a href="https://ydeseniors.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
+                         <div class="h-48 overflow-hidden">
+                            <img src="https://placehold.co/800x480/14532D/ffffff?text=Educational+Portal" 
+                                 class="w-full h-full object-cover transition-default group-hover:scale-110" 
+                                 alt="Preview of YDE Seniors website">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">YDE Seniors</h3>
+                            <p class="text-zinc-400 text-sm mt-2">Educational / School Portal</p>
+                            <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
+                                Visit Site <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Project 3: Binyan Shalem -->
+                    <a href="https://binyan-shalem.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://placehold.co/800x480/991B1B/ffffff?text=Non-Profit+Organization" 
+                                 class="w-full h-full object-cover transition-default group-hover:scale-110" 
+                                 alt="Preview of Binyan Shalem website">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Binyan Shalem</h3>
+                            <p class="text-zinc-400 text-sm mt-2">Non-profit/Organizational Site</p>
+                            <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
+                                Visit Site <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Project 4: Torat Yosef Raffle -->
+                    <a href="https://toratyosefsummerraffle.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://placehold.co/800x480/F59E0B/ffffff?text=Raffle+Fundraising+Site" 
+                                 class="w-full h-full object-cover transition-default group-hover:scale-110" 
+                                 alt="Preview of Torat Yosef Raffle website">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Torat Yosef Raffle</h3>
+                            <p class="text-zinc-400 text-sm mt-2">Fundraising/Raffle Site</p>
+                            <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
+                                Visit Site <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 lg:py-32 px-6 bg-[#11111f] text-center">
+            <div class="container mx-auto max-w-3xl">
+                <h2 class="text-4xl lg:text-5xl font-extrabold mb-6 text-white">Ready to build something amazing?</h2>
+                <p class="text-xl text-zinc-400 mb-10">
+                    Your next high-performing website is just a quote away.
+                </p>
+                <button id="footer-quote-button" class="py-3 px-10 text-lg bg-[var(--accent-color)] text-[var(--primary-color)] font-extrabold rounded-lg shadow-xl hover:shadow-[0_0_20px_rgba(0,210,255,0.9)] transition-default transform hover:scale-105">
+                    Start My Project Quote
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-zinc-500 text-sm bg-black">
+        &copy; 2025 Setton Source. Built with precision and passion.
+    </footer>
+
+    <!-- Quote Generation Modal -->
+    <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 flex justify-center items-start py-8 px-4 hidden modal-exit overflow-y-auto">
+        <div class="bg-[var(--primary-color)] rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-8 my-auto modal-content-box transition-default">
+            <div class="flex justify-between items-center mb-6 border-b border-zinc-700 pb-4">
+                <h3 class="text-3xl font-bold text-white">Project Quote — Step <span id="current-step-display">1</span>/3</h3>
+                <button id="close-quote-modal" class="text-zinc-400 hover:text-[var(--accent-color)] transition-default">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Quote Form Steps -->
+            <form id="quote-form" class="space-y-6">
+
+                <!-- Step 1: Site Requirements (Initial Step) -->
+                <div id="step-1-content" class="space-y-6">
+                    <!-- 1. Number of Pages -->
+                    <div>
+                        <label class="block text-lg font-semibold mb-3 text-zinc-300">1. How many unique pages will your site require?</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 custom-radio">
+                            <!-- 1 Page: $1,000 (BASE) -->
+                            <input type="radio" id="pages-1" name="pages" value="1" data-cost="0" class="hidden" checked>
+                            <label for="pages-1" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">1 Page</label>
+
+                            <!-- 3 Pages: $1,500 (+$500) -->
+                            <input type="radio" id="pages-3" name="pages" value="3" data-cost="500" class="hidden">
+                            <label for="pages-3" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">3 Pages</label>
+
+                            <!-- 5 Pages: $2,500 (+$1500) -->
+                            <input type="radio" id="pages-5" name="pages" value="5" data-cost="1500" class="hidden">
+                            <label for="pages-5" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">5 Pages</label>
+
+                            <!-- 7 Pages: $3,000 (+$2000) -->
+                            <input type="radio" id="pages-7" name="pages" value="7" data-cost="2000" class="hidden">
+                            <label for="pages-7" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">7 Pages</label>
+
+                            <!-- 10+ Pages: $5,000 (+$4000) -->
+                            <input type="radio" id="pages-10-plus" name="pages" value="10+" data-cost="4000" class="hidden">
+                            <label for="pages-10-plus" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">10+ Pages</label>
+                        </div>
+                    </div>
+
+                    <!-- 2. Backend/Database Requirement -->
+                    <div>
+                        <div class="flex items-center mb-3">
+                            <label class="block text-lg font-semibold text-zinc-300">2. Will you require a backend/database?</label>
+                            <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="backend-info"></i>
+                        </div>
+                        <div id="backend-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
+                            The backend is the brain of your website. It's needed for features like user logins, storing product data, saving form entries, or handling any dynamic content (content that changes based on user actions or time).
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 custom-radio">
+                            <input type="radio" id="backend-no" name="backend" value="no" data-cost="0" class="hidden" checked>
+                            <label for="backend-no" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">No Backend (Static)</label>
+
+                            <input type="radio" id="backend-yes" name="backend" value="yes" data-cost="800" class="hidden">
+                            <label for="backend-yes" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">Yes, I need a Backend</label>
+                        </div>
+                    </div>
+
+                    <!-- 3. Site Type / Key Features -->
+                    <div>
+                        <label class="block text-lg font-semibold mb-3 text-zinc-300">3. Select the key features needed:</label>
+                        <div class="space-y-3">
+                            <div class="flex flex-col">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="feature-ecommerce" name="feature-ecommerce" data-cost="1500" class="w-5 h-5 accent-[var(--accent-color)] rounded">
+                                    <label for="feature-ecommerce" class="ml-3 text-zinc-300">Store / Payment Gateway Integration</label>
+                                    <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="ecommerce-info"></i>
+                                </div>
+                                <div id="ecommerce-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
+                                    This covers setting up product listings, shopping carts, checkout logic, and connecting to services like PayPal or Stripe to securely accept payments.
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="feature-admin" name="feature-admin" data-cost="700" class="w-5 h-5 accent-[var(--accent-color)] rounded">
+                                    <label for="feature-admin" class="ml-3 text-zinc-300">Custom Admin/CMS Page</label>
+                                    <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="admin-info"></i>
+                                </div>
+                                <div id="admin-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
+                                    A Content Management System (CMS) or admin page lets you easily update text, change images, add blog posts, or modify products yourself without needing a developer for every little change.
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="feature-support" name="feature-support" data-cost="300" class="w-5 h-5 accent-[var(--accent-color)] rounded">
+                                    <label for="feature-support" class="ml-3 text-zinc-300">Customer Support / Live Chat Integration</label>
+                                    <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="support-info"></i>
+                                </div>
+                                <div id="support-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
+                                    Integrating a tool like Tidio, Zendesk, or a similar service to allow visitors to instantly chat with your team or send support requests directly from the website.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Color Scheme -->
+                    <div>
+                        <div class="flex items-center mb-3">
+                            <label class="block text-lg font-semibold text-zinc-300">4. Do you have a defined color scheme?</label>
+                            <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="color-info"></i>
+                        </div>
+                        <div id="color-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
+                            A Custom Branding/Color Audit means working together to define the perfect colors, fonts, and style guide for your business, ensuring visual consistency and maximum impact.
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 custom-radio">
+                            <input type="radio" id="colors-yes" name="colors" value="yes" data-cost="0" class="hidden" checked>
+                            <label for="colors-yes" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">Yes (Standard)</label>
+
+                            <input type="radio" id="colors-custom" name="colors" value="custom" data-cost="150" class="hidden">
+                            <label for="colors-custom" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">Custom Branding/Color Audit</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Contact Information -->
+                <div id="step-2-content" class="hidden space-y-4">
+                    <p class="text-lg font-semibold text-zinc-300 mb-4">Please provide your contact information to receive the quote summary.</p>
+                    
+                    <div>
+                        <label for="contact-name" class="block text-sm font-medium text-zinc-400 mb-1">Your Full Name (Required)</label>
+                        <input type="text" id="contact-name" name="contact-name" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+                    
+                    <div>
+                        <label for="contact-email" class="block text-sm font-medium text-zinc-400 mb-1">Email Address (Required)</label>
+                        <input type="email" id="contact-email" name="contact-email" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+
+                    <div>
+                        <label for="contact-phone" class="block text-sm font-medium text-zinc-400 mb-1">Phone Number (Required)</label>
+                        <input type="tel" id="contact-phone" name="contact-phone" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+                </div>
+
+                <!-- Step 3: Project Details -->
+                <div id="step-3-content" class="hidden space-y-4">
+                    <p class="text-lg font-semibold text-zinc-300 mb-4">Final project details.</p>
+                    
+                    <div>
+                        <label for="project-name" class="block text-sm font-medium text-zinc-400 mb-1">Website Name/Business Name</label>
+                        <input type="text" id="project-name" name="project-name" class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+                    
+                    <div>
+                        <label for="project-url" class="block text-sm font-medium text-zinc-400 mb-1">Intended/Existing URL (if available)</label>
+                        <input type="url" id="project-url" name="project-url" class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+                    
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">Do you have a company logo?</label>
+                        <div class="grid grid-cols-2 gap-3 custom-radio">
+                            <input type="radio" id="logo-yes" name="logo-status" value="yes" data-cost="0" class="hidden" checked>
+                            <label for="logo-yes" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">Yes, I have one.</label>
+                            
+                            <!-- $100 for logo creation service -->
+                            <input type="radio" id="logo-no" name="logo-status" value="no" data-cost="100" class="hidden">
+                            <label for="logo-no" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">No, create one</label>
+                        </div>
+                        <p class="text-xs text-zinc-500 mt-2">Note: This is an estimate for a basic design. Complex branding will require a custom quote. The logo creation service adds $100 to your total.</p>
+                    </div>
+
+                </div>
+
+                <!-- Step Navigation and Quote Result -->
+                <div class="mt-8 pt-6 border-t border-zinc-700">
+                    <div id="navigation-buttons" class="flex justify-between items-center">
+                        <button type="button" id="prev-step" class="py-2 px-4 bg-zinc-600 text-white font-bold rounded-lg transition-default hover:bg-zinc-500 hidden">
+                            <i data-lucide="arrow-left" class="w-4 h-4 inline mr-2"></i> Back
+                        </button>
+                        
+                        <div id="quote-price-preview" class="text-center">
+                            <p class="text-lg font-medium text-zinc-300">Current Estimate:</p>
+                            <p id="quote-result" class="text-4xl font-extrabold text-[var(--accent-color)] mt-1">$1,000</p>
+                        </div>
+
+                        <button type="button" id="next-step" class="py-2 px-4 bg-[var(--accent-color)] text-[var(--primary-color)] font-bold rounded-lg transition-default hover:bg-cyan-400">
+                            Continue <i data-lucide="arrow-right" class="w-4 h-4 inline ml-2"></i>
+                        </button>
+
+                        <button type="submit" id="submit-quote" class="py-2 px-4 bg-green-500 text-[var(--primary-color)] font-bold rounded-lg transition-default hover:bg-green-400 hidden">
+                            Submit Quote
+                        </button>
+                    </div>
+
+                    <div id="submission-status" class="hidden text-center mt-6 p-4 rounded-lg bg-[#3a3a5e]">
+                        <p id="status-message" class="text-xl font-bold text-white mb-2"></p>
+                        <p id="final-price-display" class="text-4xl font-extrabold text-[var(--accent-color)] mb-4"></p>
+                        <p class="text-sm text-zinc-400">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 inline mr-1 text-yellow-500"></i>
+                            This is an ESTIMATE. The final price may fluctuate based on detailed scope requests, content readiness, and unforeseen technical complexity. We will contact you shortly to confirm the details.
+                        </p>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Imports (MUST use type="module") -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // setLogLevel('Debug'); // Uncomment to debug Firebase in console
+
+        // Initialize Lucide icons to render the help-circle buttons -- THIS WAS MISSING!
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-setton-source';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Default (or provided) Firebase configuration
+        const userProvidedConfig = {
+            apiKey: "YOUR_FALLBACK_API_KEY", // Placeholder - Canvas environment provides actual config
+            authDomain: "your-project-id.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:1234567890abcdef",
+        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userProvidedConfig;
+
+
+        // Initialize Firebase
+        let app, auth, db, userId;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            // Handle authentication using custom token or anonymous sign-in
+            if (initialAuthToken) {
+                signInWithCustomToken(auth, initialAuthToken).then(userCredential => {
+                    userId = userCredential.user.uid;
+                    console.log("Firebase signed in with custom token. User ID:", userId);
+                }).catch(error => {
+                    console.error("Custom token sign-in failed. Falling back to anonymous:", error);
+                    signInAnonymously(auth).then(userCredential => {
+                        userId = userCredential.user.uid;
+                    }).catch(err => console.error("Anonymous sign-in failed:", err));
+                });
+            } else {
+                signInAnonymously(auth).then(userCredential => {
+                    userId = userCredential.user.uid;
+                    console.log("Firebase signed in anonymously. User ID:", userId);
+                }).catch(err => console.error("Anonymous sign-in failed:", err));
+            }
+        } catch (e) {
+            console.error("Firebase initialization error:", e);
+        }
+
+        // ------------------
+        // 1. Header Scroll Logic
+        // ------------------
+        const header = document.getElementById('main-header');
+        const scrollThreshold = 50;
+
+        function updateHeader() {
+            if (window.scrollY > scrollThreshold) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        }
+
+        window.addEventListener('scroll', updateHeader);
+        updateHeader();
+
+        // ------------------
+        // 2. Typing Indicator Logic
+        // ------------------
+        const typewriterTextElement = document.getElementById('typewriter-text');
+        const phrases = [
+            "Architecting High-Impact Web Solutions.",
+            "Designing Sleek, Modern Portfolios.",
+            "Building Complex E-commerce Platforms.",
+            "Setton Source: Your Digital Foundation."
+        ];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function typeWriter() {
+            const currentPhrase = phrases[phraseIndex];
+            let displayText = currentPhrase;
+
+            if (isDeleting) {
+                displayText = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                displayText = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            typewriterTextElement.textContent = displayText;
+
+            let typingSpeed = 70;
+            
+            if (isDeleting) {
+                typingSpeed = 30;
+            }
+
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                typingSpeed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                typingSpeed = 500;
+            }
+
+            setTimeout(typeWriter, typingSpeed);
+        }
+        
+        setTimeout(typeWriter, 1000); 
+        
+        // ------------------
+        // 3. Quote Modal & Step Logic
+        // ------------------
+
+        const quoteModal = document.getElementById('quote-modal');
+        const openButtons = document.querySelectorAll('#open-quote-modal, #hero-quote-button, #footer-quote-button');
+        const closeButton = document.getElementById('close-quote-modal');
+        const quoteForm = document.getElementById('quote-form');
+        const quoteResult = document.getElementById('quote-result');
+        const stepDisplay = document.getElementById('current-step-display');
+        const prevStepBtn = document.getElementById('prev-step');
+        const nextStepBtn = document.getElementById('next-step');
+        const submitQuoteBtn = document.getElementById('submit-quote');
+        const statusDiv = document.getElementById('submission-status');
+        const statusMessage = document.getElementById('status-message');
+        const finalPriceDisplay = document.getElementById('final-price-display');
+        const pricePreview = document.getElementById('quote-price-preview');
+
+        const stepContents = [
+            document.getElementById('step-1-content'),
+            document.getElementById('step-2-content'),
+            document.getElementById('step-3-content')
+        ];
+        let currentStep = 0; // 0-indexed
+
+        const BASE_PRICE = 1000; // Base Price for a simple 1-page static site is $1000
+
+        function updateStepDisplay() {
+            // Hide all step content, then show the current one
+            stepContents.forEach((step, index) => {
+                step.classList.add('hidden');
+                if (index === currentStep) {
+                    step.classList.remove('hidden');
+                }
+            });
+
+            // Update header text (1/3, 2/3, 3/3)
+            stepDisplay.textContent = currentStep + 1;
+            
+            // Handle navigation buttons visibility
+            prevStepBtn.classList.toggle('hidden', currentStep === 0);
+            nextStepBtn.classList.toggle('hidden', currentStep === stepContents.length - 1);
+            submitQuoteBtn.classList.toggle('hidden', currentStep !== stepContents.length - 1);
+            pricePreview.classList.toggle('hidden', currentStep === stepContents.length - 1);
+            
+            // Recalculate quote to update preview
+            calculateQuote();
+            // Clear status message when navigating steps
+            statusDiv.classList.add('hidden');
+        }
+        
+        function validateStep(stepIndex) {
+            if (stepIndex === 1) { // Validation for Contact Info (Step 2)
+                const name = document.getElementById('contact-name').value;
+                const email = document.getElementById('contact-email').value;
+                const phone = document.getElementById('contact-phone').value;
+                
+                // Function to display error message without using alert()
+                const displayError = (msg) => {
+                    statusDiv.classList.remove('hidden', 'bg-green-600/50', 'bg-[#3a3a5e]');
+                    statusDiv.classList.add('bg-yellow-600/50');
+                    statusMessage.textContent = msg;
+                    finalPriceDisplay.textContent = '';
+                    setTimeout(() => { statusDiv.classList.add('hidden'); }, 3000);
+                };
+
+                if (!name || !email || !phone) {
+                    displayError('Please fill in all required contact fields.');
+                    return false;
+                }
+                // Simple email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    displayError('Please enter a valid email address.');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function changeStep(direction) {
+            const nextStep = currentStep + direction;
+            
+            if (direction > 0 && currentStep < stepContents.length - 1) {
+                if (!validateStep(currentStep)) return;
+            }
+
+            if (nextStep >= 0 && nextStep < stepContents.length) {
+                currentStep = nextStep;
+                updateStepDisplay();
+            }
+        }
+
+        prevStepBtn.addEventListener('click', () => changeStep(-1));
+        nextStepBtn.addEventListener('click', () => changeStep(1));
+
+        // Modal Open/Close Logic (with digital spawn animation)
+        function openModal() {
+            currentStep = 0; // Reset to step 1 on open
+            updateStepDisplay();
+            statusDiv.classList.add('hidden');
+            quoteModal.classList.remove('hidden', 'modal-exit-active');
+            quoteModal.classList.add('flex', 'modal-enter');
+            setTimeout(() => {
+                quoteModal.classList.remove('modal-enter');
+                quoteModal.classList.add('modal-enter-active');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+            calculateQuote();
+        }
+
+        function closeModal() {
+            quoteModal.classList.remove('modal-enter-active');
+            quoteModal.classList.add('modal-exit-active');
+            setTimeout(() => {
+                quoteModal.classList.add('hidden');
+                quoteModal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        openButtons.forEach(button => {
+            button.addEventListener('click', openModal);
+        });
+        closeButton.addEventListener('click', closeModal);
+        quoteModal.addEventListener('click', (e) => {
+            if (e.target.id === 'quote-modal') {
+                closeModal();
+            }
+        });
+
+        // ------------------
+        // 4. Quote Calculation and Submission Logic (Firebase)
+        // ------------------
+        function calculateQuote() {
+            let totalCost = BASE_PRICE;
+
+            // Get all radio/checkbox inputs from all steps
+            const inputs = quoteForm.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+
+            inputs.forEach(input => {
+                const cost = parseInt(input.getAttribute('data-cost') || '0', 10);
+
+                if (input.type === 'radio' && input.checked) {
+                    // Cost is added for page count, backend, colors, and logo status
+                    if (['pages', 'backend', 'colors', 'logo-status'].includes(input.name)) {
+                        totalCost += cost;
+                    }
+                } else if (input.type === 'checkbox' && input.checked) {
+                    // Cost is added for feature checkboxes
+                    totalCost += cost;
+                }
+            });
+
+            // Format the result as currency
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            });
+
+            const formattedCost = formatter.format(totalCost);
+            quoteResult.textContent = formattedCost;
+            return { raw: totalCost, formatted: formattedCost };
+        }
+
+        async function submitQuote(e) {
+            e.preventDefault();
+            
+            if (!db || !userId) {
+                // Display error message in the status div
+                statusDiv.classList.remove('hidden', 'bg-green-600/50', 'bg-yellow-600/50', 'bg-[#3a3a5e]');
+                statusDiv.classList.add('bg-red-600/50');
+                statusMessage.textContent = 'System is not authenticated. Please try again or refresh.';
+                finalPriceDisplay.textContent = '';
+                return;
+            }
+
+            const quoteData = {};
+            const cost = calculateQuote();
+
+            // 1. Gather Quote Details (Step 1)
+            const step1Fields = quoteForm.querySelectorAll('#step-1-content input[type="radio"]:checked, #step-1-content input[type="checkbox"]:checked');
+            step1Fields.forEach(input => {
+                quoteData[input.name] = input.value;
+            });
+
+            // 2. Gather Contact Details (Step 2)
+            quoteData.name = document.getElementById('contact-name').value;
+            quoteData.email = document.getElementById('contact-email').value;
+            quoteData.phone = document.getElementById('contact-phone').value;
+
+            // 3. Gather Project Details (Step 3)
+            quoteData.projectName = document.getElementById('project-name').value || 'N/A';
+            quoteData.projectUrl = document.getElementById('project-url').value || 'N/A';
+            // Ensure logo status is captured
+            quoteData.logoStatus = quoteForm.querySelector('input[name="logo-status"]:checked')?.value || 'yes';
+            
+            // 4. Add Final Price and Metadata
+            quoteData.finalEstimate = cost.raw;
+            quoteData.timestamp = new Date().toISOString();
+            quoteData.userId = userId;
+
+            // Show loading message
+            submitQuoteBtn.disabled = true;
+            submitQuoteBtn.textContent = 'Submitting...';
+            statusDiv.classList.add('hidden');
+
+            try {
+                // Store quotes in a private collection for the user
+                const collectionPath = `artifacts/${appId}/users/${userId}/quotes`;
+                const docRef = await addDoc(collection(db, collectionPath), quoteData);
+                
+                // Success - Display final price clearly
+                statusMessage.textContent = 'Quote Submitted Successfully!';
+                finalPriceDisplay.textContent = cost.formatted;
+                statusDiv.classList.remove('hidden', 'bg-yellow-600/50', 'bg-red-600/50');
+                statusDiv.classList.add('bg-green-600/50');
+                
+            } catch (error) {
+                console.error("Error writing document to Firestore: ", error);
+                
+                // Submission Failed - Display error
+                statusDiv.classList.remove('hidden', 'bg-green-600/50', 'bg-yellow-600/50', 'bg-[#3a3a5e]');
+                statusDiv.classList.add('bg-red-600/50');
+                statusMessage.textContent = 'Submission Failed. Please try again.';
+                finalPriceDisplay.textContent = '';
+            } finally {
+                submitQuoteBtn.disabled = false;
+                submitQuoteBtn.textContent = 'Submit Quote';
+            }
+        }
+
+        // Attach event listeners
+        quoteForm.addEventListener('change', calculateQuote);
+        quoteForm.addEventListener('submit', submitQuote);
+
+        // ------------------
+        // 5. Info Toggle Logic
+        // ------------------
+        function setupInfoToggles() {
+            document.querySelectorAll('[data-info-target]').forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    const targetElement = e.target.closest('[data-info-target]');
+                    if (!targetElement) return;
+
+                    const targetId = targetElement.getAttribute('data-info-target');
+                    const infoBox = document.getElementById(targetId);
+
+                    if (infoBox) {
+                        document.querySelectorAll('.info-box').forEach(box => {
+                            if (box.id !== targetId) {
+                                box.classList.add('hidden');
+                            }
+                        });
+                        infoBox.classList.toggle('hidden');
+                    }
+                });
+            });
+        }
+        
+        setupInfoToggles();
+        document.addEventListener('DOMContentLoaded', calculateQuote);
+        
+    </script>
+</body>
+</html>
