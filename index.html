@@ -341,7 +341,7 @@
         <div class="container mx-auto flex justify-center items-center space-x-6">
             <span>&copy; 2025 Setton Source. Built with precision and passion.</span>
             <!-- ADMIN LINK -->
-            <a href="/admin/" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
+            <a href="admin/" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
                 <i data-lucide="lock" class="w-4 h-4 mr-1"></i> Admin
             </a>
         </div>
@@ -1096,7 +1096,7 @@
                 if (keyPressHistory.length === SECRET_CODE.length && keyPressHistory.every((val, index) => val === SECRET_CODE[index])) {
                     console.log("Secret Admin Code Activated! Redirecting...");
                     keyPressHistory = []; 
-                    window.location.href = '/admin/';
+                    window.location.href = 'admin/';
                 }
             } else {
                 // If a non-alphabetic key is pressed, reset the sequence
