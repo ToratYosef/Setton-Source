@@ -3,302 +3,3245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Setton Source | Admin Dashboard</title>
-    <!-- Load Tailwind CSS -->
+    <title>YDE Senior Fund Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Lucide icons for a sleek look -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #1a1a2e; /* Deep Navy */
-            --accent-color: #00d2ff; /* Electric Blue */
-            --text-color: #e4e4e7;  /* Light Gray */
+        /* Define the core dark color scheme for consistency */
+        .primary-dark { background-color: #0d1222; }
+        .accent-yellow { color: #facc15; }
+        .card-dark { background-color: #1f2937; }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            color: #ffffff; /* Default text white */
+            background-color: #0d1222;
+            background-image: linear-gradient(135deg, #0d1222 0%, #151a2d 100%);
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            scroll-behavior: smooth;
+        .dashboard-card {
+            background-color: #1f2937; /* Dark card color */
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05); /* Darker shadow, subtle white border */
+            transition: all 0.3s ease;
         }
-        /* Style for required elements/warnings */
-        .required-tag {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 9999px;
-            font-weight: 700;
+        .tab-button.active {
+            border-bottom: 3px solid #facc15; /* Tailwind yellow-400 */
+            color: #facc15; /* Active text is yellow */
+            font-weight: 600;
         }
-        .bg-required {
-            background-color: #f59e0b; /* Amber 500 */
-            color: #1a1a2e; /* Primary Color */
+        /* Make table text slightly smaller on mobile for density */
+        .data-table th {
+            text-align: left;
+            padding: 0.5rem 0.5rem; /* Reduced padding for mobile */
+            font-size: 0.65rem; /* Smaller font size */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af; /* Light gray text */
+            background-color: #374151; /* Darker header background */
+            border-bottom: 2px solid #4b5563; /* Dark border */
+            cursor: pointer;
         }
+        .data-table td {
+            padding: 0.75rem 0.5rem; /* Reduced padding for mobile */
+            font-size: 0.75rem; /* Smaller font size */
+            border-bottom: 1px solid #374151; /* Dark border */
+            color: #d1d5db; /* Light gray text for data */
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.75); /* Darker overlay */
+            backdrop-filter: blur(8px);
+        }
+        /* Custom scrollbar for better appearance on table containers */
+        .overflow-x-auto::-webkit-scrollbar { height: 8px; }
+        .overflow-x-auto::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 4px; }
+        .overflow-x-auto::-webkit-scrollbar-track { background-color: #1f2937; }
+        .referrer-sort-header { user-select: none; }
+        /* Adjusted sort icon logic for consistency */
+        .sort-icon { display: none; }
+        .sort-header.active .sort-icon { display: inline-block; }
     </style>
 </head>
-<body class="min-h-screen p-6 pt-24 bg-[#11111f]">
+<body class="min-h-screen">
 
-    <!-- Admin Dashboard Section -->
-    <div class="container mx-auto">
-        <a href="/index.html" class="text-lg text-zinc-400 hover:text-[var(--accent-color)] transition-default mb-4 flex items-center">
-             <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back to Main Site
-        </a>
-        <h2 class="text-4xl lg:text-5xl font-extrabold text-white mb-4">Quote Requests Dashboard</h2>
-        <p class="text-zinc-400 mb-8">Viewing all requests submitted to App ID: <span class="font-mono text-sm text-zinc-500" id="admin-app-id"></span></p>
-        
-        <div id="quotes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Quotes will be dynamically inserted here -->
-            <div id="loading-quotes" class="col-span-full text-center py-12 text-zinc-500">
-                <i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto mb-2"></i>
-                Loading quote requests...
-            </div>
-        </div>
+    <!-- Global Loading Overlay -->
+    <div id="globalLoadingOverlay" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4 hidden">
+        <div class="animate-spin w-10 h-10 border-4 border-t-4 border-yellow-400 border-opacity-20 rounded-full"></div>
+        <p id="globalSpinnerText" class="text-white font-semibold">Checking authorization...</p>
+    </div>
 
-        <div id="no-quotes" class="hidden col-span-full text-center py-12 text-zinc-500 bg-[#2a2a44] rounded-xl shadow-lg mt-8">
-            <i data-lucide="check-square" class="w-8 h-8 mx-auto mb-2"></i>
-            No requests have been submitted yet.
+    <!-- Custom Popup Modal (Alert/Success) -->
+    <div id="customPopupOverlay" class="fixed inset-0 z-[101] modal-overlay flex items-center justify-center p-4 hidden">
+        <div id="customPopup" class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-xs sm:max-w-sm w-full text-center scale-95 transition-all duration-300">
+            <h2 id="popupTitle" class="text-xl sm:text-2xl font-bold text-yellow-400 mb-3"></h2>
+            <p id="popupMessage" class="text-gray-300 mb-5 text-sm sm:text-base"></p>
+            <button id="popupCloseButton" class="w-full py-2 rounded-lg bg-yellow-500 text-black font-semibold hover:bg-yellow-600 transition-colors">OK</button>
         </div>
     </div>
     
-    <!-- Footer for Admin Panel -->
-    <footer class="py-8 mt-12 text-center text-zinc-500 text-sm bg-black">
-        &copy; 2025 Setton Source Admin Panel. Real-time data feed.
-    </footer>
+    <!-- NEW: Export Confirmation Modal -->
+    <div id="exportConfirmationModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full">
+            <h2 class="text-xl sm:text-2xl font-bold text-blue-400 mb-4">Export <span id="exportTabName"></span> Data</h2>
+            <p class="text-gray-300 mb-6 text-sm sm:text-base">
+                How would you like to export the data from the current table?
+            </p>
+            <div class="space-y-3">
+                <button type="button" id="exportAllRowsButton" class="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors">
+                    Export ALL Rows (Ignore Filters)
+                </button>
+                <button type="button" id="exportFilteredRowsButton" class="w-full py-3 rounded-lg bg-yellow-600 text-black font-semibold hover:bg-yellow-700 transition-colors">
+                    Export CURRENTLY FILTERED Rows
+                </button>
+            </div>
+            <div class="pt-6 flex justify-end">
+                <button type="button" id="closeExportConfirmationModal" class="px-4 py-2 text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Firebase SDK Imports -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, setLogLevel, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // Initialize Lucide icons
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-        
-        // Global variables provided by the Canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-setton-source';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        // Use provided config with fallback for safety (consistent with index.html)
-        const userProvidedConfig = {
-            apiKey: "AIzaSyCcUMZmKwdOcUj4KszvTkPKlo-HmiVCXZU",
-            authDomain: "setton-source-68177.firebaseapp.com",
-            projectId: "setton-source-68177",
-            storageBucket: "setton-source-68177.firebasestorage.app",
-            messagingSenderId: "153708206059",
-            appId: "1:153708206059:web:14cc935233eee4ecdb72bae",
-            measurementId: "G-YW9WN4489T"
-        };
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : userProvidedConfig; 
-
-
-        // Initialize Firebase
-        let app, auth, db, userId;
-
-        try {
-            if (Object.keys(firebaseConfig).length === 0) {
-                 console.error("Firebase configuration is missing or empty. Cannot initialize.");
-            } else {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-            }
-            
-            const authAttempt = async () => {
-                if (!auth) {
-                    loadAdminDashboard(); 
-                    return;
-                }
-                
-                try {
-                    let userCredential;
-                    if (initialAuthToken) {
-                        userCredential = await signInWithCustomToken(auth, initialAuthToken);
-                        userId = userCredential.user.uid;
-                        console.log("Firebase signed in successfully with Custom Token. User ID:", userId);
-                    } else {
-                        userCredential = await signInAnonymously(auth);
-                        userId = userCredential.user.uid;
-                        console.log("Firebase signed in successfully as Anonymous User. User ID:", userId);
-                    }
-                } catch (error) {
-                    console.error("Authentication failed, attempting anonymous sign-in:", error);
-                    try {
-                        const userCredential = await signInAnonymously(auth);
-                        userId = userCredential.user.uid;
-                        console.log("Recovered by forcing Anonymous sign-in. User ID:", userId);
-                    } catch (anonError) {
-                        console.error("Critical: Anonymous sign-in also failed.", anonError);
-                    }
-                } finally {
-                    loadAdminDashboard();
-                }
-            };
-            authAttempt();
-
-        } catch (e) {
-            console.error("Firebase initialization error:", e);
-        }
-
-        // ------------------
-        // Admin Dashboard Functions
-        // ------------------
-
-        const quotesList = document.getElementById('quotes-list');
-        const loadingQuotes = document.getElementById('loading-quotes');
-        const noQuotes = document.getElementById('no-quotes');
-        const adminAppId = document.getElementById('admin-app-id');
-
-        // Creates a mailto link to simulate contacting the user (as Nodemailer is server-side)
-        function createMailtoLink(quote) {
-            const subject = encodeURIComponent(`Project Quote Follow-up: ${quote.projectName || 'New Project'}`);
-            
-            const features = [];
-            if (quote['feature-ecommerce'] === 'on') features.push('E-commerce/Payments');
-            if (quote['feature-admin'] === 'on') features.push('Custom Admin/CMS');
-            if (quote['feature-support'] === 'on') features.push('Live Chat/Support');
-            
-            const body = encodeURIComponent(
-                `Hi ${quote.name},\n\n` +
-                `Thank you for using the Setton Source instant quote calculator. I've reviewed your submission.\n\n` +
-                `Project Summary:\n` +
-                `Estimated Cost: ${quote.formattedEstimate}\n` +
-                `Pages: ${quote.pages}\n` +
-                `Backend: ${quote.backend === 'yes' ? 'Required' : 'No'}\n` +
-                `Features: ${features.join(', ') || 'Standard Site'}\n` +
-                `Logo Status: ${quote.logoStatus === 'no' ? 'Needs Design' : 'Ready'}\n\n` +
-                `I recommend we schedule a brief call to finalize the scope. When are you available?\n\n` +
-                `Best regards,\nSetton Source Team`
-            );
-
-            return `mailto:${quote.email}?subject=${subject}&body=${body}`;
-        }
-
-        // Renders a single quote document into an HTML card
-        function renderQuote(docId, quote) {
-            const date = new Date(quote.timestamp).toLocaleString();
-            
-            // Format the cost since it's stored as a raw number in the database
-            const formatter = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-            });
-            quote.formattedEstimate = formatter.format(quote.finalEstimate);
-            
-            const element = document.createElement('div');
-            element.classList.add('bg-[#2a2a44]', 'p-6', 'rounded-xl', 'shadow-xl', 'border', 'border-zinc-700', 'hover:shadow-[0_0_15px_rgba(0,210,255,0.2)]', 'transition-default', 'flex', 'flex-col', 'justify-between');
-            
-            const features = [];
-            if (quote['feature-ecommerce'] === 'on') features.push('E-commerce');
-            if (quote['feature-admin'] === 'on') features.push('CMS');
-            if (quote['feature-support'] === 'on') features.push('Live Chat');
-
-            const needsBackend = quote.backend === 'yes';
-            const needsLogo = quote.logoStatus === 'no';
-
-            element.innerHTML = `
+    <!-- Batch Password Reset Modal (Super Admin Only) -->
+    <div id="batchResetModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-xs sm:max-w-md w-full">
+            <h2 class="text-xl sm:text-2xl font-bold text-red-400 mb-4">Batch Password Reset </h2>
+            <p class="text-gray-300 mb-4 text-sm sm:text-base">
+                You are about to reset the password for <span id="selectedUserCount" class="font-bold text-red-400">0</span> user(s).
+            </p>
+            <form id="batchResetForm" class="space-y-4">
                 <div>
-                    <div class="flex justify-between items-start border-b border-zinc-600 pb-3 mb-3">
-                        <h4 class="text-xl font-bold text-white">${quote.projectName || 'Unspecified Project'}</h4>
-                        <span class="text-2xl font-extrabold text-[var(--accent-color)]">${quote.formattedEstimate}</span>
-                    </div>
-                    
-                    <p class="text-sm text-zinc-400 mb-4">Submitted: ${date}</p>
-                    
-                    <!-- Client Details -->
-                    <div class="space-y-2 mb-4 text-sm bg-[#1a1a2e] p-3 rounded-lg">
-                        <p class="font-bold text-zinc-300 border-b border-zinc-700 pb-1 mb-1">Client Info:</p>
-                        <p><strong>Name:</strong> ${quote.name}</p>
-                        <p><strong>Email:</strong> <a href="mailto:${quote.email}" class="text-cyan-400 hover:underline">${quote.email}</a></p>
-                        <p><strong>Phone:</strong> ${quote.phone}</p>
-                        <p><strong>URL:</strong> ${quote.projectUrl && quote.projectUrl !== 'N/A' ? `<a href="${quote.projectUrl}" target="_blank" class="text-cyan-400 hover:underline">${quote.projectUrl}</a>` : 'N/A'}</p>
-                    </div>
+                    <label for="batch-new-password" class="block text-sm font-medium text-gray-300">Temporary New Password (min 6 chars)</label>
+                    <input type="password" id="batch-new-password" placeholder="Enter new password" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-red-500 focus:border-red-500 bg-gray-700 text-white" required minlength="6">
+                </div>
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" id="closeBatchResetModal" class="px-4 py-2 text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Cancel</button>
+                    <button type="submit" id="submitBatchReset" class="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50">
+                        Confirm Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                    <!-- Project Requirements -->
-                    <div class="space-y-2 text-sm">
-                        <p class="font-bold text-zinc-300 border-b border-zinc-700 pb-1 mb-1">Requirements:</p>
-                        <p><strong>Pages:</strong> ${quote.pages}</p>
-                        <p class="flex items-center">
-                            <strong>Backend:</strong> 
-                            <span class="ml-2 ${needsBackend ? 'text-red-400 font-semibold' : 'text-zinc-500'}">
-                                ${needsBackend ? 'REQUIRED' : 'No'}
-                            </span>
-                        </p>
-                        <p><strong>Key Features:</strong> ${features.join(', ') || 'Standard Brochure Site'}</p>
-                        <p class="flex items-center">
-                            <strong>Logo Status:</strong> 
-                            ${needsLogo ? 
-                                `<span class="ml-2 required-tag bg-required">Needs Design (+ $100)</span>` : 
-                                `<span class="ml-2 text-green-400">Ready</span>`
-                            }
-                        </p>
+    <!-- Manual Sale Modal (Super Admin Only) -->
+    <div id="manualSaleModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-xs sm:max-w-md w-full">
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">Add Manual Raffle Sale (SA Only)</h2>
+            <form id="manualSaleForm" class="space-y-4">
+                <div>
+                    <input type="text" id="manual-name" placeholder="Customer Full Name" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                </div>
+                <div>
+                    <input type="email" id="manual-email" placeholder="Customer Email (Optional)" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                </div>
+                <div>
+                    <input type="tel" id="manual-phone" placeholder="Customer Phone (Optional)" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                </div>
+                <div class="flex space-x-2 sm:space-x-4">
+                    <input type="number" id="manual-tickets" placeholder="Tickets Bought" min="1" class="w-1/2 p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                    <input type="number" id="manual-amount" placeholder="Amount Paid ($)" step="0.01" min="0.01" class="w-1/2 p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                </div>
+                <div id="manual-referrer-container">
+                    <input type="text" id="manual-refId" placeholder="Referrer ID (e.g., A1B2C3)" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                    <p class="text-xs text-gray-400 mt-1">Credited to this Ref ID.</p>
+                </div>
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" id="closeManualSaleModal" class="px-4 py-2 text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Cancel</button>
+                    <button type="submit" id="submitManualSale" class="px-4 py-2 text-black bg-yellow-500 rounded-lg hover:bg-yellow-600 transition-colors font-semibold">Add Sale</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- NEW: Manual Donation Modal (Super Admin Only) -->
+    <div id="manualDonationModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-xs sm:max-w-md w-full">
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">Add Manual General Donation (SA Only)</h2>
+            <form id="manualDonationForm" class="space-y-4">
+                <div>
+                    <input type="text" id="donation-name" placeholder="Donor Full Name" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                </div>
+                <div>
+                    <input type="email" id="donation-email" placeholder="Donor Email (Optional)" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                </div>
+                <div>
+                    <input type="tel" id="donation-phone" placeholder="Donor Phone (Optional)" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                </div>
+                <div>
+                    <input type="number" id="donation-amount" placeholder="Donation Amount ($)" step="0.01" min="0.01" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                </div>
+                <div>
+                    <input type="text" id="donation-refId" placeholder="Referrer ID to Credit (e.g., A1B2C3)" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                    <p class="text-xs text-gray-400 mt-1">Credited to this Ref ID.</p>
+                </div>
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" id="closeManualDonationModal" class="px-4 py-2 text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Cancel</button>
+                    <button type="submit" id="submitManualDonation" class="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors font-semibold">Add Donation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Edit Raffle Sale Modal (Super Admin Only) -->
+    <div id="editSaleModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-xs sm:max-w-md w-full">
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">Edit Raffle Sale Entry </h2>
+            <form id="editSaleForm" class="space-y-4">
+                <input type="hidden" id="edit-sale-id">
+                <div>
+                    <label for="edit-name" class="block text-sm font-medium text-gray-300">Customer Full Name</label>
+                    <input type="text" id="edit-name" placeholder="Full Name" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                </div>
+                <div>
+                    <label for="edit-email" class="block text-sm font-medium text-gray-300">Email</label>
+                    <input type="email" id="edit-email" placeholder="Email (Optional)" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                </div>
+                <div>
+                    <label for="edit-phone" class="block text-sm font-medium text-gray-300">Phone</label>
+                    <input type="tel" id="edit-phone" placeholder="Phone (Optional)" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                </div>
+                <div class="flex space-x-2 sm:space-x-4">
+                    <div class="w-1/2">
+                        <label for="edit-tickets" class="block text-sm font-medium text-gray-300">Tickets Bought</label>
+                        <input type="number" id="edit-tickets" placeholder="Tickets Bought" min="1" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                    </div>
+                    <div class="w-1/2">
+                        <label for="edit-amount" class="block text-sm font-medium text-gray-300">Amount Paid ($)</label>
+                        <input type="number" id="edit-amount" placeholder="Amount Paid ($)" step="0.01" min="0.01" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                    </div>
+                </div>
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" id="closeEditSaleModal" class="px-4 py-2 text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Cancel</button>
+                    <button type="submit" id="submitEditSale" class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- NEW: Ticket Conversion Tool Modal (Super Admin Only) - ADDED SURPLUS OPTION -->
+    <div id="conversionToolModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-lg w-full">
+            <h2 class="text-xl sm:text-2xl font-bold text-yellow-400 mb-4">Old Ticket Conversion Tool</h2>
+            <form id="conversionForm" class="space-y-4">
+                <div class="border-b border-gray-700 pb-4">
+                    <label for="conversion-search-email" class="block text-sm font-medium text-gray-300 mb-1">1. Find Old Rolex Ticket Purchase (by Email):</label>
+                    <div class="flex space-x-2">
+                        <input type="email" id="conversion-search-email" placeholder="Customer Email" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                        <button type="button" id="searchOldTicketButton" class="px-4 py-2 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-600 transition-colors">Search</button>
                     </div>
                 </div>
 
-                <a href="${createMailtoLink(quote)}" 
-                   class="w-full inline-flex justify-center items-center py-2 px-4 bg-green-500 text-black font-bold rounded-lg transition-default hover:bg-green-400 mt-6 shadow-md"
-                   target="_blank" rel="noopener noreferrer">
-                    <i data-lucide="mail" class="w-4 h-4 mr-2"></i> Contact User Now
-                </a>
-            `;
-            
-            // Re-render Lucide icons for the newly created element
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+                <div id="conversion-details-container" class="space-y-4 hidden pt-4">
+                    <h3 class="text-lg font-semibold text-white">Customer and Old Sale Details:</h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-400">Name:</p>
+                            <p id="conversion-name" class="font-bold text-white"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-400">Old Amount Paid:</p>
+                            <p id="conversion-old-amount" class="font-bold text-green-400"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-400">Email:</p>
+                            <p id="conversion-email" class="text-gray-300"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-400">Referrer ID:</p>
+                            <p id="conversion-refId" class="text-gray-300"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-700 pt-4 space-y-4">
+                        <label for="conversion-new-tickets" class="block text-sm font-medium text-gray-300 mb-1">2. New Rolex Raffle Tickets ($150 each):</label>
+                        <input type="number" id="conversion-new-tickets" placeholder="How many new tickets?" min="1" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">New Required Cost:</p>
+                                <p id="conversion-required-amount" class="font-bold text-white text-xl">$0.00</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-400"><span id="balance-label">Outstanding Balance Due:</span></p>
+                                <p id="conversion-outstanding-balance" class="font-bold text-red-500 text-xl">$0.00</p>
+                            </div>
+                        </div>
 
-            return element;
+                        <!-- NEW: Surplus Action Options -->
+                        <div id="surplus-action-container" class="space-y-2 pt-4 hidden">
+                            <p class="text-sm font-medium text-gray-300">3. Select Action for Surplus Credit:</p>
+                            <div class="flex flex-col space-y-2">
+                                <label class="inline-flex items-center text-gray-200">
+                                    <input type="radio" name="surplus_action" value="donate" class="form-radio text-green-500 h-4 w-4" checked>
+                                    <span class="ml-2">Convert the surplus credit into a **General Donation**</span>
+                                </label>
+                                <label class="inline-flex items-center text-gray-200">
+                                    <input type="radio" name="surplus_action" value="refund" class="form-radio text-red-500 h-4 w-4">
+                                    <span class="ml-2">Log the surplus amount as a **Refund Due** to customer</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="conversion-entry-id">
+                        <input type="hidden" id="conversion-original-amount-value">
+
+                        <div class="pt-4">
+                            <button type="submit" id="convertTicketsButton" class="w-full py-3 text-black bg-yellow-500 rounded-lg font-semibold hover:bg-yellow-600 transition-colors disabled:opacity-50" disabled>Convert & Finalize Tickets</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end">
+                    <button type="button" id="closeConversionToolModal" class="px-4 py-2 text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Apply Raffle Tickets Modal (Split the Pot) - Super Admin Only -->
+    <div id="applyTicketsModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-2 sm:p-4 hidden">
+        <div class="bg-gray-800 p-4 sm:p-8 rounded-lg shadow-2xl w-full max-w-lg md:max-w-4xl max-h-[95vh] overflow-y-auto">
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Assign/Transfer Split The Pot Tickets to: <span id="targetReferrerName" class="text-blue-400"></span></h2>
+            <p class="text-xs sm:text-sm text-gray-400 mb-4">Select sales below to assign (if unassigned) or transfer (if already assigned) them to this referrer's ID (<span id="targetReferrerId"></span>).</p>
+
+            <!-- Search and Action Bar -->
+            <div class="flex flex-col md:flex-row gap-3 md:items-center mb-4">
+                <input type="text" id="unassignedSearchInput" placeholder="Search customer, phone, email, or current referrer ID..." class="w-full md:w-1/2 p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                <div class="flex-grow"></div>
+                <span id="selectedCountDisplay" class="text-sm font-medium text-gray-400">0 sales selected</span>
+                <button id="applyReferrerButton" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:opacity-50" disabled>
+                    Apply Referrer to Selected
+                </button>
+            </div>
+
+            <!-- Unassigned Sales Table -->
+            <div class="overflow-x-auto dashboard-card max-h-[50vh]">
+                <table class="data-table w-full whitespace-nowrap">
+                    <thead>
+                        <tr>
+                            <th class="w-12 text-center">
+                                <input type="checkbox" id="selectAllUnassigned" class="rounded text-blue-400 focus:ring-blue-400 bg-gray-700 border-gray-600">
+                            </th>
+                            <th>Date</th>
+                            <th>Full Name</th>
+                            <th>Phone/Email</th> <!-- Updated Header -->
+                            <th>Tickets</th>
+                            <th class="text-right">Amount Paid</th>
+                            <th>Current Referrer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unassignedSalesTableBody">
+                        <tr><td colspan="7" class="text-center py-4 text-gray-400">Loading sales data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pt-6 flex justify-end">
+                <button type="button" id="closeApplyTicketsModal" class="px-4 py-2 text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Apply Rolex Tickets Modal (Rolex Raffle) - Super Admin Only -->
+    <div id="applyRolexTicketsModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-2 sm:p-4 hidden">
+        <div class="bg-gray-800 p-4 sm:p-8 rounded-lg shadow-2xl w-full max-w-lg md:max-w-4xl max-h-[95vh] overflow-y-auto">
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Assign/Transfer Rolex Raffle Tickets to: <span id="targetRolexReferrerName" class="text-purple-400"></span></h2>
+            <p class="text-xs sm:text-sm text-gray-400 mb-4">Select tickets below to assign or transfer them to this referrer's ID (<span id="targetRolexReferrerId"></span>). Tickets must be Paid or Converted.</p>
+
+            <!-- Search and Action Bar -->
+            <div class="flex flex-col md:flex-row gap-3 md:items-center mb-4">
+                <input type="text" id="rolexSearchInput" placeholder="Search customer, email, or current referrer ID..." class="w-full md:w-1/2 p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                <div class="flex-grow"></div>
+                <span id="selectedRolexCountDisplay" class="text-sm font-medium text-gray-400">0 tickets selected</span>
+                <button id="applyRolexReferrerButton" class="px-4 py-2 bg-purple-500 text-white font-semibold rounded-lg shadow-md hover:bg-purple-600 transition-colors disabled:opacity-50" disabled>
+                    Apply Referrer to Selected
+                </button>
+            </div>
+
+            <!-- Rolex Sales Table -->
+            <div class="overflow-x-auto dashboard-card max-h-[50vh]">
+                <table class="data-table w-full whitespace-nowrap">
+                    <thead>
+                        <tr>
+                            <th class="w-12 text-center">
+                                <input type="checkbox" id="selectAllRolex" class="rounded text-purple-400 focus:ring-purple-400 bg-gray-700 border-gray-600">
+                            </th>
+                            <th>Ticket #</th>
+                            <th>Date</th>
+                            <th>Full Name</th>
+                            <th>Phone/Email</th> <!-- Updated Header -->
+                            <th>Status</th>
+                            <th class="sort-header text-right" data-table="rolex" data-sort-key="amountPaid">Amount Paid <span class="sort-icon ml-1"></span></th>
+                            <th class="sort-header" data-table="rolex" data-sort-key="referrerRefId">Referrer <span class="sort-icon ml-1"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolexAssignmentTableBody">
+                        <tr><td colspan="7" class="text-center py-4 text-gray-400">Loading Rolex Raffle data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pt-6 flex justify-end">
+                <button type="button" id="closeApplyRolexTicketsModal" class="px-4 py-2 text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upgrade Admin Confirmation Modal (Super Admin Only) -->
+    <div id="upgradeAdminModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-xs sm:max-w-sm w-full">
+            <h2 class="text-xl sm:text-2xl font-bold text-red-400 mb-4">Confirm Role Change</h2>
+            <p class="text-gray-300 mb-6 text-sm sm:text-base">
+                Are you sure you want to promote <span id="upgrade-referrer-name" class="font-bold text-white"></span>
+                (<span id="upgrade-referrer-refid" class="font-mono text-xs bg-gray-700 p-1 rounded"></span>)
+                to a **Super Admin**?
+            </p>
+            <p class="text-sm text-red-400 mb-4">This action grants full system access and requires them to re-login.</p>
+            <input type="hidden" id="upgrade-referrer-uid">
+            
+            <div class="pt-4 flex justify-end space-x-3">
+                <button type="button" id="closeUpgradeAdminModal" class="px-4 py-2 text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Cancel</button>
+                <button type="button" id="confirmUpgradeAdmin" class="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors">Confirm Promote</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main Dashboard Container -->
+    <div id="dashboardContainer" class="hidden max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-700 pb-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 md:mb-0">
+                Admin Dashboard 
+                <span id="userRoleDisplay" class="text-base font-normal text-yellow-400"></span>
+            </h1>
+            <!-- Added flex-wrap and adjusted spacing for smaller screens -->
+            <div class="flex flex-wrap items-center gap-2 mt-2 md:mt-0">
+                <!-- EXPORT BUTTON (Triggers new modal) -->
+                <button id="exportDataButton" class="flex items-center px-3 py-2 text-sm bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors hidden" title="Export current table view to CSV">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span class="hidden sm:inline">Export CSV</span>
+                    <span class="inline sm:hidden">Export</span>
+                </button>
+                <!-- REFRESH BUTTON -->
+                <button id="refreshDataButton" class="flex items-center px-3 py-2 text-sm bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.76 2.82"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.76-2.82"></path><path d="M3 3v4h4M21 21v-4h-4"></path></svg>
+                    <span class="hidden sm:inline">Refresh Data</span>
+                    <span class="inline sm:hidden">Refresh</span>
+                </button>
+                <!-- ADD MANUAL DONATION BUTTON (NEW) -->
+                <button id="addManualDonationButton" class="flex items-center px-3 py-2 text-sm bg-green-700 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition-colors hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M4 12a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H4zM10 12a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2zM16 12a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2zM4 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V8a2 2 0 00-2-2H4zM10 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V8a2 2 0 00-2-2h-2zM16 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V8a2 2 0 00-2-2h-2z" /></svg>
+                    <span class="hidden sm:inline">Add Manual Donation</span>
+                    <span class="inline sm:hidden">Add Donation</span>
+                </button>
+                <!-- ADD MANUAL SALE BUTTON -->
+                <button id="addManualSaleButton" class="flex items-center px-3 py-2 text-sm bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition-colors hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                    <span class="hidden sm:inline">Add Manual Sale</span>
+                    <span class="inline sm:hidden">Add Sale</span>
+                </button>
+                <button id="logoutButton" class="px-3 py-2 text-sm text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors">Logout</button>
+            </div>
+        </header>
+
+        <!-- Referrer Overview (For Referrers and Super Admins) -->
+        <div id="referrerOverview" class="dashboard-card p-4 sm:p-6 mb-6 hidden">
+            <!-- New Referral Link Section -->
+            <div id="referrerLinkContainer" class="mb-4">
+                <p class="text-sm font-medium text-gray-400 mb-1">Your Referral Link:</p>
+                <div class="flex items-center bg-gray-700 p-2 rounded-lg border border-gray-600">
+                    <span id="referralLink" class="text-xs sm:text-base font-mono text-blue-400 truncate mr-3 select-all"></span>
+                    <button id="copyLinkButton" class="ml-auto p-1 text-gray-400 hover:text-blue-500 transition-colors" title="Copy Link">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M7.75 3.75a.75.75 0 0 1 1.5 0v3.5h3.5a.75.75 0 0 1 0 1.5h-3.5v3.5a.75.75 0 0 1-1.5 0v-3.5h-3.5a.75.75 0 0 1 0-1.5h3.5v-3.5Z" clip-rule="evenodd" /></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">Your Performance</h2>
+            <!-- Adjusted grid to collapse better on mobile -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- NEW: Total Clicks Card -->
+                <div class="p-4 bg-purple-900/50 border-l-4 border-purple-500 rounded-lg">
+                    <p class="text-sm font-medium text-gray-400">Total Clicks</p>
+                    <p id="overviewTotalClicks" class="text-xl font-bold text-white mt-1">0</p>
+                </div>
+                
+                <div class="p-4 bg-yellow-900/50 border-l-4 border-yellow-500 rounded-lg">
+                    <p class="text-sm font-medium text-gray-400">Ref ID</p>
+                    <p id="overviewRefId" class="text-xl font-bold text-white mt-1">Loading...</p>
+                </div>
+                <div class="p-4 bg-blue-900/50 border-l-4 border-blue-500 rounded-lg">
+                    <p class="text-sm font-medium text-gray-400">Total Tickets (Split + Spin)</p>
+                    <p id="overviewTotalTickets" class="text-xl font-bold text-white mt-1">0</p>
+                </div>
+                <div class="p-4 bg-green-900/50 border-l-4 border-green-500 rounded-lg">
+                    <p class="text-sm font-medium text-gray-400">Total Sales Amount</p>
+                    <p id="overviewTotalAmount" class="text-xl font-bold text-white mt-1">$0.00</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation - Added overflow-x-auto to handle many tabs on mobile -->
+        <nav class="flex space-x-2 sm:space-x-4 mb-6 border-b border-gray-700 overflow-x-auto whitespace-nowrap">
+            <button data-tab="referrers" class="tab-button py-3 px-2 sm:px-4 text-sm sm:text-base text-gray-400 hover:text-white transition-colors hidden">Referrers</button>
+            <button data-tab="raffle" class="tab-button py-3 px-2 sm:px-4 text-sm sm:text-base text-gray-400 hover:text-white transition-colors">Split The Pot Sales</button>
+            <button data-tab="rolex" class="tab-button py-3 px-2 sm:px-4 text-sm sm:text-base text-gray-400 hover:text-white transition-colors hidden">Rolex Raffle Sales</button>
+            <button data-tab="donations" class="tab-button py-3 px-2 sm:px-4 text-sm sm:text-base text-gray-400 hover:text-white transition-colors hidden">Donations</button>
+            <button data-tab="users" class="tab-button py-3 px-2 sm:px-4 text-sm sm:text-base text-gray-400 hover:text-white transition-colors hidden">User Management</button>
+            <button data-tab="tools" class="tab-button py-3 px-2 sm:px-4 text-sm sm:text-base text-gray-400 hover:text-white transition-colors hidden">Admin Tools</button>
+        </nav>
+
+        <!-- Tab Content Containers -->
+        <div id="tab-content" class="space-y-6">
+        
+            <!-- NEW: User Management Tab (Super Admin Only) -->
+            <div id="tab-users" class="tab-pane hidden">
+                <div class="dashboard-card p-4">
+                    <h3 class="text-xl font-semibold mb-3 text-white">All Firebase Users</h3>
+                    
+                    <!-- Controls -->
+                    <div class="flex flex-col sm:flex-row gap-3 mb-4 items-center">
+                        <input type="text" id="userSearchInput" placeholder="Search by Name, Email, or UID..." class="w-full sm:w-1/3 p-2 pl-3 border border-gray-600 rounded-lg focus:ring-red-500 focus:border-red-500 bg-gray-700 text-white text-sm">
+                        <div class="flex-grow"></div>
+                        <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
+                            <span id="usersSelectedCount" class="text-sm font-medium text-gray-400">0 selected</span>
+                            <button id="openBatchResetModalButton" class="px-3 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors disabled:opacity-50" disabled>
+                                Batch Reset Passwords
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="data-table w-full whitespace-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="w-12 text-center">
+                                        <input type="checkbox" id="selectAllUsers" class="rounded text-red-500 focus:ring-red-500 bg-gray-700 border-gray-600">
+                                    </th>
+                                    <th class="user-sort-header cursor-pointer" data-sort-key="displayName" data-table="users">Name<span class="sort-icon ml-1"></span></th>
+                                    <th class="user-sort-header cursor-pointer" data-sort-key="email" data-table="users">Email<span class="sort-icon ml-1"></span></th>
+                                    <th>UID</th>
+                                    <th class="user-sort-header cursor-pointer" data-sort-key="createdAt" data-table="users">Created<span class="sort-icon ml-1"></span></th>
+                                    <th>Roles</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr><td colspan="7" class="text-center py-4 text-gray-400">Loading user list...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Referrers Tab Content (Super Admin Only) -->
+            <div id="tab-referrers" class="tab-pane hidden">
+                <div class="dashboard-card p-4">
+                    <h3 class="text-xl font-semibold mb-3 text-white">All Referrers (SA Only)</h3>
+                    
+                    <!-- Search and Sort Controls -->
+                    <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                        <!-- Search Input -->
+                        <div class="relative flex-grow">
+                            <input type="text" id="referrerSearchInput" placeholder="Search by Name, ID, or Email..." class="w-full p-2 pl-10 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.197 5.197a7.5 7.5 0 0010.607 10.607z" /></svg>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="data-table w-full whitespace-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="referrer-sort-header cursor-pointer group hover:bg-gray-700" data-sort-key="name">
+                                        <div class="flex items-center justify-between">Name
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 ml-1 hidden text-yellow-500"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                        </div>
+                                    </th>
+                                    <th class="referrer-sort-header cursor-pointer group hover:bg-gray-700" data-sort-key="refId">
+                                        <div class="flex items-center justify-between">Ref ID
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 ml-1 hidden text-yellow-500"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                        </div>
+                                    </th>
+                                    <th>Email</th>
+                                    <th class="referrer-sort-header cursor-pointer group hover:bg-gray-700 text-right" data-sort-key="raffleTickets">
+                                        <div class="flex items-center justify-end">Split Pot Tickets
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 ml-1 hidden text-yellow-500"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                        </div>
+                                    </th>
+                                    <th class="referrer-sort-header cursor-pointer group hover:bg-gray-700 text-right" data-sort-key="rolexTickets">
+                                        <div class="flex items-center justify-end">Spin Wheel Tickets
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 ml-1 hidden text-yellow-500"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                        </div>
+                                    </th>
+                                    <th class="referrer-sort-header cursor-pointer group hover:bg-gray-700 text-right" data-sort-key="combinedTotalAmount">
+                                        <div class="flex items-center justify-end">Total Amount
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 ml-1 hidden text-yellow-500"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                        </div>
+                                    </th>
+                                    <th>Goal</th>
+                                    <th class="referrer-sort-header cursor-pointer group hover:bg-gray-700 text-right" data-sort-key="clickCount">
+                                        <div class="flex items-center justify-end">Clicks
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 ml-1 hidden text-yellow-500"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                        </div>
+                                    </th>
+                                    <th class="text-center">Action</th> <!-- NEW ACTION COLUMN -->
+                                </tr>
+                            </thead>
+                            <tbody id="referrersTableBody">
+                                <tr><td colspan="9" class="text-center py-4 text-gray-400">Loading referrer data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Split The Pot Sales Tab Content -->
+            <div id="tab-raffle" class="tab-pane hidden">
+                <div class="dashboard-card p-4 overflow-x-auto">
+                    <!-- Filter and Header Controls -->
+                    <div class="flex flex-wrap justify-between items-center mb-3 gap-3">
+                        <h3 class="text-xl font-semibold text-white" id="raffleSalesHeader">Split The Pot Sales</h3>
+                        <!-- FILTER DROPDOWN (Hidden for non-SA Referrers) -->
+                        <div id="raffleFilterControls" class="flex items-center space-x-2">
+                            <label for="raffleFilter" class="text-sm font-medium text-gray-400">Filter:</label>
+                            <select id="raffleFilter" class="p-2 border border-gray-600 rounded-lg text-sm focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white">
+                                <option value="all">All Sales</option>
+                                <option value="assigned">Assigned</option>
+                                <option value="unassigned">Unassigned</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="data-table w-full whitespace-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="sort-header" data-table="raffle" data-sort-key="timestamp">Date <span class="sort-icon ml-1"></span></th>
+                                    <th class="sort-header" data-table="raffle" data-sort-key="fullName">Full Name <span class="sort-icon ml-1"></span></th>
+                                    <th>Phone/Email</th> <!-- Updated Header -->
+                                    <th class="sort-header" data-table="raffle" data-sort-key="ticketCount">Tickets <span class="sort-icon ml-1"></span></th>
+                                    <th class="sort-header text-right" data-table="raffle" data-sort-key="amountPaid">Amount Paid <span class="sort-icon ml-1"></span></th>
+                                    <th class="sort-header" data-table="raffle" data-sort-key="referrerRefId">Referrer <span class="sort-icon ml-1"></span></th>
+                                    <th>Source</th>
+                                    <th id="raffleSalesActionHeader" class="hidden">Action</th> <!-- Added for Edit button -->
+                                </tr>
+                            </thead>
+                            <tbody id="raffleTableBody">
+                                <tr><td colspan="7" class="text-center py-4 text-gray-400">Loading raffle sales data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rolex Raffle Sales Tab Content (Super Admin Only) -->
+            <div id="tab-rolex" class="tab-pane hidden">
+                <div class="dashboard-card p-4 overflow-x-auto">
+                    <!-- Filter and Header Controls -->
+                    <div class="flex flex-wrap justify-between items-center mb-3 gap-3">
+                        <h3 class="text-xl font-semibold text-white" id="rolexSalesHeader">Rolex Raffle Sales (SA Only)</h3>
+                        <!-- NEW FILTER DROPDOWN -->
+                        <div id="rolexFilterControls" class="flex items-center space-x-2">
+                            <label for="rolexFilter" class="text-sm font-medium text-gray-400">Filter:</label>
+                            <select id="rolexFilter" class="p-2 border border-gray-600 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500 bg-gray-700 text-white">
+                                <option value="all">All Tickets</option>
+                                <option value="assigned">Assigned</option>
+                                <option value="unassigned">Unassigned</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="data-table w-full whitespace-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="sort-header" data-table="rolex" data-sort-key="timestamp">Date <span class="sort-icon ml-1"></span></th>
+                                    <th class="sort-header" data-table="rolex" data-sort-key="id">Ticket # <span class="sort-icon ml-1"></span></th>
+                                    <th class="sort-header" data-table="rolex" data-sort-key="name">Full Name <span class="sort-icon ml-1"></span></th>
+                                    <th>Phone/Email</th> <!-- Updated Header -->
+                                    <th>Status</th>
+                                    <th class="sort-header text-right" data-table="rolex" data-sort-key="amountPaid">Amount Paid <span class="sort-icon ml-1"></span></th>
+                                    <th class="sort-header" data-table="rolex" data-sort-key="referrerRefId">Referrer <span class="sort-icon ml-1"></span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="rolexTableBody">
+                                <tr><td colspan="7" class="text-center py-4 text-gray-400">No Rolex Raffle sales found.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donations Tab Content (Super Admin Only) -->
+            <div id="tab-donations" class="tab-pane hidden">
+                <div class="dashboard-card p-4 overflow-x-auto">
+                    <h3 class="text-xl font-semibold mb-3 text-white">All Donations (SA Only)</h3>
+                    <table class="data-table w-full whitespace-nowrap">
+                        <thead>
+                            <tr>
+                                <th class="sort-header" data-table="donations" data-sort-key="createdAt">Date <span class="sort-icon ml-1"></span></th>
+                                <th>Name</th>
+                                <th>Contact</th> <!-- Updated Header -->
+                                <th>Referrer</th>
+                                <th class="text-right">Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donationsTableBody">
+                            <tr><td colspan="6" class="text-center py-4 text-gray-400">No donations found.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin Tools Tab Content (Super Admin Only) -->
+            <div id="tab-tools" class="tab-pane hidden">
+                <div class="dashboard-card p-6 space-y-4">
+                    <h3 class="text-2xl font-bold text-white">System Tools (SA Only)</h3>
+                    
+                    <!-- NEW: Conversion Tool Card -->
+                    <div class="border p-4 rounded-lg bg-yellow-900/50 border-yellow-700">
+                        <h4 class="font-semibold text-lg text-yellow-400 mb-2">Ticket Conversion Tool (Old Raffle to New Rolex)</h4>
+                        <p class="text-sm text-gray-300 mb-3">Converts old ticket purchases (based on amount paid) to the new $150 Rolex Raffle tickets, applying the old amount as credit.</p>
+                        <button id="openConversionToolButton" class="px-4 py-2 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 text-sm">
+                            Open Conversion Tool
+                        </button>
+                    </div>
+
+                    <!-- Reserved Ticket Cleanup -->
+                    <div class="border p-4 rounded-lg bg-red-900/50 border-red-700">
+                        <h4 class="font-semibold text-lg text-red-400 mb-2">Reserved Ticket Cleanup (Rolex Raffle)</h4>
+                        <div id="reservedTicketInfo" class="text-sm text-gray-300 mb-3">Loading counts...</div>
+                        <button id="deleteExpiredTicketsButton" class="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 text-sm">
+                            Manually Run Cleanup
+                        </button>
+                    </div>
+
+                    <!-- Recalculate Totals - Adjusted to grid-cols-1 on small screens -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        
+                        <!-- NEW: Recalculate ALL Referrer Totals (The requested feature) -->
+                        <div id="recalculateAllTotalsCard" class="border p-4 rounded-lg bg-red-900/50 border-red-700">
+                            <h4 class="font-semibold text-lg text-red-400 mb-2">Recalculate ALL Referrer Totals</h4>
+                            <p class="text-sm text-gray-300 mb-3">Rebuilds all ticket counts (Split/Spin) and combined sales amount for **every** referrer from all sales data.</p>
+                            <button id="recalculateAllReferrerTotalsButton" class="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 text-sm">
+                                Rebuild All Totals
+                            </button>
+                        </div>
+                        
+                        <!-- Recalculate Split The Pot Totals (Original) -->
+                        <div id="recalculateRaffleTotalsCard" class="border p-4 rounded-lg bg-indigo-900/50 border-indigo-700">
+                            <h4 class="font-semibold text-lg text-indigo-400 mb-2">Recalculate Split The Pot Totals (Global)</h4>
+                            <p class="text-sm text-gray-300 mb-3">Resets and sums all Split the Pot entries to update **Global** <code>totalTickets</code> (Split Count) and <code>totalAmount</code> (Split $).</p>
+                            <button id="recalculateTotalsButton" class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors disabled:opacity-50 text-sm">
+                                Recalculate Global Pot
+                            </button>
+                        </div>
+
+                        <!-- Recalculate Rolex Raffle Totals (NEW) -->
+                        <div id="recalculateRolexTotalsCard" class="border p-4 rounded-lg bg-purple-900/50 border-purple-700">
+                            <h4 class="font-semibold text-lg text-purple-400 mb-2">Recalculate Rolex Raffle Totals (Global)</h4>
+                            <p class="text-sm text-gray-300 mb-3">Resets and sums all Spin tickets to update **Global** <code>rolexTicketsTotal</code> (Spin Count) and the combined <code>totalAmount</code> ($).</p>
+                            <button id="recalculateRolexTotalsButton" class="px-4 py-2 bg-purple-500 text-white font-semibold rounded-lg hover:bg-purple-600 transition-colors disabled:opacity-50 text-sm">
+                                Recalculate Global Wheel
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <p id="authErrorDisplay" class="text-red-400 text-center mt-8 hidden">
+            Authentication Error: You must sign in with a valid Admin, Super Admin, or Referrer account.
+        </p>
+    </div>
+    
+    <!-- Login Modal -->
+    <div id="loginModalOverlay" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-sm">
+            <h2 class="text-3xl font-bold text-white mb-6 text-center">Admin Login</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <input type="email" id="loginEmail" placeholder="Email" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                </div>
+                <div>
+                    <input type="password" id="loginPassword" placeholder="Password" class="w-full p-3 border border-gray-600 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-gray-700 text-white" required>
+                </div>
+                <button type="submit" id="loginButton" class="w-full py-3 text-black bg-yellow-500 rounded-lg font-semibold hover:bg-yellow-600 transition-colors">Sign In</button>
+            </form>
+            <p id="loginError" class="text-red-400 text-sm mt-3 text-center hidden"></p>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // Import the modular functions you need from the SDKs using CDN paths
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signInWithEmailAndPassword, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            setLogLevel,
+            doc,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { 
+            getFunctions, 
+            httpsCallable 
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
+
+        // Global variables for Firebase services
+        let app;
+        let auth;
+        let functions;
+        let db;
+        let isSuperAdmin = false;
+        let isReferrer = false;
+        let isLoggedInAdmin = false; 
+
+        // --- GLOBAL STATE ---
+        let allAuthUsers = []; 
+        let filteredAuthUsers = [];
+        let selectedUserUids = new Set(); 
+        let allAssignmentRaffleSales = []; 
+        let filteredRaffleSales = []; 
+        let selectedRaffleSaleIds = new Set(); 
+        let targetRaffleRefId = null; 
+        let targetRaffleRefName = null; 
+        
+        let allAssignmentRolexSales = [];
+        let filteredRolexSales = [];
+        let selectedRolexSaleIds = new Set();
+        let targetRolexRefId = null;
+        let targetRolexRefName = null;
+        
+        // Unified state for filtering sales tables by specific referrer (SA only)
+        let activeRefIdFilter = null;
+        let activeRefNameFilter = null;
+
+        // State for sorting and filtering the sales tables
+        let raffleSortConfig = { key: 'timestamp', direction: 'desc' };
+        let raffleFilter = 'all'; // 'all', 'assigned', 'unassigned'
+
+        let rolexSortConfig = { key: 'timestamp', direction: 'desc' };
+        let rolexFilter = 'all'; // 'all', 'assigned', 'unassigned'
+        
+        // State for sorting the Referrers table
+        let referrerSortConfig = { key: 'combinedTotalAmount', direction: 'desc' };
+        let userSortConfig = { key: 'createdAt', direction: 'desc' }; // Default sort for users
+        let donationSortConfig = { key: 'createdAt', direction: 'desc' }; // Default sort for donations
+
+        let searchTerm = '';
+        let userSearchTerm = '';
+        let currentTab = ''; // Tracks the currently active tab
+
+        // ---------------------------------------------
+
+        // Configuration and App ID (Hardcoded for request compliance)
+        const appId = 'yde-senior-fund';
+        const initialAuthToken = null;
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT539nr_s2OxHPTAmkxwMpaWt-FiDTgQs", // Placeholder Key
+            authDomain: "yderaffle.firebaseapp.com",
+            projectId: "yderaffle",
+            storageBucket: "yderaffle.firebasestorage.app",
+            messagingSenderId: "967768309102",
+            appId: "1:967768309102:web:c89d61a747e8cb941f557f"
+        };
+        
+        // --- Utility Functions ---
+
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
+        };
+
+        /**
+         * Parses a timestamp (can be a Date, string, Firestore Timestamp object from client or server-serialized)
+         * and formats it into a human-readable string.
+         */
+        const formatDate = (timestamp) => {
+            if (!timestamp) return 'N/A';
+            
+            let date;
+            
+            if (typeof timestamp === 'object') {
+                // Check for standard Firestore Timestamp object methods
+                if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+                    date = timestamp.toDate();
+                } else {
+                    // Check for server-serialized raw seconds/nanoseconds (common from callable functions)
+                    const seconds = timestamp.seconds || timestamp._seconds;
+                    if (typeof seconds === 'number') {
+                        // Use the seconds property for reconstruction
+                        date = new Date(seconds * 1000);
+                    } else {
+                        // Fallback: try converting the object itself (if it contains an ISO string, etc.)
+                        date = new Date(timestamp);
+                    }
+                }
+            } else {
+                // Primitive value (string, number)
+                date = new Date(timestamp);
+            }
+
+            if (isNaN(date.getTime())) {
+                return 'Invalid Date';
+            }
+
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        };
+        
+        /**
+         * Safely converts a value (Firebase Timestamp, Date object, string, or number) to milliseconds.
+         */
+        const getTimestampValue = (val) => {
+            if (!val) return 0;
+            
+            let seconds = val.seconds || val._seconds;
+
+            if (val.toDate && typeof val.toDate === 'function') {
+                // Client SDK Timestamp
+                return val.toDate().getTime();
+            } else if (typeof seconds === 'number') {
+                // Server-serialized Timestamp
+                return seconds * 1000;
+            } else {
+                // Handle Date object or parsable value (string/number)
+                let date = new Date(val);
+                if (isNaN(date.getTime())) {
+                    return 0;
+                }
+                return date.getTime();
+            }
+        };
+
+        const showGlobalLoading = (message = "Loading dashboard data...") => {
+            document.getElementById('globalSpinnerText').textContent = message;
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        };
+        const hideGlobalLoading = () => {
+            document.getElementById('globalLoadingOverlay').classList.add('hidden');
+        };
+        
+        // Redefine to avoid native confirm() and alert()
+        const hideCustomPopup = () => {
+            document.getElementById('customPopup').classList.remove('scale-100');
+            setTimeout(() => { document.getElementById('customPopupOverlay').classList.add('hidden'); }, 300);
+        };
+
+        const showCustomPopup = (title, message, isConfirm = false) => {
+            document.getElementById('popupTitle').textContent = title;
+            document.getElementById('popupMessage').textContent = message;
+            const closeBtn = document.getElementById('popupCloseButton');
+            
+            closeBtn.textContent = 'OK'; 
+            closeBtn.onclick = hideCustomPopup;
+
+            document.getElementById('customPopupOverlay').classList.remove('hidden');
+            setTimeout(() => { document.getElementById('customPopup').classList.add('scale-100'); }, 10);
+        };
+        window.showCustomPopup = showCustomPopup; // Make available globally for handlers
+        
+        // Copy to clipboard function
+        const copyToClipboard = (text, message = 'Link copied!') => {
+            // navigator.clipboard.writeText is preferred, fall back to document.execCommand('copy')
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCustomPopup('Success', message);
+                }, (err) => {
+                    console.error('Could not copy text:', err);
+                    fallbackCopy(text, message);
+                });
+            } else {
+                fallbackCopy(text, message);
+            }
+        };
+        
+        const fallbackCopy = (text, message) => {
+             try {
+                 const tempInput = document.createElement('input');
+                 tempInput.value = text;
+                 document.body.appendChild(tempInput);
+                 tempInput.select();
+                 document.execCommand('copy');
+                 document.body.removeChild(tempInput);
+                 showCustomPopup('Success', message);
+             } catch (e) {
+                 console.error('Fallback copy failed:', e);
+                 showCustomPopup('Error', 'Failed to copy link. Please copy it manually.');
+             }
+        }
+        
+        const getRefIdFromUrl = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('ref');
+        };
+
+        const trackRefClick = async (refId) => {
+            try {
+                const trackRefLinkClickCallable = httpsCallable(functions, 'trackRefLinkClick');
+                await trackRefLinkClickCallable({ refId }); 
+            } catch (error) {
+                console.error(`Failed to track click for ${refId}:`, error);
+            }
+        };
+
+        
+        // --- Client-Side Sorting and Filtering Logic ---
+        
+        const sortEntries = (data, sortConfig) => {
+            // 1. Sort
+            if (sortConfig.key) {
+                data.sort((a, b) => {
+                    let aVal = a[sortConfig.key];
+                    let bVal = b[sortConfig.key];
+                    
+                    if (sortConfig.key === 'name' || sortConfig.key === 'fullName' || sortConfig.key === 'referrerRefId' || sortConfig.key === 'id' || sortConfig.key === 'email' || sortConfig.key === 'displayName' || sortConfig.key === 'refId') {
+                        // String comparison
+                        aVal = String(aVal || '').toLowerCase();
+                        bVal = String(bVal || '').toLowerCase();
+                        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+                        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+                        return 0;
+                    } else if (sortConfig.key === 'timestamp' || sortConfig.key === 'createdAt' || sortConfig.key === 'lastSignInTime') {
+                        // Date comparison (using milliseconds)
+                        const aTime = getTimestampValue(aVal);
+                        const bTime = getTimestampValue(bVal);
+                        return sortConfig.direction === 'asc' ? aTime - bTime : bTime - aTime;
+                    } 
+                    else {
+                        // Numeric comparison
+                        aVal = aVal || 0;
+                        bVal = bVal || 0;
+                        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+                        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+                        return 0;
+                    }
+                });
+            }
+            return data;
+        };
+
+        const filterReferrers = (data) => {
+            let filtered = data.filter(r => {
+                const searchLower = searchTerm.toLowerCase();
+                return r.name.toLowerCase().includes(searchLower) ||
+                        (r.refId || '').toLowerCase().includes(searchLower) ||
+                        (r.email || '').toLowerCase().includes(searchLower);
+            });
+            return sortEntries(filtered, referrerSortConfig);
+        };
+
+        const filterAuthUsers = (data) => {
+            let filtered = data.filter(u => {
+                const searchLower = userSearchTerm.toLowerCase();
+                return (u.displayName || '').toLowerCase().includes(searchLower) ||
+                        (u.email || '').toLowerCase().includes(searchLower) ||
+                        (u.uid || '').toLowerCase().includes(searchLower);
+            });
+            return sortEntries(filtered, userSortConfig);
+        };
+        
+        const filterSalesEntries = (data, filterType) => {
+            let filtered = [...data];
+            
+            if (filterType === 'assigned') {
+                filtered = filtered.filter(e => e.referrerRefId && e.referrerRefId !== null && e.referrerRefId !== "");
+            } else if (filterType === 'unassigned') {
+                filtered = filtered.filter(e => !e.referrerRefId || e.referrerRefId === null || e.referrerRefId === "");
+            }
+            return filtered;
         }
 
-        // Sets up the real-time listener for the Admin Dashboard
-        function loadAdminDashboard() {
-            if (!db) {
-                loadingQuotes.classList.add('hidden');
-                quotesList.innerHTML = '<div class="col-span-full text-center py-12 text-red-400">Database not initialized. Please ensure Firebase is configured correctly.</div>';
+
+        const calculateReferrerMetrics = (data) => {
+            const referrerMap = new Map();
+            let currentUserRefId = data.userData.refId;
+
+            data.referrers.forEach(r => {
+                // Ensure number parsing for safety, though server should send clean data
+                const raffleTickets = parseInt(r.totalTickets) || 0; 
+                const rolexTickets = parseInt(r.rolexTicketsTotal) || 0; 
+                
+                // Use the server-provided combined amount
+                let combinedTotalAmount = parseFloat(r.totalAmount) || 0; 
+
+                const totalTickets = raffleTickets + rolexTickets;
+
+                referrerMap.set(r.refId, {
+                    ...r,
+                    raffleTickets: raffleTickets,
+                    rolexTickets: rolexTickets,
+                    // Use a new field name here for the list view, so we don't confuse it with the raw field.
+                    combinedTotalAmount: combinedTotalAmount, 
+                    totalTickets: totalTickets, 
+                    clickCount: parseInt(r.clickCount) || 0
+                });
+            });
+
+            data.referrers = Array.from(referrerMap.values());
+            
+            // FIX: Ensure data.userData gets the fully calculated/parsed metrics from the map.
+            if (currentUserRefId && referrerMap.has(currentUserRefId)) {
+                // Overwrite the userData with the richer object that contains combinedTotalAmount
+                data.userData = referrerMap.get(currentUserRefId);
+            }
+            
+            return data;
+        };
+
+
+        // --- Core Data Fetching and UI Logic ---
+
+        let dashboardData = {
+            referrers: [],
+            raffleEntries: [],
+            rolexEntries: [],
+            donationEntries: [],
+            userData: {}
+        };
+
+        const renderTables = () => {
+            if (isSuperAdmin) {
+                renderAuthUsersTable(allAuthUsers); // New User Management Table
+                renderReferrersTable(dashboardData.referrers);
+                renderRolexTable(dashboardData.rolexEntries); 
+                renderDonationsTable(dashboardData.donationEntries);
+            }
+            // Render Raffle table is the base view for all authorized users
+            renderRaffleTable(dashboardData.raffleEntries);
+        };
+
+        const fetchAllUsers = async () => {
+            if (!isSuperAdmin) return;
+            showGlobalLoading("Fetching all users...");
+            try {
+                const getAllAuthUsersCallable = httpsCallable(functions, 'getAllAuthUsers');
+                const response = await getAllAuthUsersCallable({});
+                allAuthUsers = response.data.users;
+                // Re-render table after fetch
+                if (currentTab === 'users') {
+                    renderAuthUsersTable(allAuthUsers);
+                }
+            } catch (error) {
+                console.error("Error fetching all users (SA only):", error);
+                // Non-critical if main dashboard loads
+            }
+        }
+
+        const fetchDashboardData = async () => {
+            showGlobalLoading("Fetching dashboard data...");
+            try {
+                const getAdminDashboardDataCallable = httpsCallable(functions, 'getAdminDashboardData');
+                const response = await getAdminDashboardDataCallable({});
+                
+                dashboardData = response.data;
+                isSuperAdmin = dashboardData.isSuperAdmin;
+                isReferrer = dashboardData.isReferrer;
+                isLoggedInAdmin = dashboardData.isSuperAdmin || dashboardData.isReferrer || (auth.currentUser && auth.currentUser.customClaims.admin);
+
+                dashboardData = calculateReferrerMetrics(dashboardData); 
+
+                let roleText = 'Admin';
+                if (isSuperAdmin) roleText = 'Super Admin';
+                else if (isReferrer) roleText = 'Referrer';
+                document.getElementById('userRoleDisplay').textContent = `(${roleText})`;
+                
+                const referrerTab = document.querySelector('[data-tab="referrers"]');
+                const donationTab = document.querySelector('[data-tab="donations"]');
+                const toolsTab = document.querySelector('[data-tab="tools"]');
+                const rolexTab = document.querySelector('[data-tab="rolex"]');
+                const usersTab = document.querySelector('[data-tab="users"]');
+                const raffleTab = document.querySelector('[data-tab="raffle"]');
+                const addManualSaleButton = document.getElementById('addManualSaleButton');
+                const addManualDonationButton = document.getElementById('addManualDonationButton'); // NEW
+                const overviewCard = document.getElementById('referrerOverview');
+                const exportButton = document.getElementById('exportDataButton');
+                const raffleFilterControls = document.getElementById('raffleFilterControls');
+
+                // --- Access Control Logic ---
+                
+                // 1. Hide/show SA-only sections
+                referrerTab.classList.add('hidden');
+                donationTab.classList.add('hidden');
+                toolsTab.classList.add('hidden');
+                rolexTab.classList.add('hidden'); 
+                usersTab.classList.add('hidden'); 
+                addManualSaleButton.classList.add('hidden');
+                addManualDonationButton.classList.add('hidden'); // NEW
+                overviewCard.classList.add('hidden');
+                exportButton.classList.add('hidden');
+                raffleTab.classList.add('hidden'); 
+
+                
+                if (isSuperAdmin) {
+                    // Super Admin sees everything
+                    referrerTab.classList.remove('hidden');
+                    donationTab.classList.remove('hidden');
+                    toolsTab.classList.remove('hidden');
+                    rolexTab.classList.remove('hidden'); 
+                    usersTab.classList.remove('hidden'); 
+                    addManualSaleButton.classList.remove('hidden');
+                    addManualDonationButton.classList.remove('hidden'); // NEW
+                    exportButton.classList.remove('hidden');
+                    overviewCard.classList.remove('hidden');
+                    raffleTab.classList.remove('hidden'); 
+                    raffleFilterControls.classList.remove('hidden'); // SA uses the filter control
+                    currentTab = currentTab || 'referrers'; 
+                    await fetchAllUsers(); // Fetch users list for SA
+
+                } else if (isReferrer) {
+                    // Regular Referrer sees their overview and Split The Pot Sales (filtered internally)
+                    overviewCard.classList.remove('hidden');
+                    raffleTab.classList.remove('hidden'); 
+                    raffleFilterControls.classList.add('hidden'); // Hide filter dropdown for non-SA Referrers
+                    activeRefIdFilter = null; // Ensure no lingering SA filter
+                    currentTab = currentTab || 'raffle';
+                    
+                } else if (isLoggedInAdmin) { 
+                    // General Admin (non-referrer, non-super) sees only the Raffle Tab (All Sales)
+                    raffleTab.classList.remove('hidden');
+                    raffleFilterControls.classList.remove('hidden'); 
+                    activeRefIdFilter = null; // Ensure no lingering SA filter
+                    currentTab = currentTab || 'raffle';
+                }
+
+                // --- Overview Card Population (Visible to SA and Referrers) ---
+                if (isReferrer || isSuperAdmin) {
+                    const finalRefId = dashboardData.userData.refId || 'N/A';
+                    // FIX: Use the processed data from userData which now includes correct aggregated fields
+                    const finalTotalTickets = dashboardData.userData.totalTickets || 0; 
+                    // FIX APPLIED: Fallback to totalAmount for non-SA users whose userData object was not enriched by the list processing
+                    const finalTotalAmount = dashboardData.userData.combinedTotalAmount || dashboardData.userData.totalAmount || 0; 
+                    const finalClicks = dashboardData.userData.clickCount || 0;
+                    
+                    document.getElementById('overviewRefId').textContent = finalRefId;
+                    
+                    document.getElementById('overviewTotalClicks').textContent = finalClicks.toLocaleString(); 
+                    
+                    document.getElementById('overviewTotalTickets').textContent = finalTotalTickets.toLocaleString();
+                    document.getElementById('overviewTotalAmount').textContent = formatCurrency(finalTotalAmount); 
+
+                    const referralLinkElement = document.getElementById('referralLink');
+                    const link = `ydeseniors.com/?ref=${finalRefId}`;
+                    referralLinkElement.textContent = link;
+                    document.getElementById('referrerLinkContainer').classList.remove('hidden');
+
+                    document.getElementById('copyLinkButton').onclick = () => {
+                        copyToClipboard(`https://${link}`, 'Referral link copied!');
+                    };
+                } else {
+                    document.getElementById('referrerLinkContainer').classList.add('hidden');
+                }
+                
+                renderTables();
+                updateSortIndicators('referrer', referrerSortConfig); 
+                updateSortIndicators('users', userSortConfig);
+                updateSortIndicators('donations', donationSortConfig);
+                
+                if (isSuperAdmin || isLoggedInAdmin) {
+                    await updateReservedTicketCounts();
+                }
+                
+                hideGlobalLoading();
+                switchTab(currentTab || 'raffle'); 
+
+            } catch (error) {
+                console.error("Error fetching dashboard data:", error);
+                hideGlobalLoading();
+                if (error.code === 'permission-denied') {
+                    document.getElementById('authErrorDisplay').textContent = "Permission Denied: Your account is not authorized as Admin, Super Admin, or Referrer.";
+                    document.getElementById('authErrorDisplay').classList.remove('hidden');
+                    document.getElementById('dashboardContainer').classList.add('hidden');
+                } else {
+                    showCustomPopup('Data Fetch Error', `Failed to load dashboard data: ${error.message}. Please check logs.`);
+                }
+            }
+        };
+        
+        // --- Sorting Indicator Logic ---
+        const updateSortIndicators = (table, config) => {
+            // Find all headers associated with the table
+            document.querySelectorAll(`.sort-header[data-table="${table}"], .referrer-sort-header[data-sort-key], .user-sort-header[data-sort-key], .donation-sort-header[data-sort-key]`).forEach(header => {
+                // Determine if this header belongs to the current table context based on class or attribute
+                const tableContext = header.dataset.table || (header.classList.contains('referrer-sort-header') ? 'referrer' : (header.classList.contains('user-sort-header') ? 'users' : (header.classList.contains('donation-sort-header') ? 'donations' : '')));
+                if (tableContext === table) {
+                    // Remove all previous active/color classes
+                    header.classList.remove('active', 'text-yellow-400', 'text-purple-400', 'text-red-400', 'font-semibold', 'text-asc', 'text-desc');
+                    
+                    // Specific handling for referrer table header icons (using the nested SVG)
+                    if (header.classList.contains('referrer-sort-header')) {
+                        header.querySelectorAll('svg').forEach(svg => svg.classList.add('hidden'));
+                    }
+                    
+                    // Specific handling for non-referrer/user sales table icons (using the inner span)
+                    const icon = header.querySelector('.sort-icon');
+                    if (icon) icon.classList.add('hidden');
+                }
+            });
+            
+            // Highlight the active header
+            const activeHeader = document.querySelector(`[data-table="${table}"][data-sort-key="${config.key}"], .referrer-sort-header[data-sort-key="${config.key}"], .user-sort-header[data-sort-key="${config.key}"], .donation-sort-header[data-sort-key="${config.key}"]`);
+            if (activeHeader) {
+                activeHeader.classList.add('active', 'font-semibold');
+
+                // Determine color based on table type
+                let colorClass = 'text-yellow-400'; // Default for raffle/referrer
+                if (table === 'rolex') colorClass = 'text-purple-400';
+                else if (table === 'users') colorClass = 'text-red-400';
+
+                activeHeader.classList.add(colorClass);
+
+                // Handle icon display
+                if (activeHeader.classList.contains('referrer-sort-header')) {
+                    // Handle nested SVG for referrer table
+                    const svg = activeHeader.querySelector('svg');
+                    if (svg) {
+                        svg.classList.remove('hidden');
+                        // Rotate SVG for direction
+                        svg.style.transform = config.direction === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)';
+                    }
+                } else {
+                    // Handle inner span for sales tables and users/donations
+                    const icon = activeHeader.querySelector('.sort-icon');
+                    if (icon) {
+                        icon.classList.remove('hidden');
+                        icon.innerHTML = config.direction === 'asc' ? '&#9650;' : '&#9660;'; // Up or Down Triangle
+                    }
+                }
+            }
+        };
+
+        // --- Render Functions ---
+        
+        const renderAuthUsersTable = (users) => {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            filteredAuthUsers = filterAuthUsers(users);
+
+            // 1. Reset Select All and count
+            const selectAllCheckbox = document.getElementById('selectAllUsers');
+            selectAllCheckbox.checked = false;
+            
+            document.getElementById('usersSelectedCount').textContent = `${selectedUserUids.size} selected`;
+            document.getElementById('openBatchResetModalButton').disabled = selectedUserUids.size === 0;
+            
+            // Check if all displayed users are selected to tick the selectAll box
+            const allDisplayedSelected = filteredAuthUsers.length > 0 && 
+                                                    filteredAuthUsers.every(u => selectedUserUids.has(u.uid));
+            if (allDisplayedSelected) {
+                selectAllCheckbox.checked = true;
+            }
+
+
+            if (filteredAuthUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">No users found matching search criteria.</td></tr>';
+                return;
+            }
+            
+            filteredAuthUsers.forEach(u => {
+                const tr = document.createElement('tr');
+                
+                const isSelected = selectedUserUids.has(u.uid);
+                
+                const statusContent = u.disabled 
+                    ? '<span class="text-xs font-medium px-2 py-1 rounded-full bg-red-900/50 text-red-400">DISABLED</span>'
+                    : '<span class="text-xs font-medium px-2 py-1 rounded-full bg-green-900/50 text-green-400">ACTIVE</span>';
+
+                const roles = [];
+                if (u.isSuperAdmin) roles.push('SA');
+                if (u.isReferrer) roles.push('Ref');
+                if (u.isAdmin && !u.isSuperAdmin && !u.isReferrer) roles.push('Admin');
+                if (roles.length === 0) roles.push('User');
+
+                tr.innerHTML = `
+                    <td class="text-center">
+                        <input type="checkbox" data-uid="${u.uid}" class="user-select-checkbox rounded text-red-500 focus:ring-red-500 bg-gray-700 border-gray-600" ${isSelected ? 'checked' : ''}>
+                    </td>
+                    <td>${u.displayName || 'N/A'}</td>
+                    <td><span class="${u.emailVerified ? 'text-green-400' : 'text-orange-400'}" title="${u.emailVerified ? 'Verified' : 'Unverified'}">${u.email}</span></td>
+                    <td class="font-mono text-xs text-gray-400 truncate max-w-[100px] sm:max-w-[150px]">${u.uid}</td>
+                    <td>${formatDate(u.createdAt)}</td>
+                    <td>${roles.map(r => `<span class="text-xs font-medium px-2 py-1 rounded-full bg-gray-600 text-gray-300">${r}</span>`).join(' ')}</td>
+                    <td>${statusContent}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateSortIndicators('users', userSortConfig);
+        };
+        
+        const handleUserCheckboxChange = (e) => {
+            const uid = e.target.dataset.uid;
+            if (e.target.checked) {
+                selectedUserUids.add(uid);
+            } else {
+                selectedUserUids.delete(uid);
+            }
+            
+            // Update UI elements
+            document.getElementById('usersSelectedCount').textContent = `${selectedUserUids.size} selected`;
+            document.getElementById('openBatchResetModalButton').disabled = selectedUserUids.size === 0;
+
+            const selectAllCheckbox = document.getElementById('selectAllUsers');
+            const allDisplayedSelected = filteredAuthUsers.length > 0 && 
+                                                    filteredAuthUsers.every(u => selectedUserUids.has(u.uid));
+                                                    
+            if (allDisplayedSelected) {
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.checked = false;
+            }
+        };
+
+        const handleUserSelectAllChange = (e) => {
+            selectedUserUids.clear();
+            const isChecked = e.target.checked;
+
+            document.querySelectorAll('.user-select-checkbox').forEach(checkbox => {
+                checkbox.checked = isChecked;
+                const uid = checkbox.dataset.uid;
+                if (isChecked) {
+                    selectedUserUids.add(uid);
+                }
+            });
+
+            document.getElementById('usersSelectedCount').textContent = `${selectedUserUids.size} selected`;
+            document.getElementById('openBatchResetModalButton').disabled = selectedUserUids.size === 0;
+        };
+
+        const handleUserSearchChange = (e) => {
+            userSearchTerm = e.target.value;
+            renderAuthUsersTable(allAuthUsers);
+        };
+        
+        const openBatchResetModal = () => {
+            if (!isSuperAdmin) return;
+            if (selectedUserUids.size === 0) {
+                showCustomPopup('Selection Required', 'Please select at least one user to reset the password.');
+                return;
+            }
+            document.getElementById('selectedUserCount').textContent = selectedUserUids.size;
+            document.getElementById('batchResetForm').reset();
+            document.getElementById('submitBatchReset').disabled = false;
+            document.getElementById('batchResetModalOverlay').classList.remove('hidden');
+        };
+
+        const closeBatchResetModal = () => {
+            document.getElementById('batchResetModalOverlay').classList.add('hidden');
+        };
+
+        const handleBatchResetSubmit = async (e) => {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('batch-new-password').value;
+            const uidsToReset = Array.from(selectedUserUids);
+
+            if (newPassword.length < 6) {
+                showCustomPopup('Invalid Password', 'The new password must be at least 6 characters long.');
                 return;
             }
 
-            adminAppId.textContent = appId;
+            closeBatchResetModal();
+            showGlobalLoading(`Resetting passwords for ${uidsToReset.length} users...`);
+
+            try {
+                const adminResetMultiPasswordCallable = httpsCallable(functions, 'adminResetMultiPassword');
+                const response = await adminResetMultiPasswordCallable({ uids: uidsToReset, newPassword });
+
+                const { successfulResets, failedResets } = response.data;
+
+                if (failedResets.length === 0) {
+                    showCustomPopup('Batch Reset Complete', `Successfully reset ${successfulResets.length} password(s). All users must now use the new temporary password.`);
+                } else {
+                    showCustomPopup('Batch Reset Complete (With Errors)', 
+                        `Successfully reset ${successfulResets.length} password(s). Failed to reset ${failedResets.length} user(s). Check console for failure details.`);
+                }
+                
+                // Clear selection and refresh user list
+                selectedUserUids.clear();
+                await fetchDashboardData(); 
+
+            } catch (error) {
+                console.error("Batch Reset Failed:", error);
+                showCustomPopup('Batch Reset Failed', `Error: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+
+        const renderReferrersTable = (referrers) => {
+            const tbody = document.getElementById('referrersTableBody');
+            tbody.innerHTML = '';
             
-            // Listen to the PUBLIC collection where all quotes are submitted
-            const publicQuotesRef = collection(db, `quotes`);
-            const quotesQuery = query(publicQuotesRef);
+            // Only Super Admins see this table content
+            if (!isSuperAdmin) {
+                 tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-400">Permission Denied. Only Super Admins can view all referrers.</td></tr>';
+                 return;
+            }
 
-            // Use onSnapshot for real-time updates
-            const unsubscribe = onSnapshot(quotesQuery, (snapshot) => {
-                loadingQuotes.classList.add('hidden');
-                quotesList.innerHTML = ''; // Clear previous content
+            const sortedReferrers = filterReferrers(referrers);
 
-                if (snapshot.empty) {
-                    noQuotes.classList.remove('hidden');
-                    return;
+            if (sortedReferrers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-400">No referrers found matching search criteria.</td></tr>';
+                return;
+            }
+            sortedReferrers.forEach(r => {
+                const tr = document.createElement('tr');
+                
+                let nameCellContent = r.name;
+                let actionCellContent = 'N/A';
+                let upgradeButton = '';
+
+                // Super Admin can see the action buttons and click to filter sales
+                if (isSuperAdmin) {
+                    // Update: Clicking the name now applies the combined filter and shows sales.
+                    nameCellContent = `<span 
+                                            class="text-white font-semibold cursor-pointer hover:underline" 
+                                            data-action="view-referrer-sales" 
+                                            data-refid="${r.refId}" 
+                                            data-refname="${r.name}"
+                                            >${r.name}</span>`;
+                    
+                    // Check if a corresponding Firebase Auth User exists (optional, but good practice)
+                    const authUser = allAuthUsers.find(u => u.refId === r.refId);
+                    
+                    if (authUser && !authUser.isSuperAdmin && authUser.uid !== auth.currentUser?.uid) {
+                        upgradeButton = `
+                            <button class="px-2 py-1 text-xs bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors mb-1"
+                                            data-action="promote-sa"
+                                            data-uid="${authUser.uid}"
+                                            data-refid="${r.refId}"
+                                            data-refname="${r.name}">Promote to SA</button>
+                        `;
+                    }
+                    
+                    actionCellContent = `
+                        ${upgradeButton}
+                        <button class="px-2 py-1 text-xs bg-purple-500 text-white font-semibold rounded-lg shadow-md hover:bg-purple-600 transition-colors mb-1"
+                                            data-action="assign-rolex-tickets"
+                                            data-refid="${r.refId}"
+                                            data-refname="${r.name}">Assign Spin</button>
+                        <button class="px-2 py-1 text-xs bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+                                            data-action="assign-raffle-tickets"
+                                            data-refid="${r.refId}"
+                                            data-refname="${r.name}">Assign Raffle</button>
+                    `;
                 }
 
-                noQuotes.classList.add('hidden');
-                
-                const quotes = [];
-                snapshot.forEach(doc => {
-                    quotes.push({ id: doc.id, data: doc.data() });
-                });
-
-                // Sort the quotes client-side by timestamp (newest first)
-                quotes.sort((a, b) => {
-                    // Assuming timestamp is in ISO string format (e.g., "2023-10-26T10:30:00.000Z")
-                    return new Date(b.data.timestamp).getTime() - new Date(a.data.timestamp).getTime();
-                });
-
-                // Render the sorted quotes
-                quotes.forEach(quote => {
-                    quotesList.appendChild(renderQuote(quote.id, quote.data));
-                });
-
-            }, (error) => {
-                console.error("Error loading quotes:", error);
-                quotesList.innerHTML = `<div class="col-span-full text-center py-12 text-red-400">Error loading quotes: ${error.message}</div>`;
+                tr.innerHTML = `
+                    <td>${nameCellContent}</td>
+                    <td><span class="font-mono text-xs px-2 py-1 bg-yellow-400/20 text-yellow-300 rounded">${r.refId}</span></td>
+                    <td>${r.email || 'N/A'}</td>
+                    <td class="text-right">${(r.raffleTickets || 0).toLocaleString()}</td>
+                    <td class="text-right">${(r.rolexTickets || 0).toLocaleString()}</td>
+                    <td class="text-right font-semibold">${formatCurrency(r.combinedTotalAmount || 0)}</td>
+                    <td class="text-right">${formatCurrency(r.goal || 0)}</td>
+                    <td class="text-right font-bold text-purple-400">${(r.clickCount || 0).toLocaleString()}</td>
+                    <td class="text-center flex flex-col items-center justify-center space-y-1">${actionCellContent}</td>
+                `;
+                tbody.appendChild(tr);
             });
+            updateSortIndicators('referrer', referrerSortConfig);
+        };
+
+        const renderRaffleTable = (entries) => {
+            const tbody = document.getElementById('raffleTableBody');
+            const headerElement = document.getElementById('raffleSalesHeader');
+            const actionHeader = document.getElementById('raffleSalesActionHeader');
+            const raffleFilterControls = document.getElementById('raffleFilterControls');
+            tbody.innerHTML = '';
+            
+            // 1. Filter based on current filter state ('all', 'assigned', 'unassigned')
+            let displayEntries = filterSalesEntries(entries, raffleFilter);
+
+            // Determine header and filter visibility
+            raffleFilterControls.classList.remove('hidden');
+            let headerText = "Split The Pot Sales";
+
+            if (isReferrer && !isSuperAdmin) {
+                // Non-Super Admin Referrer: filter sales to only show their referred sales
+                const currentRefId = dashboardData.userData.refId;
+                displayEntries = displayEntries.filter(e => e.referrerRefId === currentRefId);
+                headerText = "Your Split The Pot Sales";
+                activeRefIdFilter = null; // Clear manual filter if automatic filter is active
+                raffleFilterControls.classList.add('hidden'); // Hide filter dropdown for non-SA Referrers
+                
+            } else if (activeRefIdFilter) {
+                // Super Admin manual filter is active
+                displayEntries = displayEntries.filter(e => e.referrerRefId === activeRefIdFilter);
+                headerText = `Split The Pot Sales for ${activeRefNameFilter}`;
+                
+            } else {
+                // Super Admin or General Admin viewing all sales
+                headerText = "All Split The Pot Sales";
+                // Show filter controls for SA/Admin
+                if (isSuperAdmin || isLoggedInAdmin) {
+                     raffleFilterControls.classList.remove('hidden');
+                }
+            }
+
+            // Set header text and add 'Clear Filter' button if filter is active
+            headerElement.textContent = headerText;
+            // FIX: Remove old clear filter button before re-adding
+            const existingClearButton = headerElement.querySelector('#clearRaffleFilter');
+            if (existingClearButton) existingClearButton.remove();
+
+            if (activeRefIdFilter) {
+                // IMPORTANT: The button must be a child of the header element for dynamic update
+                headerElement.innerHTML += ` <button id="clearRaffleFilter" class="ml-4 px-2 py-1 text-sm text-white bg-red-500 rounded-lg hover:bg-red-600">Clear Filter</button>`;
+            }
+
+
+            // 2. Sort the display entries
+            displayEntries = sortEntries(displayEntries, raffleSortConfig);
+
+            // 3. Show/Hide action column header for SA
+            if (isSuperAdmin) {
+                actionHeader.classList.remove('hidden');
+            } else {
+                actionHeader.classList.add('hidden');
+            }
+
+            // 4. Render rows
+            const colspan = isSuperAdmin ? 8 : 7;
+            if (displayEntries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center py-4 text-gray-400">No Split The Pot sales found matching current criteria.</td></tr>`;
+                return;
+            }
+            displayEntries.forEach(e => {
+                const referrerInfo = e.referrerName ? `<span class="text-gray-300">${e.referrerName}</span> (<span class="font-mono text-xs px-1 bg-yellow-400/20 text-yellow-300 rounded">${e.referrerRefId}</span>)` : '<span class="text-red-400 font-medium">None</span>';
+                const customerName = e.fullName || e.name || e.firstName || 'N/A';
+                
+                let actionCell = '';
+                if (isSuperAdmin) {
+                    actionCell = `
+                        <button class="px-2 py-1 text-xs bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-600 transition-colors"
+                            data-action="edit-sale"
+                            data-entry-id="${e.id}">Edit</button>
+                    `;
+                }
+
+                // FIX: Prioritize Phone Number over Email
+                const contactDisplay = e.phoneNumber || e.email || 'N/A';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatDate(e.timestamp)}</td>
+                    <td>${customerName}</td>
+                    <td>${contactDisplay}</td> <!-- Updated to prioritize phone -->
+                    <td>${(e.ticketCount || 0).toLocaleString()}</td>
+                    <td class="text-right font-medium">${formatCurrency(e.amountPaid || 0)}</td>
+                    <td>${referrerInfo}</td>
+                    <td>${e.sourceApp || 'N/A'}</td>
+                    ${isSuperAdmin ? `<td>${actionCell}</td>` : ''}
+                `;
+                tbody.appendChild(tr);
+            });
+            updateSortIndicators('raffle', raffleSortConfig);
+        };
+
+        const renderRolexTable = (entries) => {
+            const tbody = document.getElementById('rolexTableBody');
+            const headerElement = document.getElementById('rolexSalesHeader');
+
+            // This tab is only visible to Super Admin, so no non-SA referrer logic needed here.
+            
+            // 1. Filter based on current filter state
+            let displayEntries = filterSalesEntries(entries, rolexFilter);
+            
+            let headerText = "Rolex Raffle Sales (SA Only)";
+
+            // Apply direct referrer filter (Rolex must also be filtered by the active referrer if set)
+            if (activeRefIdFilter) {
+                displayEntries = displayEntries.filter(e => e.referrerRefId === activeRefIdFilter);
+                headerText = `Rolex Raffle Sales for ${activeRefNameFilter}`;
+            } else {
+                headerText = "Rolex Raffle Sales (SA Only)";
+            }
+
+            // Set header text and add 'Clear Filter' button if filter is active
+            headerElement.textContent = headerText;
+            // FIX: Remove old clear filter button before re-adding
+            const existingClearButton = headerElement.querySelector('#clearRolexFilter');
+            if (existingClearButton) existingClearButton.remove();
+
+            if (activeRefIdFilter) {
+                headerElement.innerHTML += ` <button id="clearRolexFilter" class="ml-4 px-2 py-1 text-sm text-white bg-red-500 rounded-lg hover:bg-red-600">Clear Filter</button>`;
+            }
+            
+            // 2. Sort the display entries
+            displayEntries = sortEntries(displayEntries, rolexSortConfig);
+            tbody.innerHTML = '';
+
+
+            if (displayEntries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">No Rolex Raffle sales found matching current criteria.</td></tr>';
+                return;
+            }
+            displayEntries.forEach(e => {
+                const referrerInfo = e.referrerRefId ? `<span class="font-mono text-xs px-1 bg-yellow-400/20 text-yellow-300 rounded">${e.referrerRefId}</span>` : 'None';
+                // Use background color based on status
+                let statusText = (e.status || 'N/A').toUpperCase();
+                let statusClass = 'bg-gray-700/50 text-gray-300';
+                if (e.status === 'paid') {
+                    statusClass = 'bg-green-700/50 text-green-300';
+                } else if (e.status === 'converted') {
+                    statusClass = 'bg-purple-700/50 text-purple-300';
+                    statusText = 'CONVERTED';
+                }
+
+                const customerName = e.fullName || e.name || e.firstName || 'N/A';
+                
+                // FIX: Prioritize Phone Number over Email
+                const contactDisplay = e.phoneNumber || e.email || 'N/A';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatDate(e.timestamp)}</td>
+                    <td class="font-bold">${e.id}</td>
+                    <td>${customerName}</td>
+                    <td>${contactDisplay}</td> <!-- Updated to prioritize phone -->
+                    <td><span class="text-xs font-medium px-2 py-1 rounded-full ${statusClass}">${statusText}</span></td>
+                    <td class="text-right font-medium">${formatCurrency(e.amountPaid || 0)}</td>
+                    <td>${referrerInfo}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateSortIndicators('rolex', rolexSortConfig);
+        };
+        
+        const renderDonationsTable = (entries) => {
+            const tbody = document.getElementById('donationsTableBody');
+            tbody.innerHTML = '';
+            // Donations always sort by creation date descending
+            const sortedEntries = entries.sort((a, b) => getTimestampValue(b.createdAt) - getTimestampValue(a.createdAt));
+
+            if (entries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">No donations found.</td></tr>';
+                return;
+            }
+            sortedEntries.forEach(e => {
+                const customerName = e.fullName || e.name || 'N/A';
+                
+                // FIX: Combine Email and Phone into Contact column, prioritizing Phone
+                const contactDisplay = e.phone || e.email || 'N/A';
+                
+                // Status Handling
+                let statusText = (e.status || 'N/A').toUpperCase();
+                let statusClass = 'bg-green-700/50 text-green-300';
+                if (statusText === 'MANUAL_DONATED') {
+                     statusClass = 'bg-yellow-700/50 text-yellow-300';
+                } else if (statusText === 'PAID') {
+                     statusClass = 'bg-green-700/50 text-green-300';
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatDate(e.createdAt)}</td>
+                    <td>${customerName}</td>
+                    <td>${contactDisplay}</td> <!-- Updated to prioritize phone in combined contact field -->
+                    <td>${e.referrerRefId || 'N/A'}</td>
+                    <td class="text-right font-medium">${formatCurrency(e.amount || e.amountPaid || 0)}</td>
+                    <td><span class="text-xs font-medium px-2 py-1 rounded-full ${statusClass}">${statusText}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        const switchTab = (tabName) => {
+            currentTab = tabName;
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.tab-button[data-tab="${tabName}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+            const activePane = document.getElementById(`tab-${tabName}`);
+            if (activePane) activePane.classList.remove('hidden');
+
+            // Re-render tables on tab switch to apply current filters/sorts
+            if (tabName === 'raffle') {
+                renderRaffleTable(dashboardData.raffleEntries);
+            } else if (tabName === 'rolex') {
+                renderRolexTable(dashboardData.rolexEntries);
+            } else if (tabName === 'referrers') {
+                 renderReferrersTable(dashboardData.referrers); // Ensure SA referrer table is rendered
+            } else if (tabName === 'users') {
+                 renderAuthUsersTable(allAuthUsers); // Ensure SA user table is rendered
+            } else if (tabName === 'donations') {
+                 renderDonationsTable(dashboardData.donationEntries);
+            }
+        };
+
+        // --- NEW: Refresh Feature ---
+        const handleRefreshClick = async () => {
+            // Clearing the current filter is generally safer on a full refresh
+            if (activeRefIdFilter) {
+                clearRefIdFilter(); 
+            }
+            // Fetch data will also re-render tables and switch back to the correct tab
+            await fetchDashboardData();
+        };
+
+        // --- Referrer Sales View Feature Functions (Combined Filter) ---
+        
+        const openReferrerSalesModal = (refId, refName) => {
+            if (!isSuperAdmin) {
+                showCustomPopup('Permission Denied', 'Only Super Admins can view filtered referrer sales.');
+                return;
+            }
+            
+            // Set the unified filter state
+            activeRefIdFilter = refId;
+            activeRefNameFilter = refName;
+            
+            // Reset the internal sales filter to 'all' so we see all sales types
+            raffleFilter = 'all'; 
+            document.getElementById('raffleFilter').value = 'all';
+
+            // Re-render both sales tables (Raffle and Rolex) to apply the combined filter
+            renderRaffleTable(dashboardData.raffleEntries); 
+            renderRolexTable(dashboardData.rolexEntries); 
+            
+            switchTab('raffle'); // Switch to the Raffle tab, where the filter starts
+        };
+        
+        const clearRefIdFilter = () => {
+            activeRefIdFilter = null;
+            activeRefNameFilter = null;
+            
+            // Restore the main filter setting and remove the clear button
+            document.getElementById('raffleFilter').value = raffleFilter; 
+            
+            // Re-render both sales tables to clear filters
+            renderRaffleTable(dashboardData.raffleEntries); 
+            renderRolexTable(dashboardData.rolexEntries); 
+        };
+        
+        // --- Edit Order Feature Functions ---
+        
+        const openEditSaleModal = (entryId) => {
+            const sale = dashboardData.raffleEntries.find(e => e.id === entryId);
+            if (!sale) {
+                showCustomPopup('Error', 'Sale entry not found.');
+                return;
+            }
+
+            document.getElementById('edit-sale-id').value = entryId;
+            document.getElementById('edit-name').value = sale.fullName || sale.name || sale.firstName || '';
+            document.getElementById('edit-email').value = sale.email || '';
+            document.getElementById('edit-phone').value = sale.phoneNumber || '';
+            document.getElementById('edit-tickets').value = sale.ticketCount || 0;
+            document.getElementById('edit-amount').value = sale.amountPaid || 0;
+
+            document.getElementById('editSaleModalOverlay').classList.remove('hidden');
+        };
+
+        const closeEditSaleModal = () => {
+            document.getElementById('editSaleModalOverlay').classList.add('hidden');
+        };
+
+        const handleEditSaleSubmit = async (e) => {
+            e.preventDefault();
+            
+            const entryId = document.getElementById('edit-sale-id').value;
+            const updatedData = {
+                fullName: document.getElementById('edit-name').value.trim(),
+                email: document.getElementById('edit-email').value.trim(),
+                phoneNumber: document.getElementById('edit-phone').value.trim(),
+                ticketCount: parseInt(document.getElementById('edit-tickets').value.trim(), 10),
+                amountPaid: parseFloat(document.getElementById('edit-amount').value.trim()),
+            };
+
+            closeEditSaleModal();
+            showGlobalLoading(`Updating sale ${entryId}...`);
+
+            try {
+                const updateRaffleEntryCallable = httpsCallable(functions, 'updateRaffleEntry');
+                const response = await updateRaffleEntryCallable({ entryId, updatedData });
+
+                showCustomPopup('Success', response.data.message);
+                await fetchDashboardData(); 
+
+            } catch (error) {
+                console.error("Error updating sale:", error);
+                showCustomPopup('Update Failed', `Error: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+        // --- Promote to Super Admin Logic ---
+
+        const upgradeToSuperAdmin = async (uid) => {
+            try {
+                const setSuperAdminClaimCallable = httpsCallable(functions, 'setSuperAdminClaim'); 
+                const response = await setSuperAdminClaimCallable({ uid });
+                return response.data;
+            } catch (error) {
+                console.error("Error calling upgradeToSuperAdmin:", error);
+                throw error;
+            }
+        }
+
+        const openUpgradeAdminModal = (uid, name, refId) => {
+            if (!isSuperAdmin) {
+                showCustomPopup('Permission Denied', 'Only Super Admins can promote other users.');
+                return;
+            }
+            
+            document.getElementById('upgrade-referrer-uid').value = uid;
+            document.getElementById('upgrade-referrer-name').textContent = name;
+            document.getElementById('upgrade-referrer-refid').textContent = refId;
+
+            document.getElementById('upgradeAdminModalOverlay').classList.remove('hidden');
+        }
+
+        const closeUpgradeAdminModal = () => {
+            document.getElementById('upgradeAdminModalOverlay').classList.add('hidden');
+        }
+
+        const handleUpgradeAdmin = async () => {
+            const uid = document.getElementById('upgrade-referrer-uid').value;
+            const name = document.getElementById('upgrade-referrer-name').textContent;
+            
+            closeUpgradeAdminModal();
+            showGlobalLoading(`Promoting ${name} to Super Admin...`);
+
+            try {
+                await upgradeToSuperAdmin(uid);
+                
+                showCustomPopup('Success', `${name} has been promoted to Super Admin. They must sign out and sign back in to see their new permissions.`);
+                
+                // Re-fetch all data to update local claims and tables
+                await fetchDashboardData(); 
+                
+            } catch (error) {
+                console.error("Promotion Failed:", error);
+                showCustomPopup('Promotion Failed', `Failed to promote ${name}. Error: ${error.message}. Ensure your backend function 'setSuperAdminClaim' is implemented.`);
+            } finally {
+                hideGlobalLoading();
+            }
         }
         
+        // --- Admin Tools Logic (SA Only) ---
+        
+        const updateReservedTicketCounts = async () => {
+            if (!isSuperAdmin && !isLoggedInAdmin) return;
+            
+            const infoDiv = document.getElementById('reservedTicketInfo');
+            infoDiv.textContent = "Updating...";
+            try {
+                const getReservedTicketCountsCallable = httpsCallable(functions, 'getReservedTicketCounts');
+                const response = await getReservedTicketCountsCallable({});
+                const { totalReserved, expired5Min, expired10Min } = response.data;
+                
+                infoDiv.innerHTML = `
+                    <p>Total Reserved Tickets: <span class="font-bold">${totalReserved}</span></p>
+                    <p>Reserved > 5 Min (Expired by Cron): <span class="font-bold text-red-400">${expired5Min}</span></p>
+                    <p>Reserved > 10 Min: <span class="font-bold text-red-400">${expired10Min}</span></p>
+                `;
+            } catch (error) {
+                infoDiv.textContent = 'Failed to load ticket counts.';
+                console.error("Error fetching ticket counts:", error);
+            }
+        };
+
+        const handleCleanupClick = async () => {
+            if (!isSuperAdmin) return;
+            showGlobalLoading("Running manual ticket cleanup...");
+            try {
+                const deleteExpiredReservedTicketsCallable = httpsCallable(functions, 'deleteExpiredReservedTickets');
+                const response = await deleteExpiredReservedTicketsCallable({});
+                showCustomPopup('Cleanup Success', response.data.message);
+                await updateReservedTicketCounts();
+                await fetchDashboardData();
+            } catch (error) {
+                console.error("Error running cleanup:", error);
+                showCustomPopup('Cleanup Failed', `Error: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+        
+        const handleRecalculateAllReferrerTotals = async () => {
+            if (!isSuperAdmin) return;
+            
+            showGlobalLoading("Recalculating ALL Referrer totals...");
+            try {
+                const recalculateAllReferrerTotalsCallable = httpsCallable(functions, 'recalculateAllReferrerTotals');
+                const response = await recalculateAllReferrerTotalsCallable({});
+                showCustomPopup('Recalculation Complete', response.data.message);
+                await fetchDashboardData(); 
+            } catch (error) {
+                console.error("Error recalculating all referrer totals:", error);
+                showCustomPopup('Recalculation Failed', `Error: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+        
+        const handleRecalculateRaffleTotals = async () => {
+            if (!isSuperAdmin) return;
+            
+            showGlobalLoading("Recalculating Split The Pot totals (Global Counter)...");
+            try {
+                const recalculateRaffleTotalsCallable = httpsCallable(functions, 'recalculateRaffleTotals');
+                const response = await recalculateRaffleTotalsCallable({});
+                showCustomPopup('Recalculation Complete', response.data.message);
+                await fetchDashboardData(); 
+            } catch (error) {
+                console.error("Error recalculating raffle totals:", error);
+                showCustomPopup('Recalculation Failed', `Error: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+        const handleRecalculateRolexTotals = async () => {
+            if (!isSuperAdmin) return;
+            
+            showGlobalLoading("Recalculating Rolex Raffle totals (Global Counter)...");
+            try {
+                const recalculateRolexTotalsCallable = httpsCallable(functions, 'recalculateRolexTotals');
+                const response = await recalculateRolexTotalsCallable({});
+                showCustomPopup('Recalculation Complete', response.data.message);
+                await fetchDashboardData(); 
+
+            } catch (error) {
+                console.error("Error recalculating Rolex totals:", error);
+                showCustomPopup('Recalculation Failed', `Error: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+        // --- Export to CSV Logic (New Feature) ---
+        
+        const downloadCSV = (data, filename) => {
+            // Generate CSV content
+            if (!data || data.length === 0) {
+                showCustomPopup('No Data', 'No data to export based on current view/filters.');
+                return;
+            }
+
+            // Ensure all data items have the same fields for consistent header row
+            const headers = Object.keys(data[0]);
+            const csvContent = [
+                headers.join(','),
+                ...data.map(row => headers.map(fieldName => {
+                    let value = row[fieldName] === null || row[fieldName] === undefined ? '' : row[fieldName];
+
+                    // Special handling for nested objects (e.g., Timestamps) and commas
+                    if (typeof value === 'object') {
+                        if (fieldName.toLowerCase().includes('date') || fieldName.toLowerCase().includes('timestamp') || fieldName.toLowerCase().includes('createdat') || fieldName.toLowerCase().includes('time')) {
+                            // Use existing date formatter, remove internal commas
+                            value = formatDate(value).replace(/,/g, ''); 
+                        } else {
+                            // Serialize object, replace internal commas with semicolons
+                            value = JSON.stringify(value).replace(/,/g, ';'); 
+                        }
+                    } else if (typeof value === 'string') {
+                        value = value.replace(/"/g, '""'); // Escape double quotes
+                        if (value.includes(',')) {
+                            value = `"${value}"`; // Enclose strings with commas in quotes
+                        }
+                    }
+                    return value;
+                }).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) { 
+                link.setAttribute("href", URL.createObjectURL(blob));
+                link.setAttribute("download", filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showCustomPopup('Export Success', `Downloaded ${filename}`);
+            } else {
+                showCustomPopup('Export Error', 'Your browser does not support automatic CSV download.');
+            }
+        };
+
+        /**
+         * Selects the appropriate data set based on the current tab and requested scope.
+         * @param {string} scope - 'all' or 'filtered'
+         * @returns {Array} The data array to export.
+         */
+        const getExportDataForCurrentTab = (scope) => {
+            let data = [];
+            
+            // Function to filter/sort the current list to match the UI view
+            const getFilteredView = (dataArray, sortConfig, filter) => {
+                let filtered = dataArray;
+
+                // Apply assignment filter if it exists (only for sales tables)
+                if (filter) {
+                    filtered = filterSalesEntries(filtered, filter);
+                }
+
+                // Apply active referrer filter if it exists (only for sales tables)
+                if (activeRefIdFilter && (currentTab === 'raffle' || currentTab === 'rolex')) {
+                     filtered = filtered.filter(e => e.referrerRefId === activeRefIdFilter);
+                }
+                
+                // Apply search filter (for referrer and users tabs)
+                if (currentTab === 'referrers') {
+                    filtered = filtered.filter(r => {
+                        const searchLower = searchTerm.toLowerCase();
+                        return r.name.toLowerCase().includes(searchLower) ||
+                            (r.refId || '').toLowerCase().includes(searchLower) ||
+                            (r.email || '').toLowerCase().includes(searchLower);
+                    });
+                } else if (currentTab === 'users') {
+                    filtered = filtered.filter(u => {
+                        const searchLower = userSearchTerm.toLowerCase();
+                        return (u.displayName || '').toLowerCase().includes(searchLower) ||
+                            (u.email || '').toLowerCase().includes(searchLower) ||
+                            (u.uid || '').toLowerCase().includes(searchLower);
+                    });
+                }
+
+
+                return sortEntries(filtered, sortConfig);
+            };
+
+            const cleanData = (data) => data.map(item => {
+                const cleaned = JSON.parse(JSON.stringify(item)); 
+                delete cleaned.uid; 
+                delete cleaned.referrerUid; 
+                return cleaned;
+            });
+
+            switch (currentTab) {
+                case 'users':
+                    // Users list has special formatting and no 'all' equivalent besides ignoring search
+                    const userList = scope === 'all' ? allAuthUsers : filteredAuthUsers;
+                    data = userList.map(u => ({
+                        UID: u.uid,
+                        Email: u.email,
+                        DisplayName: u.displayName,
+                        Is_Super_Admin: u.isSuperAdmin || false,
+                        Is_Referrer: u.isReferrer || false,
+                        Is_Disabled: u.disabled || false,
+                        Email_Verified: u.emailVerified || false,
+                        Created_At: u.createdAt,
+                        Last_Sign_In: u.lastSignInTime
+                    }));
+                    break;
+                case 'referrers':
+                    // Referrers export combines filtering and sorting.
+                    data = cleanData(scope === 'all' ? sortEntries(dashboardData.referrers, referrerSortConfig) : filterReferrers(dashboardData.referrers));
+                    break;
+                case 'raffle':
+                    data = cleanData(scope === 'all' ? sortEntries(dashboardData.raffleEntries, raffleSortConfig) : getFilteredView(dashboardData.raffleEntries, raffleSortConfig, raffleFilter));
+                    break;
+                case 'rolex':
+                    data = cleanData(scope === 'all' ? sortEntries(dashboardData.rolexEntries, rolexSortConfig) : getFilteredView(dashboardData.rolexEntries, rolexSortConfig, rolexFilter));
+                    break;
+                case 'donations':
+                    // Donations data is relatively small, scope='all' ignores sort, scope='filtered' applies sort.
+                    data = cleanData(scope === 'all' ? dashboardData.donationEntries : sortEntries(dashboardData.donationEntries, donationSortConfig));
+                    break;
+                default:
+                    data = [];
+            }
+            return data;
+        }
+
+        const openExportConfirmationModal = () => {
+            if (!isSuperAdmin) {
+                 showCustomPopup('Permission Denied', 'Only Super Admins can export data.');
+                 return;
+            }
+            if (currentTab === 'tools' || currentTab === '') {
+                 showCustomPopup('Export Failed', 'Please navigate to a data tab (Referrers, Sales, Donations, Users) to export.');
+                 return;
+            }
+
+            const tabName = document.querySelector(`.tab-button[data-tab="${currentTab}"]`).textContent;
+            document.getElementById('exportTabName').textContent = tabName.replace('Sales', '').trim();
+            document.getElementById('exportConfirmationModalOverlay').classList.remove('hidden');
+        };
+
+        const closeExportConfirmationModal = () => {
+            document.getElementById('exportConfirmationModalOverlay').classList.add('hidden');
+        };
+
+        const performExport = (scope) => {
+            closeExportConfirmationModal();
+
+            showGlobalLoading(`Preparing to export ${scope} data...`);
+            
+            try {
+                const dataToExport = getExportDataForCurrentTab(scope);
+                const tabName = currentTab.charAt(0).toUpperCase() + currentTab.slice(1);
+                const filename = `${tabName}_${scope}_${new Date().toISOString().slice(0, 10)}.csv`;
+                
+                if (dataToExport.length > 0) {
+                    downloadCSV(dataToExport, filename);
+                } else {
+                    showCustomPopup('Export Failed', `No data found in the selected scope (${scope}) for ${tabName}.`);
+                }
+
+            } catch (error) {
+                console.error("Export Failed:", error);
+                showCustomPopup('Export Failed', `An unexpected error occurred during export: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+        const handleExportClick = () => {
+            openExportConfirmationModal();
+        };
+
+
+        // --- Other Modal and Form Handlers ---
+
+        const openManualSaleModal = () => {
+            if (!isSuperAdmin) {
+                window.showCustomPopup('Permission Denied', 'Only Super Admins can add manual sales.');
+                return;
+            }
+            document.getElementById('manualSaleModalOverlay').classList.remove('hidden');
+            document.getElementById('manualSaleForm').reset();
+            // Show Ref ID field only for SA
+            document.getElementById('manual-referrer-container').classList.remove('hidden');
+        };
+
+        const closeManualSaleModal = () => {
+            document.getElementById('manualSaleModalOverlay').classList.add('hidden');
+        };
+
+        const handleManualSaleSubmit = async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('manual-name').value.trim();
+            const email = document.getElementById('manual-email').value.trim();
+            const phone = document.getElementById('manual-phone').value.trim();
+            const ticketsBought = document.getElementById('manual-tickets').value.trim();
+            const amount = document.getElementById('manual-amount').value.trim();
+            const refId = document.getElementById('manual-refId').value.trim();
+
+            if (!name || !ticketsBought || !amount) {
+                window.showCustomPopup('Missing Fields', 'Name, Tickets Bought, and Amount Paid are required.');
+                return;
+            }
+
+            closeManualSaleModal();
+            showGlobalLoading("Adding manual raffle entry...");
+
+            try {
+                const addManualSaleCallable = httpsCallable(functions, 'addManualSale');
+                const response = await addManualSaleCallable({
+                    name, email: email || null, phone: phone || null,
+                    ticketsBought, amount, refId: refId || null
+                });
+
+                window.showCustomPopup('Success', response.data.message);
+                await fetchDashboardData(); // Refresh dashboard data
+            } catch (error) {
+                console.error("Error adding manual sale:", error);
+                window.showCustomPopup('Error', `Failed to add manual sale: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+        // NEW: Manual Donation Logic
+        const openManualDonationModal = () => {
+            if (!isSuperAdmin) {
+                window.showCustomPopup('Permission Denied', 'Only Super Admins can add manual donations.');
+                return;
+            }
+            document.getElementById('manualDonationModalOverlay').classList.remove('hidden');
+            document.getElementById('manualDonationForm').reset();
+        };
+
+        const closeManualDonationModal = () => {
+            document.getElementById('manualDonationModalOverlay').classList.add('hidden');
+        };
+
+        const handleManualDonationSubmit = async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('donation-name').value.trim();
+            const email = document.getElementById('donation-email').value.trim();
+            const phone = document.getElementById('donation-phone').value.trim();
+            const amount = document.getElementById('donation-amount').value.trim();
+            const refId = document.getElementById('donation-refId').value.trim();
+
+            if (!name || !amount) {
+                window.showCustomPopup('Missing Fields', 'Donor Name and Donation Amount are required.');
+                return;
+            }
+
+            closeManualDonationModal();
+            showGlobalLoading("Adding manual donation entry...");
+
+            try {
+                // Assuming a new Cloud Function 'addManualDonation' handles this
+                const addManualDonationCallable = httpsCallable(functions, 'addManualDonation'); 
+                const response = await addManualDonationCallable({
+                    name, email: email || null, phone: phone || null,
+                    amount: parseFloat(amount), refId: refId || null
+                });
+
+                window.showCustomPopup('Success', response.data.message);
+                await fetchDashboardData(); // Refresh dashboard data
+            } catch (error) {
+                console.error("Error adding manual donation:", error);
+                window.showCustomPopup('Error', `Failed to add manual donation: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+
+        // --- Split the Pot Assignment Logic ---
+
+        const fetchAssignmentRaffleSales = async () => {
+            // Use local data as source, no extra fetch needed
+            allAssignmentRaffleSales = dashboardData.raffleEntries.map((sale, index) => ({
+                id: sale.id || `sale-${index}`, 
+                ...sale
+            }));
+            
+            filteredRaffleSales = [...allAssignmentRaffleSales];
+            selectedRaffleSaleIds.clear();
+            updateApplyRaffleTicketsUI();
+        };
+        
+        const openApplyRaffleTicketsModal = async (refId, refName) => {
+            if (!isSuperAdmin) {
+                showCustomPopup('Permission Denied', 'Only Super Admins can assign Split the Pot tickets.');
+                return;
+            }
+            
+            targetRaffleRefId = refId;
+            targetRaffleRefName = refName;
+
+            document.getElementById('targetReferrerName').textContent = refName;
+            document.getElementById('targetReferrerId').textContent = refId;
+            document.getElementById('unassignedSearchInput').value = '';
+            
+            await fetchAssignmentRaffleSales(); // Re-fetch all sales and populate the assignment modal's table
+            
+            document.getElementById('applyTicketsModalOverlay').classList.remove('hidden');
+        };
+
+        const closeApplyRaffleTicketsModal = () => {
+            document.getElementById('applyTicketsModalOverlay').classList.add('hidden');
+            targetRaffleRefId = null;
+            targetRaffleRefName = null;
+            allAssignmentRaffleSales = [];
+            filteredRaffleSales = [];
+            selectedRaffleSaleIds.clear();
+        };
+
+        const updateApplyRaffleTicketsUI = () => {
+            const tbody = document.getElementById('unassignedSalesTableBody');
+            tbody.innerHTML = '';
+            const selectAllCheckbox = document.getElementById('selectAllUnassigned');
+            const selectedCountDisplay = document.getElementById('selectedCountDisplay');
+            const applyButton = document.getElementById('applyReferrerButton');
+            
+            // Recheck state to ensure correct select-all state
+            const allDisplayedSelected = filteredRaffleSales.length > 0 && 
+                                                    filteredRaffleSales.every(s => selectedRaffleSaleIds.has(s.id));
+            selectAllCheckbox.checked = allDisplayedSelected;
+            
+            if (filteredRaffleSales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">No Split the Pot sales found matching the criteria.</td></tr>';
+                applyButton.disabled = true;
+                selectedCountDisplay.textContent = '0 sales selected';
+                return;
+            }
+
+            filteredRaffleSales.forEach(sale => {
+                const isSelected = selectedRaffleSaleIds.has(sale.id);
+                const customerName = sale.fullName || sale.name || sale.firstName || 'N/A';
+                
+                // FIX: Prioritize Phone Number over Email
+                const contact = sale.phoneNumber || sale.email || 'N/A';
+
+                const currentReferrerContent = sale.referrerRefId 
+                    ? `<span class="font-mono text-xs px-2 py-1 bg-yellow-400/20 text-yellow-300 rounded">${sale.referrerRefId}</span>`
+                    : '<span class="text-red-400">None</span>';
+
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center">
+                        <input type="checkbox" data-sale-id="${sale.id}" class="raffle-sale-checkbox rounded text-blue-400 focus:ring-blue-400 bg-gray-700 border-gray-600" ${isSelected ? 'checked' : ''}>
+                    </td>
+                    <td>${formatDate(sale.timestamp)}</td>
+                    <td>${customerName}</td>
+                    <td>${contact}</td> <!-- Updated to prioritize phone -->
+                    <td>${(sale.ticketCount || 0).toLocaleString()}</td>
+                    <td class="text-right font-medium">${formatCurrency(sale.amountPaid || 0)}</td>
+                    <td>${currentReferrerContent}</td> 
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            selectedCountDisplay.textContent = `${selectedRaffleSaleIds.size} sales selected`;
+            applyButton.disabled = selectedRaffleSaleIds.size === 0;
+
+        };
+
+        const handleRaffleSearchChange = () => {
+            const searchLower = document.getElementById('unassignedSearchInput').value.toLowerCase().trim();
+            if (searchLower === '') {
+                filteredRaffleSales = [...allAssignmentRaffleSales];
+            } else {
+                filteredRaffleSales = allAssignmentRaffleSales.filter(sale => {
+                    const name = (sale.fullName || sale.name || sale.firstName || '').toLowerCase();
+                    const email = (sale.email || '').toLowerCase();
+                    const phone = (sale.phoneNumber || '').toLowerCase();
+                    const currentRef = (sale.referrerRefId || '').toLowerCase(); 
+                    return name.includes(searchLower) || email.includes(searchLower) || phone.includes(searchLower) || currentRef.includes(searchLower);
+                });
+            }
+            // Clear selections for newly filtered set
+            selectedRaffleSaleIds.clear(); 
+            updateApplyRaffleTicketsUI();
+        };
+
+        const handleRaffleCheckboxChange = (e) => {
+            const saleId = e.target.dataset.saleId;
+            if (e.target.checked) {
+                selectedRaffleSaleIds.add(saleId);
+            } else {
+                selectedRaffleSaleIds.delete(saleId);
+            }
+            
+            const selectAllCheckbox = document.getElementById('selectAllUnassigned');
+            const allDisplayedSelected = filteredRaffleSales.length > 0 && 
+                                                    filteredRaffleSales.every(s => selectedRaffleSaleIds.has(s.id));
+                                                    
+            if (allDisplayedSelected) {
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.checked = false;
+            }
+
+            document.getElementById('selectedCountDisplay').textContent = `${selectedRaffleSaleIds.size} sales selected`;
+            document.getElementById('applyReferrerButton').disabled = selectedRaffleSaleIds.size === 0;
+        };
+
+        const handleRaffleSelectAllChange = (e) => {
+            selectedRaffleSaleIds.clear();
+            const isChecked = e.target.checked;
+
+            document.querySelectorAll('.raffle-sale-checkbox').forEach(checkbox => {
+                checkbox.checked = isChecked;
+                const saleId = checkbox.dataset.saleId;
+                if (isChecked) {
+                    selectedRaffleSaleIds.add(saleId);
+                }
+            });
+
+            document.getElementById('selectedCountDisplay').textContent = `${selectedRaffleSaleIds.size} sales selected`;
+            document.getElementById('applyReferrerButton').disabled = selectedRaffleSaleIds.size === 0;
+        };
+
+        const applyReferrerToRaffleSales = async () => {
+            if (!targetRaffleRefId || selectedRaffleSaleIds.size === 0) {
+                showCustomPopup('Error', 'No referrer or sales selected.');
+                return;
+            }
+            
+            const salesToUpdate = Array.from(selectedRaffleSaleIds);
+            const refId = targetRaffleRefId;
+            
+            closeApplyRaffleTicketsModal();
+            showGlobalLoading(`Processing transfer/assignment of ${salesToUpdate.length} Split the Pot sales to ${refId}...`);
+
+            try {
+                const assignReferrerToSalesCallable = httpsCallable(functions, 'assignReferrerToSales');
+                const response = await assignReferrerToSalesCallable({ saleIds: salesToUpdate, refId: refId });
+
+                showCustomPopup('Success', response.data.message || `Successfully processed ${salesToUpdate.length} sales for ${refId}.`);
+                
+                // Full refresh to update all tables and totals
+                await fetchDashboardData(); 
+
+            } catch (error) {
+                console.error("Error assigning referrer (Raffle):", error);
+                showCustomPopup('Assignment/Transfer Failed', `Error: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+        
+        // --- Rolex Raffle (Rolex) Assignment Logic ---
+        
+        const fetchAssignmentRolexSales = async () => {
+            // Use local data as source, no extra fetch needed
+            allAssignmentRolexSales = dashboardData.rolexEntries.filter(t => t.status === 'paid' || t.status === 'converted').map((ticket) => ({
+                id: ticket.id, // Ticket number is the ID
+                ...ticket
+            }));
+            
+            filteredRolexSales = [...allAssignmentRolexSales];
+            selectedRolexSaleIds.clear();
+            updateApplyRolexTicketsUI();
+        };
+
+        const openApplyRolexTicketsModal = async (refId, refName) => {
+            if (!isSuperAdmin) {
+                showCustomPopup('Permission Denied', 'Only Super Admins can assign Rolex Raffle tickets.');
+                return;
+            }
+            
+            targetRolexRefId = refId;
+            targetRolexRefName = refName;
+
+            document.getElementById('targetRolexReferrerName').textContent = refName;
+            document.getElementById('targetRolexReferrerId').textContent = refId;
+            document.getElementById('rolexSearchInput').value = '';
+            
+            await fetchAssignmentRolexSales();
+            
+            document.getElementById('applyRolexTicketsModalOverlay').classList.remove('hidden');
+        };
+        
+        const closeApplyRolexTicketsModal = () => {
+            document.getElementById('applyRolexTicketsModalOverlay').classList.add('hidden');
+            targetRolexRefId = null;
+            targetRolexRefName = null;
+            allAssignmentRolexSales = [];
+            filteredRolexSales = [];
+            selectedRolexSaleIds.clear();
+        };
+        
+        const updateApplyRolexTicketsUI = () => {
+            const tbody = document.getElementById('rolexAssignmentTableBody');
+            tbody.innerHTML = '';
+            const selectAllCheckbox = document.getElementById('selectAllRolex');
+            const selectedCountDisplay = document.getElementById('selectedRolexCountDisplay');
+            const applyButton = document.getElementById('applyRolexReferrerButton');
+            
+            // Recheck state to ensure correct select-all state
+            const allDisplayedSelected = filteredRolexSales.length > 0 && 
+                                                    filteredRolexSales.every(s => selectedRolexSaleIds.has(s.id));
+            selectAllCheckbox.checked = allDisplayedSelected;
+
+            if (filteredRolexSales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">No Paid or Converted Rolex Raffle tickets found matching the criteria.</td></tr>';
+                applyButton.disabled = true;
+                selectedCountDisplay.textContent = '0 tickets selected';
+                return;
+            }
+
+            filteredRolexSales.forEach(ticket => {
+                const isSelected = selectedRolexSaleIds.has(ticket.id);
+                const customerName = ticket.fullName || ticket.name || ticket.firstName || 'N/A';
+                
+                // FIX: Prioritize Phone Number over Email
+                const contact = ticket.phoneNumber || ticket.email || 'N/A';
+                
+                let statusClass = 'bg-gray-700/50 text-gray-300';
+                let statusText = (ticket.status || 'N/A').toUpperCase();
+                if (ticket.status === 'paid') {
+                    statusClass = 'bg-green-700/50 text-green-300';
+                } else if (ticket.status === 'converted') {
+                    statusClass = 'bg-purple-700/50 text-purple-300';
+                    statusText = 'CONVERTED';
+                }
+                
+                const currentReferrerContent = ticket.referrerRefId 
+                    ? `<span class="font-mono text-xs px-1 bg-yellow-400/20 text-yellow-300 rounded">${ticket.referrerRefId}</span>`
+                    : '<span class="text-red-400">None</span>';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center">
+                        <input type="checkbox" data-ticket-id="${ticket.id}" class="rolex-ticket-checkbox rounded text-purple-400 focus:ring-purple-400 bg-gray-700 border-gray-600" ${isSelected ? 'checked' : ''}>
+                    </td>
+                    <td class="font-bold">${ticket.id}</td>
+                    <td>${formatDate(ticket.timestamp)}</td>
+                    <td>${customerName}</td>
+                    <td>${contact}</td> <!-- Updated to prioritize phone -->
+                    <td><span class="text-xs font-medium px-2 py-1 rounded-full ${statusClass}">${statusText}</span></td>
+                    <td class="text-right font-medium">${formatCurrency(ticket.amountPaid || 0)}</td>
+                    <td>${currentReferrerContent}</td> 
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            selectedCountDisplay.textContent = `${selectedRolexSaleIds.size} tickets selected`;
+            applyButton.disabled = selectedRolexSaleIds.size === 0;
+
+        };
+
+        const handleRolexSearchChange = () => {
+            const searchLower = document.getElementById('rolexSearchInput').value.toLowerCase().trim();
+            if (searchLower === '') {
+                filteredRolexSales = [...allAssignmentRolexSales];
+            } else {
+                filteredRolexSales = allAssignmentRolexSales.filter(ticket => {
+                    const name = (ticket.fullName || ticket.name || ticket.firstName || '').toLowerCase();
+                    const email = (ticket.email || '').toLowerCase();
+                    const phone = (ticket.phoneNumber || '').toLowerCase(); // Added phone search
+                    const currentRef = (ticket.referrerRefId || '').toLowerCase(); 
+                    const id = String(ticket.id).toLowerCase();
+                    return name.includes(searchLower) || email.includes(searchLower) || phone.includes(searchLower) || currentRef.includes(searchLower) || id.includes(searchLower);
+                });
+            }
+            // Clear selections for newly filtered set
+            selectedRolexSaleIds.clear(); 
+            updateApplyRolexTicketsUI();
+        };
+
+        const handleRolexCheckboxChange = (e) => {
+            const ticketId = e.target.dataset.ticketId;
+            if (e.target.checked) {
+                selectedRolexSaleIds.add(ticketId);
+            } else {
+                selectedRolexSaleIds.delete(ticketId);
+            }
+            
+            const selectAllCheckbox = document.getElementById('selectAllRolex');
+            const allDisplayedSelected = filteredRolexSales.length > 0 && 
+                                                    filteredRolexSales.every(s => selectedRolexSaleIds.has(s.id));
+                                                    
+            if (allDisplayedSelected) {
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.checked = false;
+            }
+
+            document.getElementById('selectedRolexCountDisplay').textContent = `${selectedRolexSaleIds.size} tickets selected`;
+            document.getElementById('applyRolexReferrerButton').disabled = selectedRolexSaleIds.size === 0;
+        };
+
+        const handleRolexSelectAllChange = (e) => {
+            selectedRolexSaleIds.clear();
+            const isChecked = e.target.checked;
+
+            document.querySelectorAll('.rolex-ticket-checkbox').forEach(checkbox => {
+                checkbox.checked = isChecked;
+                const ticketId = checkbox.dataset.ticketId;
+                if (isChecked) {
+                    selectedRolexSaleIds.add(ticketId);
+                }
+            });
+
+            document.getElementById('selectedRolexCountDisplay').textContent = `${selectedRolexSaleIds.size} tickets selected`;
+            document.getElementById('applyRolexReferrerButton').disabled = selectedRolexSaleIds.size === 0;
+        };
+
+        const applyReferrerToRolexTickets = async () => {
+            if (!targetRolexRefId || selectedRolexSaleIds.size === 0) {
+                showCustomPopup('Error', 'No referrer or tickets selected.');
+                return;
+            }
+            
+            const ticketIds = Array.from(selectedRolexSaleIds);
+            const refId = targetRolexRefId;
+            
+            closeApplyRolexTicketsModal();
+            showGlobalLoading(`Processing transfer/assignment of ${ticketIds.length} Rolex Raffle tickets to ${refId}...`);
+
+            try {
+                const assignReferrerToRolexTicketsCallable = httpsCallable(functions, 'assignReferrerToRolexTickets');
+                const response = await assignReferrerToRolexTicketsCallable({ ticketIds: ticketIds, refId: refId });
+
+                showCustomPopup('Success', response.data.message || `Successfully processed ${ticketIds.length} tickets for ${refId}.`);
+                
+                await fetchDashboardData(); 
+
+            } catch (error) {
+                console.error("Error assigning referrer (Rolex):", error);
+                showCustomPopup('Assignment/Transfer Failed', `Error: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+        // --- NEW: Ticket Conversion Tool Logic ---
+        
+        const TICKET_PRICE_NEW = 150.00; // New Rolex Raffle ticket price
+
+        const openConversionToolModal = () => {
+            if (!isSuperAdmin) {
+                window.showCustomPopup('Permission Denied', 'Only Super Admins can access the Conversion Tool.');
+                return;
+            }
+            document.getElementById('conversionToolModalOverlay').classList.remove('hidden');
+            document.getElementById('conversionForm').reset();
+            document.getElementById('conversion-details-container').classList.add('hidden');
+            document.getElementById('surplus-action-container').classList.add('hidden');
+            
+            // Reset visual balances
+            document.getElementById('conversion-outstanding-balance').textContent = formatCurrency(0);
+            document.getElementById('conversion-outstanding-balance').classList.add('text-red-500');
+            document.getElementById('conversion-outstanding-balance').classList.remove('text-green-500');
+            document.getElementById('balance-label').textContent = 'Outstanding Balance Due:';
+        };
+
+        const closeConversionToolModal = () => {
+            document.getElementById('conversionToolModalOverlay').classList.add('hidden');
+        };
+
+        const updateConversionCalculation = () => {
+            const oldAmount = parseFloat(document.getElementById('conversion-original-amount-value').value) || 0;
+            const newTickets = parseInt(document.getElementById('conversion-new-tickets').value, 10) || 0;
+            
+            const requiredAmount = newTickets * TICKET_PRICE_NEW;
+            const balance = requiredAmount - oldAmount; // Positive means balance DUE, Negative means surplus CREDIT
+            
+            document.getElementById('conversion-required-amount').textContent = formatCurrency(requiredAmount);
+            
+            const balanceElement = document.getElementById('conversion-outstanding-balance');
+            const balanceLabel = document.getElementById('balance-label');
+            const surplusContainer = document.getElementById('surplus-action-container');
+
+            balanceElement.classList.remove('text-red-500', 'text-green-500');
+            surplusContainer.classList.add('hidden');
+            
+            if (balance > 0) {
+                // Balance DUE
+                balanceElement.textContent = formatCurrency(balance);
+                balanceElement.classList.add('text-red-500');
+                balanceLabel.textContent = 'Outstanding Balance Due:';
+                document.getElementById('convertTicketsButton').disabled = newTickets <= 0;
+            } else if (balance <= 0) {
+                // Surplus CREDIT or exact break-even
+                balanceElement.textContent = formatCurrency(Math.abs(balance));
+                balanceElement.classList.add('text-green-500');
+                balanceLabel.textContent = 'Surplus Credit:';
+                document.getElementById('convertTicketsButton').disabled = newTickets <= 0;
+                
+                // Show surplus action options only if there is a surplus (not exact break-even)
+                if (Math.abs(balance) > 0.01) {
+                    surplusContainer.classList.remove('hidden');
+                }
+            } else {
+                // Default check, covers empty field or invalid input
+                 document.getElementById('convertTicketsButton').disabled = newTickets <= 0;
+            }
+        };
+
+        const searchOldTicketEntry = async () => {
+            const email = document.getElementById('conversion-search-email').value.trim();
+            if (!email) {
+                showCustomPopup('Missing Email', 'Please enter a customer email to search old purchases.');
+                return;
+            }
+            
+            showGlobalLoading("Searching old ticket purchases...");
+            
+            try {
+                // Assuming a new Cloud Function 'getOldRaffleTicketDetails' exists
+                const getOldRaffleTicketDetailsCallable = httpsCallable(functions, 'getOldRaffleTicketDetails');
+                const response = await getOldRaffleTicketDetailsCallable({ email });
+                const oldEntry = response.data.entry;
+                
+                if (!oldEntry || !oldEntry.id) {
+                    showCustomPopup('Not Found', 'No paid ticket entry found for this email.');
+                    document.getElementById('conversion-details-container').classList.add('hidden');
+                    return;
+                }
+                
+                // Populate fields
+                document.getElementById('conversion-entry-id').value = oldEntry.id;
+                document.getElementById('conversion-original-amount-value').value = oldEntry.amountPaid || 0;
+                document.getElementById('conversion-name').textContent = oldEntry.name || oldEntry.fullName || 'N/A';
+                document.getElementById('conversion-email').textContent = oldEntry.email;
+                document.getElementById('conversion-refId').textContent = oldEntry.referrerRefId || 'N/A';
+                document.getElementById('conversion-old-amount').textContent = formatCurrency(oldEntry.amountPaid || 0);
+                
+                // Show calculator section and run initial calc
+                document.getElementById('conversion-new-tickets').value = Math.floor((oldEntry.amountPaid || 0) / TICKET_PRICE_NEW) || 1; // Suggest optimal tickets
+                document.getElementById('conversion-details-container').classList.remove('hidden');
+                updateConversionCalculation();
+
+                showCustomPopup('Success', `Found purchase of ${formatCurrency(oldEntry.amountPaid || 0)} for ${oldEntry.name}. Ready for conversion.`);
+
+            } catch (error) {
+                console.error("Error searching old entry:", error);
+                showCustomPopup('Search Failed', `Error: ${error.message}`);
+                document.getElementById('conversion-details-container').classList.add('hidden');
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+        const handleConvertTicketsSubmit = async (e) => {
+            e.preventDefault();
+            
+            const entryId = document.getElementById('conversion-entry-id').value;
+            const newTickets = parseInt(document.getElementById('conversion-new-tickets').value, 10);
+            
+            // Recalculate balance for final check
+            const oldAmount = parseFloat(document.getElementById('conversion-original-amount-value').value) || 0;
+            const requiredAmount = newTickets * TICKET_PRICE_NEW;
+            const balance = requiredAmount - oldAmount; // Positive = DUE, Negative = SURPLUS
+            
+            const name = document.getElementById('conversion-name').textContent;
+            const email = document.getElementById('conversion-email').textContent;
+            const refId = document.getElementById('conversion-refId').textContent;
+            
+            let surplusAction = 'none'; // Default if no surplus
+            
+            if (newTickets <= 0) {
+                 showCustomPopup('Invalid Quantity', 'Please select at least 1 new ticket.');
+                 return;
+            }
+            
+            if (balance > 0) {
+                 showCustomPopup('Outstanding Balance', `You must manually collect the outstanding balance of ${formatCurrency(balance)} before finalizing this conversion.`);
+                 // Admin needs to perform the manual collection first, then can proceed.
+                 return;
+            }
+            
+            // If there is a surplus (balance is 0 or negative)
+            if (balance < 0) {
+                // Get selected surplus action
+                const selectedRadio = document.querySelector('input[name="surplus_action"]:checked');
+                surplusAction = selectedRadio ? selectedRadio.value : 'donate'; // Default to donate if selected
+            }
+
+            closeConversionToolModal();
+            showGlobalLoading(`Finalizing conversion for ${name} to ${newTickets} new tickets...`);
+
+            try {
+                const convertOldTicketsToNewRaffleEntryCallable = httpsCallable(functions, 'convertOldTicketsToNewRaffleEntry');
+                const response = await convertOldTicketsToNewRaffleEntryCallable({
+                    oldEntryId: entryId,
+                    newTicketQuantity: newTickets,
+                    originalAmountPaid: oldAmount, // Use the correct variable name here
+                    newRequiredAmount: requiredAmount,
+                    customerName: name,
+                    customerEmail: email,
+                    referrerRefId: refId === 'N/A' ? null : refId,
+                    surplusAction: surplusAction // Pass the chosen action
+                });
+
+                showCustomPopup('Conversion Complete', response.data.message);
+                await fetchDashboardData(); // Refresh dashboard data
+            } catch (error) {
+                console.error("Conversion Failed:", error);
+                showCustomPopup('Conversion Failed', `Error: ${error.message}`);
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+
+
+        // --- Authentication and Initialization ---
+
+        const setupAuthListeners = () => {
+            onAuthStateChanged(auth, async (user) => {
+                showGlobalLoading("Checking authorization...");
+                if (user) {
+                    // Force refresh token to get latest claims
+                    const idTokenResult = await user.getIdTokenResult(true); 
+                    const claims = idTokenResult.claims;
+                    
+                    const isAuthenticated = claims.admin || claims.superAdmin || claims.referrer;
+
+                    if (isAuthenticated) {
+                        document.getElementById('loginModalOverlay').classList.add('hidden');
+                        document.getElementById('dashboardContainer').classList.remove('hidden');
+                        document.getElementById('authErrorDisplay').classList.add('hidden');
+                        // Fetch data, which also sets isSuperAdmin/isReferrer/isLoggedInAdmin flags
+                        await fetchDashboardData(); 
+                    } else {
+                        document.getElementById('loginModalOverlay').classList.remove('hidden');
+                        document.getElementById('dashboardContainer').classList.add('hidden');
+                        document.getElementById('loginError').textContent = "Unauthorized. Please use an Admin/Referrer account.";
+                        document.getElementById('loginError').classList.remove('hidden');
+                        hideGlobalLoading();
+                    }
+                } else {
+                    // Logged out state
+                    document.getElementById('dashboardContainer').classList.add('hidden');
+                    document.getElementById('loginModalOverlay').classList.remove('hidden');
+                    hideGlobalLoading();
+                }
+            });
+        };
+        
+        const handleLogin = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const loginError = document.getElementById('loginError');
+            
+            loginError.classList.add('hidden');
+            document.getElementById('loginButton').disabled = true;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                console.error("Login failed:", error);
+                loginError.textContent = "Login failed: Invalid credentials or account type.";
+                loginError.classList.remove('hidden');
+            } finally {
+                document.getElementById('loginButton').disabled = false;
+            }
+        };
+
+        const handleLogout = async () => {
+            showGlobalLoading("Logging out...");
+            try {
+                await signOut(auth);
+                // Clear all state flags on logout
+                isSuperAdmin = false;
+                isReferrer = false;
+                isLoggedInAdmin = false;
+                currentTab = '';
+                // The onAuthStateChanged listener will handle UI transition
+            } catch (error) {
+                console.error("Logout failed:", error);
+                window.showCustomPopup("Logout Failed", "Could not log out. Please try again.");
+            } finally {
+                hideGlobalLoading();
+            }
+        };
+        
+        // --- Event Listeners for Search and Sort Controls ---
+        const attachSortAndSearchListeners = () => {
+            // Referrer Table Search
+            const searchInput = document.getElementById('referrerSearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchTerm = e.target.value;
+                    renderReferrersTable(dashboardData.referrers);
+                });
+            }
+
+            // User Table Search
+            const userSearchInput = document.getElementById('userSearchInput');
+            if (userSearchInput) {
+                userSearchInput.addEventListener('input', handleUserSearchChange);
+            }
+
+            // User Table Sort
+            document.querySelectorAll('.user-sort-header').forEach(header => {
+                header.addEventListener('click', (e) => {
+                    const key = e.currentTarget.dataset.sortKey;
+                    if (userSortConfig.key === key) {
+                        userSortConfig.direction = userSortConfig.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        userSortConfig.key = key;
+                        // Default to ascending for strings, descending for dates
+                        userSortConfig.direction = (key === 'email' || key === 'displayName') ? 'asc' : 'desc';
+                    }
+                    renderAuthUsersTable(allAuthUsers);
+                });
+            });
+
+            // Referrer Table Sort
+            document.querySelectorAll('.referrer-sort-header').forEach(header => {
+                header.addEventListener('click', (e) => {
+                    const key = e.currentTarget.dataset.sortKey;
+                    if (referrerSortConfig.key === key) {
+                        referrerSortConfig.direction = referrerSortConfig.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        referrerSortConfig.key = key;
+                        // Default to ascending for strings, descending for numbers
+                        referrerSortConfig.direction = (key === 'name' || key === 'refId' || key === 'email') ? 'asc' : 'desc';
+                    }
+                    renderReferrersTable(dashboardData.referrers);
+                });
+            });
+            
+            // Sales Table Sorting (Raffle and Rolex)
+            document.querySelectorAll('.sort-header').forEach(header => {
+                header.addEventListener('click', (e) => {
+                    const table = e.currentTarget.dataset.table;
+                    const key = e.currentTarget.dataset.sortKey;
+                    
+                    let config = {};
+                    let data = [];
+                    let renderFunc;
+                    
+                    if (table === 'raffle') {
+                        config = raffleSortConfig;
+                        data = dashboardData.raffleEntries;
+                        renderFunc = renderRaffleTable;
+                    } else if (table === 'rolex') {
+                        config = rolexSortConfig;
+                        data = dashboardData.rolexEntries;
+                        renderFunc = renderRolexTable;
+                    } else if (table === 'donations') {
+                        config = donationSortConfig;
+                        data = dashboardData.donationEntries;
+                        renderFunc = renderDonationsTable;
+                    }
+                    
+                    if (config.key === key) {
+                        config.direction = config.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        config.key = key;
+                        // Default to ascending for strings, descending for numbers/dates
+                        config.direction = (key === 'fullName' || key === 'referrerRefId' || key === 'name' || key === 'id') ? 'asc' : 'desc';
+                    }
+                    renderFunc(data);
+                });
+            });
+            
+            // Sales Table Filtering (Raffle)
+            const raffleFilterElement = document.getElementById('raffleFilter');
+            if (raffleFilterElement) {
+                raffleFilterElement.addEventListener('change', (e) => {
+                    raffleFilter = e.target.value;
+                    // Note: If activeRefIdFilter is set, we still filter by that, 
+                    // but the raffleFilter is applied *within* that set.
+                    renderRaffleTable(dashboardData.raffleEntries);
+                });
+            }
+            
+            // Sales Table Filtering (Rolex)
+            const rolexFilterElement = document.getElementById('rolexFilter');
+            if (rolexFilterElement) {
+                rolexFilterElement.addEventListener('change', (e) => {
+                    rolexFilter = e.target.value;
+                    renderRolexTable(dashboardData.rolexEntries);
+                });
+            }
+        };
+
+
+        // --- Event Listeners and Initial Setup ---
+        window.onload = async () => {
+            try {
+                // Initialize Firebase
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                functions = getFunctions(app);
+                db = getFirestore(app);
+                
+                setLogLevel('debug');
+
+                const refId = getRefIdFromUrl();
+                if (refId) {
+                    await trackRefClick(refId); 
+                }
+
+                setupAuthListeners();
+                
+                // Attach Event Listeners
+                document.getElementById('loginForm').addEventListener('submit', handleLogin);
+                document.getElementById('logoutButton').addEventListener('click', handleLogout);
+                document.getElementById('popupCloseButton').addEventListener('click', hideCustomPopup);
+                
+                // NEW EXPORT CONFIRMATION LISTENERS
+                document.getElementById('exportDataButton').addEventListener('click', handleExportClick);
+                document.getElementById('closeExportConfirmationModal').addEventListener('click', closeExportConfirmationModal);
+                document.getElementById('exportAllRowsButton').addEventListener('click', () => performExport('all'));
+                document.getElementById('exportFilteredRowsButton').addEventListener('click', () => performExport('filtered'));
+                
+                // NEW: Refresh Data Button
+                document.getElementById('refreshDataButton').addEventListener('click', handleRefreshClick);
+
+                // Tab navigation
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.addEventListener('click', (e) => switchTab(e.target.dataset.tab));
+                });
+                
+                // Attach Search and Sort listeners
+                attachSortAndSearchListeners();
+                
+                // Manual Sale Modal listeners
+                if (document.getElementById('addManualSaleButton')) {
+                    document.getElementById('addManualSaleButton').addEventListener('click', openManualSaleModal);
+                }
+                if (document.getElementById('closeManualSaleModal')) {
+                    document.getElementById('closeManualSaleModal').addEventListener('click', closeManualSaleModal);
+                }
+                if (document.getElementById('manualSaleForm')) {
+                    document.getElementById('manualSaleForm').addEventListener('submit', handleManualSaleSubmit);
+                }
+                
+                // NEW: Manual Donation Modal listeners
+                if (document.getElementById('addManualDonationButton')) {
+                    document.getElementById('addManualDonationButton').addEventListener('click', openManualDonationModal);
+                }
+                if (document.getElementById('closeManualDonationModal')) {
+                    document.getElementById('closeManualDonationModal').addEventListener('click', closeManualDonationModal);
+                }
+                if (document.getElementById('manualDonationForm')) {
+                    document.getElementById('manualDonationForm').addEventListener('submit', handleManualDonationSubmit);
+                }
+                
+                // Edit Sale Modal listeners
+                if (document.getElementById('closeEditSaleModal')) {
+                    document.getElementById('closeEditSaleModal').addEventListener('click', closeEditSaleModal);
+                }
+                if (document.getElementById('editSaleForm')) {
+                    document.getElementById('editSaleForm').addEventListener('submit', handleEditSaleSubmit);
+                }
+                
+                // Admin Tools listeners
+                if (document.getElementById('deleteExpiredTicketsButton')) {
+                    document.getElementById('deleteExpiredTicketsButton').addEventListener('click', handleCleanupClick);
+                }
+                
+                if (document.getElementById('recalculateAllReferrerTotalsButton')) {
+                    document.getElementById('recalculateAllReferrerTotalsButton').addEventListener('click', handleRecalculateAllReferrerTotals);
+                }
+                if (document.getElementById('recalculateTotalsButton')) {
+                    document.getElementById('recalculateTotalsButton').addEventListener('click', handleRecalculateRaffleTotals);
+                }
+                if (document.getElementById('recalculateRolexTotalsButton')) {
+                    document.getElementById('recalculateRolexTotalsButton').addEventListener('click', handleRecalculateRolexTotals); 
+                }
+
+                // NEW: Conversion Tool listeners
+                if (document.getElementById('openConversionToolButton')) {
+                    document.getElementById('openConversionToolButton').addEventListener('click', openConversionToolModal);
+                }
+                if (document.getElementById('closeConversionToolModal')) {
+                    document.getElementById('closeConversionToolModal').addEventListener('click', closeConversionToolModal);
+                }
+                if (document.getElementById('searchOldTicketButton')) {
+                    document.getElementById('searchOldTicketButton').addEventListener('click', searchOldTicketEntry);
+                }
+                if (document.getElementById('conversion-new-tickets')) {
+                    document.getElementById('conversion-new-tickets').addEventListener('input', updateConversionCalculation);
+                }
+                if (document.getElementById('conversionForm')) {
+                    document.getElementById('conversionForm').addEventListener('submit', handleConvertTicketsSubmit);
+                }
+
+
+                // --- Split the Pot Assignment Modal listeners ---
+                if (document.getElementById('closeApplyTicketsModal')) {
+                    document.getElementById('closeApplyTicketsModal').addEventListener('click', closeApplyRaffleTicketsModal);
+                }
+                if (document.getElementById('applyReferrerButton')) {
+                    document.getElementById('applyReferrerButton').addEventListener('click', applyReferrerToRaffleSales);
+                }
+                if (document.getElementById('unassignedSearchInput')) {
+                    document.getElementById('unassignedSearchInput').addEventListener('input', handleRaffleSearchChange);
+                }
+                if (document.getElementById('selectAllUnassigned')) {
+                    document.getElementById('selectAllUnassigned').addEventListener('change', handleRaffleSelectAllChange);
+                }
+                
+                if (document.getElementById('unassignedSalesTableBody')) {
+                    document.getElementById('unassignedSalesTableBody').addEventListener('change', (e) => { // Using change for checkboxes is more reliable
+                        if (e.target.classList.contains('raffle-sale-checkbox')) {
+                            handleRaffleCheckboxChange(e);
+                        }
+                    });
+                }
+
+
+                // --- Rolex Raffle (Rolex) Assignment Modal listeners ---
+                if (document.getElementById('closeApplyRolexTicketsModal')) {
+                    document.getElementById('closeApplyRolexTicketsModal').addEventListener('click', closeApplyRolexTicketsModal);
+                }
+                if (document.getElementById('applyRolexReferrerButton')) {
+                    document.getElementById('applyRolexReferrerButton').addEventListener('click', applyReferrerToRolexTickets);
+                }
+                if (document.getElementById('rolexSearchInput')) {
+                    document.getElementById('rolexSearchInput').addEventListener('input', handleRolexSearchChange);
+                }
+                if (document.getElementById('selectAllRolex')) {
+                    document.getElementById('selectAllRolex').addEventListener('change', handleRolexSelectAllChange);
+                }
+                
+                if (document.getElementById('rolexAssignmentTableBody')) {
+                    document.getElementById('rolexAssignmentTableBody').addEventListener('change', (e) => { // Using change for checkboxes is more reliable
+                        if (e.target.classList.contains('rolex-ticket-checkbox')) {
+                            handleRolexCheckboxChange(e);
+                        }
+                    });
+                }
+
+                // Upgrade Admin Modal listeners
+                if (document.getElementById('closeUpgradeAdminModal')) {
+                    document.getElementById('closeUpgradeAdminModal').addEventListener('click', closeUpgradeAdminModal);
+                }
+                if (document.getElementById('confirmUpgradeAdmin')) {
+                    document.getElementById('confirmUpgradeAdmin').addEventListener('click', handleUpgradeAdmin);
+                }
+
+                // --- USER MANAGEMENT LISTENERS ---
+                if (document.getElementById('usersTableBody')) {
+                    document.getElementById('usersTableBody').addEventListener('change', (e) => { // Using change for checkboxes is more reliable
+                        if (e.target.classList.contains('user-select-checkbox')) {
+                            handleUserCheckboxChange(e);
+                        }
+                    });
+                }
+                if (document.getElementById('selectAllUsers')) {
+                    document.getElementById('selectAllUsers').addEventListener('change', handleUserSelectAllChange);
+                }
+                if (document.getElementById('openBatchResetModalButton')) {
+                    document.getElementById('openBatchResetModalButton').addEventListener('click', openBatchResetModal);
+                }
+                if (document.getElementById('closeBatchResetModal')) {
+                    document.getElementById('closeBatchResetModal').addEventListener('click', closeBatchResetModal);
+                }
+                if (document.getElementById('batchResetForm')) {
+                    document.getElementById('batchResetForm').addEventListener('submit', handleBatchResetSubmit);
+                }
+                // END NEW USER MANAGEMENT LISTENERS
+
+                // Event delegation for Referrers Table clicks (Handles View Sales, Assign Raffle/Rolex, and Promote to SA)
+                if (document.getElementById('referrersTableBody')) {
+                    document.getElementById('referrersTableBody').addEventListener('click', (e) => {
+                        const target = e.target.closest('[data-action]'); // Use closest for better button targeting
+                        if (!target || !isSuperAdmin) return;
+                        
+                        const action = target.dataset.action;
+                        const refId = target.dataset.refid;
+                        const refName = target.dataset.refname;
+                        const uid = target.dataset.uid;
+                        
+                        if (action === 'assign-raffle-tickets') {
+                            openApplyRaffleTicketsModal(refId, refName);
+                        } else if (action === 'assign-rolex-tickets') {
+                            openApplyRolexTicketsModal(refId, refName);
+                        } else if (action === 'view-referrer-sales') { 
+                            // Unified filter for both Raffle and Rolex
+                            openReferrerSalesModal(refId, refName);
+                        } else if (action === 'promote-sa') {
+                            openUpgradeAdminModal(uid, refName, refId);
+                        }
+                    });
+                }
+
+                // FIX: Centralized event delegation for Clear Filter buttons on a static parent
+                document.getElementById('dashboardContainer').addEventListener('click', (e) => {
+                    if (e.target.id === 'clearRaffleFilter' || e.target.id === 'clearRolexFilter') {
+                        if (isSuperAdmin) {
+                            clearRefIdFilter();
+                        } else {
+                            showCustomPopup('Permission Denied', 'Only Super Admins can clear referrer filters.');
+                        }
+                    }
+                     // Also handle Edit button click here for the raffle table if it's on a row item
+                    if (e.target.dataset.action === 'edit-sale' && isSuperAdmin) {
+                        openEditSaleModal(e.target.dataset.entryId);
+                    }
+                });
+                
+            } catch (error) {
+                document.getElementById('globalSpinnerText').textContent = 'A critical error occurred during setup. Check the console for details.';
+                console.error("Critical Application Error:", error);
+                hideGlobalLoading();
+            }
+        };
     </script>
 </body>
 </html>
