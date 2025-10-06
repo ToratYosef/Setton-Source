@@ -10,14 +10,21 @@ const nodemailer = require('nodemailer');
 // It automatically uses the project configuration when deployed via Firebase CLI.
 admin.initializeApp();
 
-// --- 1. Nodemailer Configuration ---
-// IMPORTANT: Replace these placeholders with your actual SMTP credentials (e.g., SendGrid, Gmail app password).
+// --- 1. Nodemailer Configuration (Using Secure Environment Variables) ---
+// IMPORTANT: The variables GMAIL_USER and GMAIL_PASS MUST be set securely using the 
+// Firebase CLI (e.g., firebase functions:config:set mail.user="email" mail.pass="key").
+// Then, access them via process.env.GMAIL_USER etc.
+const AGENCY_EMAIL = process.env.GMAIL_USER; // Assuming this is your sending email
+
+if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
+    console.error("Nodemailer setup failed: GMAIL_USER or GMAIL_PASS environment variables are missing.");
+}
+
 const transporter = nodemailer.createTransport({
-    // Example using a common service provider like Gmail
-    service: 'Gmail', 
+    service: 'gmail', 
     auth: {
-        user: 'ydeseniorfund@gmail.com', 
-        pass: 'nyhn gdnt smxq ldsl'
+        user: process.env.GMAIL_USER, 
+        pass: process.env.GMAIL_PASS
     }
 });
 
@@ -240,6 +247,12 @@ function createFollowUpEmail(name, message) {
 exports.sendQuoteConfirmation = functions.firestore
     .document('artifacts/{appId}/public/data/quotes/{quoteId}')
     .onCreate(async (snap, context) => {
+        
+        if (!process.env.GMAIL_USER) {
+            console.error("Skipping email send: GMAIL_USER is undefined. Function not configured.");
+            return null;
+        }
+
         const quoteData = snap.data();
         
         // Skip processing if email is missing (should be validated client-side, but good server practice)
@@ -250,7 +263,7 @@ exports.sendQuoteConfirmation = functions.firestore
 
         // 1. Send Confirmation Email to Client
         const mailOptionsClient = {
-            from: 'Setton Source <your_agency_email@gmail.com>', // MUST MATCH Nodemailer AUTH USER
+            from: `Setton Source <${AGENCY_EMAIL}>`, 
             to: quoteData.email,
             subject: `✅ Your Instant Quote is Ready: ${quoteData.formattedEstimate}`,
             html: createStyledEmail(quoteData)
@@ -258,8 +271,8 @@ exports.sendQuoteConfirmation = functions.firestore
 
         // 2. Send Internal Notification Email to Agency
         const mailOptionsInternal = {
-            from: 'Setton Source Automated Bot <your_agency_email@gmail.com>', // MUST MATCH Nodemailer AUTH USER
-            to: 'your_agency_email@gmail.com', // ⬅️ Sent to the agency email for notification
+            from: `Setton Source Automated Bot <${AGENCY_EMAIL}>`, 
+            to: AGENCY_EMAIL, // Sent to the agency email for notification
             subject: `🚨 NEW LEAD: ${quoteData.name} | ${quoteData.formattedEstimate}`,
             html: createInternalNotificationEmail(quoteData)
         };
@@ -291,17 +304,21 @@ exports.sendQuoteConfirmation = functions.firestore
  */
 exports.sendFollowUpEmail = functions.https.onCall(async (data, context) => {
     
+    if (!process.env.GMAIL_USER) {
+        throw new functions.https.HttpsError('internal', 'Email function is not configured. Missing GMAIL_USER.');
+    }
+
     // NOTE: For security, you should implement authentication checks here,
     // like ensuring context.auth.uid matches a known admin ID.
     
     const { email, name, message } = data;
 
     if (!email || !message) {
-        throw new functions.https.HttpsError('invalid-argument', 'Client email and response message are required.');
+        throw new new functions.https.HttpsError('invalid-argument', 'Client email and response message are required.');
     }
 
     const mailOptions = {
-        from: 'Setton Source Team <your_agency_email@gmail.com>', // MUST MATCH Nodemailer AUTH USER
+        from: `Setton Source Team <${AGENCY_EMAIL}>`, 
         to: email,
         subject: `Follow-up on your project quote from Setton Source`,
         html: createFollowUpEmail(name, message)
