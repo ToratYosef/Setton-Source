@@ -115,6 +115,23 @@
             border-color: var(--accent-color);
             background-color: rgba(0, 210, 255, 0.1);
         }
+        
+        /* UPDATED: Input Error Styling for validation - Changed to pure red */
+        .input-error {
+            border-color: #ff0000 !important; /* Pure Red for border */
+            box-shadow: 0 0 0 2px #ff0000, inset 0 0 5px rgba(255, 0, 0, 0.3);
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        /* UPDATED: Error Styling for radio/checkbox containers - Changed to pure red */
+        .error-group-border {
+            border: 2px solid #ff0000 !important;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            border-radius: 0.75rem; /* rounded-xl */
+            padding: 0.5rem; /* Add padding to contain grid nicely */
+        }
+
 
         /* New Typing Cursor Animation */
         @keyframes blink {
@@ -312,7 +329,7 @@
     <footer class="py-8 text-center text-zinc-500 text-sm bg-black">
         <div class="container mx-auto flex justify-center items-center space-x-6">
             <span>&copy; 2025 Setton Source. Built with precision and passion.</span>
-            <!-- NEW ADMIN LINK -->
+            <!-- ADMIN LINK -->
             <a href="admin_dashboard.html" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
                 <i data-lucide="lock" class="w-4 h-4 mr-1"></i> Admin
             </a>
@@ -322,6 +339,12 @@
     <!-- Quote Generation Modal -->
     <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 flex justify-center items-start py-8 px-4 hidden modal-exit overflow-y-auto">
         <div class="bg-[var(--primary-color)] rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-8 my-auto modal-content-box transition-default">
+            
+            <!-- Progress Bar (NEW) -->
+            <div class="w-full bg-zinc-700 rounded-full h-2.5 mb-6">
+                <div id="quote-progress-bar" class="bg-[var(--accent-color)] h-2.5 rounded-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
+            </div>
+            
             <div class="flex justify-between items-center mb-6 border-b border-zinc-700 pb-4">
                 <h3 class="text-3xl font-bold text-white">Project Quote — Step <span id="current-step-display">1</span>/3</h3>
                 <button id="close-quote-modal" class="text-zinc-400 hover:text-[var(--accent-color)] transition-default">
@@ -337,9 +360,9 @@
                     <!-- 1. Number of Pages (CLEAN LABELS) -->
                     <div>
                         <label class="block text-lg font-semibold mb-3 text-zinc-300">1. How many unique pages will your site require?</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 custom-radio">
-                            <!-- 1 Page: $1,000 (BASE) -->
-                            <input type="radio" id="pages-1" name="pages" value="1" data-cost="0" class="hidden" checked>
+                        <div id="pages-group" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 custom-radio">
+                            <!-- 1 Page: $1,000 (BASE) - Removed 'checked' attribute -->
+                            <input type="radio" id="pages-1" name="pages" value="1" data-cost="0" class="hidden">
                             <label for="pages-1" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">1 Page</label>
 
                             <!-- 3 Pages: $1,500 (+$500) -->
@@ -448,8 +471,8 @@
                     </div>
 
                     <div>
-                        <label for="contact-phone" class="block text-sm font-medium text-zinc-400 mb-1">Phone Number (Required)</label>
-                        <input type="tel" id="contact-phone" name="contact-phone" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                        <label for="contact-phone" class="block text-sm font-medium text-zinc-400 mb-1">Phone Number (10 Digits Required)</label>
+                        <input type="tel" id="contact-phone" name="contact-phone" required pattern="\d{10}" title="Phone number must be exactly 10 digits" class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
                     </div>
                 </div>
 
@@ -457,16 +480,37 @@
                 <div id="step-3-content" class="hidden space-y-4">
                     <p class="text-lg font-semibold text-zinc-300 mb-4">Final project details.</p>
                     
+                    <!-- 1. Project Name (REQUIRED) -->
                     <div>
-                        <label for="project-name" class="block text-sm font-medium text-zinc-400 mb-1">Website Name/Business Name</label>
-                        <input type="text" id="project-name" name="project-name" class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                        <label for="project-name" class="block text-sm font-medium text-zinc-400 mb-1">Website Name/Business Name (Required)</label>
+                        <input type="text" id="project-name" name="project-name" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
                     </div>
                     
+                    <!-- 2. Project URL (REQUIRED) -->
                     <div>
-                        <label for="project-url" class="block text-sm font-medium text-zinc-400 mb-1">Intended/Existing URL (if available)</label>
-                        <input type="url" id="project-url" name="project-url" class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                        <label for="project-url" class="block text-sm font-medium text-zinc-400 mb-1">Intended/Existing URL (Required)</label>
+                        <input type="url" id="project-url" name="project-url" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
                     </div>
-                    
+
+                    <!-- 3. URL Ownership Status (NEW, REQUIRED) -->
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">URL Status (Domain Name Required)</label>
+                        <div id="url-status-group" class="grid grid-cols-2 gap-3 custom-radio">
+                            <input type="radio" id="url-owned" name="url-status" value="owned" data-cost="0" class="hidden">
+                            <label for="url-owned" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">I own the domain.</label>
+                            
+                            <input type="radio" id="url-buy" name="url-status" value="buy" data-cost="0" class="hidden">
+                            <label for="url-buy" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">Need help acquiring it.</label>
+                        </div>
+                    </div>
+
+                    <!-- 4. Project Description (NEW, REQUIRED) -->
+                    <div class="mt-4">
+                        <label for="project-description" class="block text-sm font-medium text-zinc-400 mb-1">Quick Site Description (Required)</label>
+                        <textarea id="project-description" name="project-description" rows="3" required placeholder="E.g., A sleek, mobile-first portfolio site for my photography business with a secure client login area." class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default"></textarea>
+                    </div>
+
+                    <!-- Existing Logo Status -->
                     <div class="mt-6">
                         <label class="block text-sm font-medium text-zinc-400 mb-2">Do you have a company logo?</label>
                         <div class="grid grid-cols-2 gap-3 custom-radio">
@@ -506,7 +550,7 @@
                     <div id="submission-status" class="hidden text-center mt-6 p-4 rounded-lg bg-[#3a3a5e]">
                         <p id="status-message" class="text-xl font-bold text-white mb-2"></p>
                         <p id="final-price-display" class="text-4xl font-extrabold text-[var(--accent-color)] mb-4"></p>
-                        <p class="text-sm text-zinc-400">
+                        <p id="disclaimer-text" class="text-sm text-zinc-400">
                             <i data-lucide="alert-triangle" class="w-4 h-4 inline mr-1 text-yellow-500"></i>
                             This is an ESTIMATE. The final price may fluctuate based on detailed scope requests, content readiness, and unforeseen technical complexity. We will contact you shortly to confirm the details.
                         </p>
@@ -592,6 +636,13 @@
         const statusMessage = document.getElementById('status-message');
         const finalPriceDisplay = document.getElementById('final-price-display');
         const pricePreview = document.getElementById('quote-price-preview');
+        const progressBar = document.getElementById('quote-progress-bar');
+        
+        // NEW ELEMENTS for validation targeting
+        const pagesGroup = document.getElementById('pages-group');
+        const urlStatusGroup = document.getElementById('url-status-group');
+        const disclaimerText = document.getElementById('disclaimer-text');
+
 
         const stepContents = [
             document.getElementById('step-1-content'),
@@ -671,6 +722,26 @@
         // ------------------
         // 3. Quote Modal & Step Logic
         // ------------------
+        
+        // Helper function for non-validation related alerts (like Firebase errors)
+        function alertUser(message, color) {
+            statusDiv.classList.remove('hidden');
+            // Remove all existing background colors
+            statusDiv.classList.remove('bg-green-600/50', 'bg-yellow-600/50', 'bg-red-600/50', 'bg-[#3a3a5e]'); 
+            // Apply error background
+            statusDiv.classList.add(color === 'red' ? 'bg-red-600/50' : 'bg-yellow-600/50');
+            statusMessage.textContent = message;
+            finalPriceDisplay.textContent = '';
+            
+            // Hide the legal disclaimer during error alerts
+            disclaimerText.classList.add('hidden'); 
+            
+            setTimeout(() => { 
+                statusDiv.classList.add('hidden');
+                // Re-enable disclaimer for the next time submission-status is used for success
+                disclaimerText.classList.remove('hidden'); 
+            }, 3000);
+        }
 
         function updateStepDisplay() {
             // Hide all step content, then show the current one
@@ -683,6 +754,10 @@
 
             // Update header text (1/3, 2/3, 3/3)
             stepDisplay.textContent = currentStep + 1;
+            
+            // Update progress bar
+            const progress = ((currentStep + 1) / stepContents.length) * 100;
+            progressBar.style.width = `${progress}%`;
             
             // Handle navigation buttons visibility
             prevStepBtn.classList.toggle('hidden', currentStep === 0);
@@ -697,25 +772,106 @@
         }
         
         function validateStep(stepIndex) {
-            if (stepIndex === 1) { // Validation for Contact Info (Step 2)
-                const name = document.getElementById('contact-name').value;
-                const email = document.getElementById('contact-email').value;
-                const phone = document.getElementById('contact-phone').value;
+            let isValid = true;
+            let firstInvalidElement = null;
 
-                if (!name || !email || !phone) {
-                    alertUser('Please fill in all required contact fields.', 'yellow');
-                    return false;
-                }
-                // Simple email validation (can be more robust)
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    alertUser('Please enter a valid email address.', 'yellow');
-                    return false;
+            // Helper to remove all error styles
+            const removeErrors = () => {
+                // Remove input text errors
+                quoteForm.querySelectorAll('.input-text').forEach(el => el.classList.remove('input-error'));
+                // Remove group container errors
+                [pagesGroup, urlStatusGroup].forEach(el => el && el.classList.remove('error-group-border'));
+            };
+            
+            // Clear all existing error styles at the start
+            removeErrors();
+            
+            // Clear submission status message if visible
+            statusDiv.classList.add('hidden');
+
+
+            if (stepIndex === 0) { // Step 1: Site Requirements
+                const pagesSelected = quoteForm.querySelector('input[name="pages"]:checked');
+                
+                if (!pagesSelected) {
+                    isValid = false;
+                    pagesGroup.classList.add('error-group-border');
+                    if (!firstInvalidElement) firstInvalidElement = pagesGroup;
                 }
             }
-            // Step 1 and Step 3 currently require no complex validation, 
-            // but structure is ready for future checks.
-            return true;
+
+            if (stepIndex === 1) { // Step 2: Contact Information
+                const nameInput = document.getElementById('contact-name');
+                const emailInput = document.getElementById('contact-email');
+                const phoneInput = document.getElementById('contact-phone');
+                const phoneRegex = /^\d{10}$/; // Exactly 10 digits
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                // 1. Name
+                if (!nameInput.value) {
+                    isValid = false;
+                    nameInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = nameInput;
+                }
+                // 2. Email
+                if (!emailInput.value || !emailRegex.test(emailInput.value)) {
+                    isValid = false;
+                    emailInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = emailInput;
+                }
+                // 3. Phone (length 10)
+                if (!phoneInput.value || !phoneRegex.test(phoneInput.value)) {
+                    isValid = false;
+                    phoneInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = phoneInput;
+                }
+            }
+            
+            if (stepIndex === 2) { // Step 3: Project Details
+                const projectNameInput = document.getElementById('project-name');
+                const projectUrlInput = document.getElementById('project-url');
+                const projectDescriptionTextarea = document.getElementById('project-description');
+                const urlStatusSelected = quoteForm.querySelector('input[name="url-status"]:checked');
+                
+                // 1. Project Name (required)
+                if (!projectNameInput.value) {
+                    isValid = false;
+                    projectNameInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = projectNameInput;
+                }
+                
+                // 2. Project URL (required, basic check)
+                if (!projectUrlInput.value) {
+                    isValid = false;
+                    projectUrlInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = projectUrlInput;
+                }
+                
+                // 3. Project Description (required)
+                if (!projectDescriptionTextarea.value) {
+                    isValid = false;
+                    projectDescriptionTextarea.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = projectDescriptionTextarea;
+                }
+
+                // 4. URL Status (required)
+                if (!urlStatusSelected) {
+                    isValid = false;
+                    urlStatusGroup.classList.add('error-group-border');
+                    if (!firstInvalidElement) firstInvalidElement = urlStatusGroup;
+                }
+            }
+            
+            if (!isValid && firstInvalidElement) {
+                // Focus on the first invalid element if validation failed
+                firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // If it's an input/textarea, focus it
+                if (firstInvalidElement.tagName === 'INPUT' || firstInvalidElement.tagName === 'TEXTAREA') {
+                     firstInvalidElement.focus(); 
+                }
+            }
+            
+            return isValid;
         }
 
         function changeStep(direction) {
@@ -731,17 +887,6 @@
             }
         }
 
-        function alertUser(message, color) {
-            // Note: Using the submission status div as a temporary alert box
-            statusDiv.classList.remove('hidden');
-            statusDiv.classList.remove('bg-green-600/50', 'bg-yellow-600/50', 'bg-red-600/50');
-            statusDiv.classList.add(color === 'yellow' ? 'bg-yellow-600/50' : (color === 'red' ? 'bg-red-600/50' : 'bg-green-600/50'));
-            statusMessage.textContent = message;
-            finalPriceDisplay.textContent = '';
-            
-            // Hide alert after 3 seconds
-            setTimeout(() => { statusDiv.classList.add('hidden'); }, 3000);
-        }
 
         prevStepBtn.addEventListener('click', () => changeStep(-1));
         nextStepBtn.addEventListener('click', () => changeStep(1));
@@ -820,10 +965,12 @@
         async function submitQuote(e) {
             e.preventDefault();
             
+            // Final step validation
+            if (!validateStep(currentStep)) return;
+            
             // Check if userId is available (authentication complete)
             if (!db || !userId) {
                 alertUser('System is not authenticated. Please wait a moment and try again.', 'red');
-                // The onAuthStateChanged listener will handle the auth, no need to call authSetup here.
                 return;
             }
 
@@ -842,8 +989,10 @@
             quoteData.phone = document.getElementById('contact-phone').value;
 
             // 3. Gather Project Details (Step 3)
-            quoteData.projectName = document.getElementById('project-name').value || 'N/A';
-            quoteData.projectUrl = document.getElementById('project-url').value || 'N/A';
+            quoteData.projectName = document.getElementById('project-name').value;
+            quoteData.projectUrl = document.getElementById('project-url').value;
+            quoteData.urlStatus = quoteForm.querySelector('input[name="url-status"]:checked')?.value || 'N/A';
+            quoteData.projectDescription = document.getElementById('project-description').value;
             quoteData.logoStatus = quoteForm.querySelector('input[name="logo-status"]:checked').value;
             
             // 4. Add Final Price and Metadata
@@ -857,7 +1006,7 @@
             statusDiv.classList.add('hidden');
 
             try {
-                // FIX: Write to public collection so Admin Dashboard can see it.
+                // Write to public collection so Admin Dashboard can see it.
                 const collectionPath = `quotes`;
                 const docRef = await addDoc(collection(db, collectionPath), quoteData);
                 
@@ -869,9 +1018,12 @@
                 statusDiv.classList.remove('bg-yellow-600/50', 'bg-red-600/50');
                 statusDiv.classList.add('bg-green-600/50');
                 
+                // Ensure disclaimer is visible on SUCCESS
+                disclaimerText.classList.remove('hidden');
+                
             } catch (error) {
                 console.error("Error writing document to Firestore: ", error);
-                alertUser('Submission Failed. Please check console for errors.', 'red');
+                alertUser('Submission Failed (Database Error). Please try again.', 'red');
             } finally {
                 submitQuoteBtn.disabled = false;
                 submitQuoteBtn.textContent = 'Submit Quote';
