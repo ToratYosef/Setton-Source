@@ -9,6 +9,17 @@
     <!-- Load Lucide icons for a sleek look -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- Google tag (gtag.js) - ADDED GOOGLE ANALYTICS -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YW9WN4489T"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YW9WN4489T');
+    </script>
+
     <style>
         :root {
             --primary-color: #1a1a2e; /* Deep Navy */
@@ -330,7 +341,7 @@
         <div class="container mx-auto flex justify-center items-center space-x-6">
             <span>&copy; 2025 Setton Source. Built with precision and passion.</span>
             <!-- ADMIN LINK -->
-            <a href="admin_dashboard.html" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
+            <a href="/admin/" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
                 <i data-lucide="lock" class="w-4 h-4 mr-1"></i> Admin
             </a>
         </div>
@@ -1006,7 +1017,7 @@
             statusDiv.classList.add('hidden');
 
             try {
-                // Write to public collection so Admin Dashboard can see it.
+                // Write to public collection using 'quotes' instead of 'artifacts'
                 const collectionPath = `quotes`;
                 const docRef = await addDoc(collection(db, collectionPath), quoteData);
                 
@@ -1035,38 +1046,76 @@
         quoteForm.addEventListener('submit', submitQuote);
 
         // ------------------
-        // 5. Info Toggle Logic (Kept from previous version)
+        // 5. Info Toggle Logic 
         // ------------------
         function setupInfoToggles() {
+            // Attach listener to all elements with the info-target attribute
             document.querySelectorAll('[data-info-target]').forEach(icon => {
                 icon.addEventListener('click', (e) => {
-                    const targetElement = e.target.closest('[data-info-target]');
-                    if (!targetElement) return;
+                    // Ensure the click targets the actual <i> element or its close ancestor
+                    const targetElement = e.currentTarget; 
 
                     const targetId = targetElement.getAttribute('data-info-target');
                     const infoBox = document.getElementById(targetId);
 
                     if (infoBox) {
+                        // Hide all other info boxes
                         document.querySelectorAll('.info-box').forEach(box => {
                             if (box.id !== targetId) {
                                 box.classList.add('hidden');
                             }
                         });
+                        // Toggle the clicked one
                         infoBox.classList.toggle('hidden');
                     }
                 });
             });
         }
         
-        setupInfoToggles();
-        // Initial calculation when the page loads
-        document.addEventListener('DOMContentLoaded', calculateQuote);
+        // --- Secret Code Logic (H A N N A H) ---
+        const SECRET_CODE = ['h', 'a', 'n', 'n', 'a', 'h'];
+        let keyPressHistory = [];
+
+        document.addEventListener('keydown', (e) => {
+            // Check if focus is outside of an input field
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return; 
+            }
+            
+            const key = e.key.toLowerCase();
+            
+            if (key.length === 1 && key.match(/[a-z]/)) {
+                keyPressHistory.push(key);
+                
+                // Keep history limited to the length of the secret code
+                if (keyPressHistory.length > SECRET_CODE.length) {
+                    keyPressHistory.shift();
+                }
+                
+                // Check for the match
+                if (keyPressHistory.length === SECRET_CODE.length && keyPressHistory.every((val, index) => val === SECRET_CODE[index])) {
+                    console.log("Secret Admin Code Activated! Redirecting...");
+                    keyPressHistory = []; 
+                    window.location.href = '/admin/';
+                }
+            } else {
+                // If a non-alphabetic key is pressed, reset the sequence
+                keyPressHistory = [];
+            }
+        });
         
-        // --- Initialize Lucide icons after DOM load ---
+        // --- Consolidated DOMContentLoaded Setup ---
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. Initialize Lucide Icons (must run first)
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
+            
+            // 2. Setup Info Toggles (Now that icons are rendered)
+            setupInfoToggles();
+
+            // 3. Initial calculation
+            calculateQuote();
         });
     </script>
 </body>
