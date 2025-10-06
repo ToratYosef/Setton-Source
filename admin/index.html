@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setton Source | Admin Dashboard</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide icons for a sleek look -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a1a2e; /* Deep Navy */
+            --accent-color: #00d2ff; /* Electric Blue */
+            --text-color: #e4e4e7;  /* Light Gray */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            scroll-behavior: smooth;
+        }
+        /* Style for required elements/warnings */
+        .required-tag {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 700;
+        }
+        .bg-required {
+            background-color: #f59e0b; /* Amber 500 */
+            color: #1a1a2e; /* Primary Color */
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6 pt-24 bg-[#11111f]">
+
+    <!-- Admin Dashboard Section -->
+    <div class="container mx-auto">
+        <a href="index.html" class="text-lg text-zinc-400 hover:text-[var(--accent-color)] transition-default mb-4 flex items-center">
+             <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back to Main Site
+        </a>
+        <h2 class="text-4xl lg:text-5xl font-extrabold text-white mb-4">Quote Requests Dashboard</h2>
+        <p class="text-zinc-400 mb-8">Viewing all requests submitted to App ID: <span class="font-mono text-sm text-zinc-500" id="admin-app-id"></span></p>
+        
+        <div id="quotes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Quotes will be dynamically inserted here -->
+            <div id="loading-quotes" class="col-span-full text-center py-12 text-zinc-500">
+                <i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto mb-2"></i>
+                Loading quote requests...
+            </div>
+        </div>
+
+        <div id="no-quotes" class="hidden col-span-full text-center py-12 text-zinc-500 bg-[#2a2a44] rounded-xl shadow-lg mt-8">
+            <i data-lucide="check-square" class="w-8 h-8 mx-auto mb-2"></i>
+            No requests have been submitted yet.
+        </div>
+    </div>
+    
+    <!-- Footer for Admin Panel -->
+    <footer class="py-8 mt-12 text-center text-zinc-500 text-sm bg-black">
+        &copy; 2025 Setton Source Admin Panel. Real-time data feed.
+    </footer>
+
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, setLogLevel, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-setton-source';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Use provided config with fallback for safety (consistent with index.html)
+        const userProvidedConfig = {
+            apiKey: "AIzaSyCcUMZmKwdOcUj4KszvTkPKlo-HmiVCXZU",
+            authDomain: "setton-source-68177.firebaseapp.com",
+            projectId: "setton-source-68177",
+            storageBucket: "setton-source-68177.firebasestorage.app",
+            messagingSenderId: "153708206059",
+            appId: "1:153708206059:web:14cc935233eee4ecdb72bae",
+            measurementId: "G-YW9WN4489T"
+        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : userProvidedConfig; 
+
+
+        // Initialize Firebase
+        let app, auth, db, userId;
+
+        try {
+            if (Object.keys(firebaseConfig).length === 0) {
+                 console.error("Firebase configuration is missing or empty. Cannot initialize.");
+            } else {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+            }
+            
+            const authAttempt = async () => {
+                if (!auth) {
+                    loadAdminDashboard(); 
+                    return;
+                }
+                
+                try {
+                    let userCredential;
+                    if (initialAuthToken) {
+                        userCredential = await signInWithCustomToken(auth, initialAuthToken);
+                        userId = userCredential.user.uid;
+                        console.log("Firebase signed in successfully with Custom Token. User ID:", userId);
+                    } else {
+                        userCredential = await signInAnonymously(auth);
+                        userId = userCredential.user.uid;
+                        console.log("Firebase signed in successfully as Anonymous User. User ID:", userId);
+                    }
+                } catch (error) {
+                    console.error("Authentication failed, attempting anonymous sign-in:", error);
+                    try {
+                        const userCredential = await signInAnonymously(auth);
+                        userId = userCredential.user.uid;
+                        console.log("Recovered by forcing Anonymous sign-in. User ID:", userId);
+                    } catch (anonError) {
+                        console.error("Critical: Anonymous sign-in also failed.", anonError);
+                    }
+                } finally {
+                    loadAdminDashboard();
+                }
+            };
+            authAttempt();
+
+        } catch (e) {
+            console.error("Firebase initialization error:", e);
+        }
+
+        // ------------------
+        // Admin Dashboard Functions
+        // ------------------
+
+        const quotesList = document.getElementById('quotes-list');
+        const loadingQuotes = document.getElementById('loading-quotes');
+        const noQuotes = document.getElementById('no-quotes');
+        const adminAppId = document.getElementById('admin-app-id');
+
+        // Creates a mailto link to simulate contacting the user (as Nodemailer is server-side)
+        function createMailtoLink(quote) {
+            const subject = encodeURIComponent(`Project Quote Follow-up: ${quote.projectName || 'New Project'}`);
+            
+            const features = [];
+            if (quote['feature-ecommerce'] === 'on') features.push('E-commerce/Payments');
+            if (quote['feature-admin'] === 'on') features.push('Custom Admin/CMS');
+            if (quote['feature-support'] === 'on') features.push('Live Chat/Support');
+            
+            const body = encodeURIComponent(
+                `Hi ${quote.name},\n\n` +
+                `Thank you for using the Setton Source instant quote calculator. I've reviewed your submission.\n\n` +
+                `Project Summary:\n` +
+                `Estimated Cost: ${quote.formattedEstimate}\n` +
+                `Pages: ${quote.pages}\n` +
+                `Backend: ${quote.backend === 'yes' ? 'Required' : 'No'}\n` +
+                `Features: ${features.join(', ') || 'Standard Site'}\n` +
+                `Logo Status: ${quote.logoStatus === 'no' ? 'Needs Design' : 'Ready'}\n\n` +
+                `I recommend we schedule a brief call to finalize the scope. When are you available?\n\n` +
+                `Best regards,\nSetton Source Team`
+            );
+
+            return `mailto:${quote.email}?subject=${subject}&body=${body}`;
+        }
+
+        // Renders a single quote document into an HTML card
+        function renderQuote(docId, quote) {
+            const date = new Date(quote.timestamp).toLocaleString();
+            
+            // Format the cost since it's stored as a raw number in the database
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            });
+            quote.formattedEstimate = formatter.format(quote.finalEstimate);
+            
+            const element = document.createElement('div');
+            element.classList.add('bg-[#2a2a44]', 'p-6', 'rounded-xl', 'shadow-xl', 'border', 'border-zinc-700', 'hover:shadow-[0_0_15px_rgba(0,210,255,0.2)]', 'transition-default', 'flex', 'flex-col', 'justify-between');
+            
+            const features = [];
+            if (quote['feature-ecommerce'] === 'on') features.push('E-commerce');
+            if (quote['feature-admin'] === 'on') features.push('CMS');
+            if (quote['feature-support'] === 'on') features.push('Live Chat');
+
+            const needsBackend = quote.backend === 'yes';
+            const needsLogo = quote.logoStatus === 'no';
+
+            element.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-start border-b border-zinc-600 pb-3 mb-3">
+                        <h4 class="text-xl font-bold text-white">${quote.projectName || 'Unspecified Project'}</h4>
+                        <span class="text-2xl font-extrabold text-[var(--accent-color)]">${quote.formattedEstimate}</span>
+                    </div>
+                    
+                    <p class="text-sm text-zinc-400 mb-4">Submitted: ${date}</p>
+                    
+                    <!-- Client Details -->
+                    <div class="space-y-2 mb-4 text-sm bg-[#1a1a2e] p-3 rounded-lg">
+                        <p class="font-bold text-zinc-300 border-b border-zinc-700 pb-1 mb-1">Client Info:</p>
+                        <p><strong>Name:</strong> ${quote.name}</p>
+                        <p><strong>Email:</strong> <a href="mailto:${quote.email}" class="text-cyan-400 hover:underline">${quote.email}</a></p>
+                        <p><strong>Phone:</strong> ${quote.phone}</p>
+                        <p><strong>URL:</strong> ${quote.projectUrl && quote.projectUrl !== 'N/A' ? `<a href="${quote.projectUrl}" target="_blank" class="text-cyan-400 hover:underline">${quote.projectUrl}</a>` : 'N/A'}</p>
+                    </div>
+
+                    <!-- Project Requirements -->
+                    <div class="space-y-2 text-sm">
+                        <p class="font-bold text-zinc-300 border-b border-zinc-700 pb-1 mb-1">Requirements:</p>
+                        <p><strong>Pages:</strong> ${quote.pages}</p>
+                        <p class="flex items-center">
+                            <strong>Backend:</strong> 
+                            <span class="ml-2 ${needsBackend ? 'text-red-400 font-semibold' : 'text-zinc-500'}">
+                                ${needsBackend ? 'REQUIRED' : 'No'}
+                            </span>
+                        </p>
+                        <p><strong>Key Features:</strong> ${features.join(', ') || 'Standard Brochure Site'}</p>
+                        <p class="flex items-center">
+                            <strong>Logo Status:</strong> 
+                            ${needsLogo ? 
+                                `<span class="ml-2 required-tag bg-required">Needs Design (+ $100)</span>` : 
+                                `<span class="ml-2 text-green-400">Ready</span>`
+                            }
+                        </p>
+                    </div>
+                </div>
+
+                <a href="${createMailtoLink(quote)}" 
+                   class="w-full inline-flex justify-center items-center py-2 px-4 bg-green-500 text-black font-bold rounded-lg transition-default hover:bg-green-400 mt-6 shadow-md"
+                   target="_blank" rel="noopener noreferrer">
+                    <i data-lucide="mail" class="w-4 h-4 mr-2"></i> Contact User Now
+                </a>
+            `;
+            
+            // Re-render Lucide icons for the newly created element
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            return element;
+        }
+
+        // Sets up the real-time listener for the Admin Dashboard
+        function loadAdminDashboard() {
+            if (!db) {
+                loadingQuotes.classList.add('hidden');
+                quotesList.innerHTML = '<div class="col-span-full text-center py-12 text-red-400">Database not initialized. Please ensure Firebase is configured correctly.</div>';
+                return;
+            }
+
+            adminAppId.textContent = appId;
+            
+            // Listen to the PUBLIC collection where all quotes are submitted
+            const publicQuotesRef = collection(db, `quotes`);
+            const quotesQuery = query(publicQuotesRef);
+
+            // Use onSnapshot for real-time updates
+            const unsubscribe = onSnapshot(quotesQuery, (snapshot) => {
+                loadingQuotes.classList.add('hidden');
+                quotesList.innerHTML = ''; // Clear previous content
+
+                if (snapshot.empty) {
+                    noQuotes.classList.remove('hidden');
+                    return;
+                }
+
+                noQuotes.classList.add('hidden');
+                
+                const quotes = [];
+                snapshot.forEach(doc => {
+                    quotes.push({ id: doc.id, data: doc.data() });
+                });
+
+                // Sort the quotes client-side by timestamp (newest first)
+                quotes.sort((a, b) => {
+                    // Assuming timestamp is in ISO string format (e.g., "2023-10-26T10:30:00.000Z")
+                    return new Date(b.data.timestamp).getTime() - new Date(a.data.timestamp).getTime();
+                });
+
+                // Render the sorted quotes
+                quotes.forEach(quote => {
+                    quotesList.appendChild(renderQuote(quote.id, quote.data));
+                });
+
+            }, (error) => {
+                console.error("Error loading quotes:", error);
+                quotesList.innerHTML = `<div class="col-span-full text-center py-12 text-red-400">Error loading quotes: ${error.message}</div>`;
+            });
+        }
+        
+    </script>
+</body>
+</html>

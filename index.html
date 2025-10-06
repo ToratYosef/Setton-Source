@@ -73,6 +73,7 @@
         }
 
         /* 2. Outer container controls backdrop fade and sets initial state for inner box */
+        /* We explicitly remove old transforms/transitions from the backdrop container */
         .modal-enter {
             opacity: 0;
             transform: none; 
@@ -134,6 +135,42 @@
             outline: none;
         }
 
+        /* --- IFRAME SNAPSHOT STYLING --- */
+        .iframe-container {
+            /* Create a viewport for the iframe */
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 0.75rem; /* Matches the card's rounded-xl */
+        }
+
+        .iframe-snapshot {
+            /* Transform the iframe to look like a scaled-down desktop view */
+            width: 1500px; /* Original width of the site content (e.g., desktop view) */
+            height: 1000px; /* Original height */
+            
+            /* UPDATED: Centering logic */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: 50% 50%; /* Scale from the center */
+            transform: translate(-50%, -50%) scale(0.32); /* Center before scaling, then scale */
+            
+            border: none;
+            pointer-events: none; /* Crucial: disables all interaction (clicks/scrolling) */
+        }
+
+        .iframe-overlay {
+            /* Invisible barrier to ensure no interaction bleeds through */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10; /* Above the iframe */
+            background: transparent;
+        }
+
     </style>
 </head>
 <body>
@@ -141,7 +178,7 @@
     <!-- Header: Transparent and Fixed -->
     <header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-default py-4">
         <div class="container mx-auto px-6 flex justify-between items-center">
-            <!-- Agency Logo/Brand Name -->
+            <!-- Updated to Setton Source -->
             <a href="#hero" class="text-2xl font-black text-white hover:text-cyan-400 transition-default">Setton Source<span class="text-[var(--accent-color)]">.</span></a>
             <nav class="hidden md:flex space-x-8 font-medium">
                 <a href="#hero" class="text-zinc-300 hover:text-white transition-default">Home</a>
@@ -157,14 +194,14 @@
     <main>
         <!-- Hero Section -->
         <section id="hero" class="relative min-h-screen flex items-center justify-center p-6 pt-32 overflow-hidden">
-            <!-- Background Gradient/Blob Effect for visual interest -->
+            <!-- Background Gradient/Blob Effect -->
             <div class="absolute inset-0 bg-gradient-to-br from-[var(--primary-color)] to-[#11111f] opacity-90"></div>
             <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-[var(--accent-color)] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
             <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
 
             <div class="z-10 text-center max-w-4xl space-y-8">
                 <p class="text-xl text-zinc-400 animated-hero">— Your Foundation for Digital Growth</p>
-                <!-- Hero Heading -->
+                <!-- Updated to Setton Source -->
                 <h1 class="6xl sm:text-7xl lg:text-9xl font-extrabold text-white leading-tight animated-hero">
                     SETTON <span class="text-[var(--accent-color)] block md:inline-block">SOURCE</span>
                 </h1>
@@ -186,12 +223,13 @@
                 <h2 class="text-4xl lg:text-5xl font-extrabold text-center mb-16 text-white">My Work</h2>
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-                    <!-- Project 1: Second Hand Cell -->
+                    <!-- Project 1: Second Hand Cell (IFRAME SNAPSHOT) -->
                     <a href="https://secondhandcell.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
-                        <div class="h-48 overflow-hidden">
-                            <img src="https://placehold.co/800x480/1E3A8A/ffffff?text=E-commerce+Platform" 
-                                 class="w-full h-full object-cover transition-default group-hover:scale-110" 
-                                 alt="Preview of Second Hand Cell website">
+                        <div class="h-48 overflow-hidden relative">
+                            <div class="iframe-container transition-default group-hover:scale-110">
+                                <iframe src="https://secondhandcell.com" class="iframe-snapshot" title="Second Hand Cell Preview"></iframe>
+                                <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
+                            </div>
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Second Hand Cell</h3>
@@ -202,12 +240,13 @@
                         </div>
                     </a>
 
-                    <!-- Project 2: YDE Seniors -->
+                    <!-- Project 2: YDE Seniors (IFRAME SNAPSHOT) -->
                     <a href="https://ydeseniors.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
-                         <div class="h-48 overflow-hidden">
-                            <img src="https://placehold.co/800x480/14532D/ffffff?text=Educational+Portal" 
-                                 class="w-full h-full object-cover transition-default group-hover:scale-110" 
-                                 alt="Preview of YDE Seniors website">
+                         <div class="h-48 overflow-hidden relative">
+                            <div class="iframe-container transition-default group-hover:scale-110">
+                                <iframe src="https://ydeseniors.com" class="iframe-snapshot" title="YDE Seniors Preview"></iframe>
+                                <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
+                            </div>
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">YDE Seniors</h3>
@@ -218,12 +257,13 @@
                         </div>
                     </a>
 
-                    <!-- Project 3: Binyan Shalem -->
+                    <!-- Project 3: Binyan Shalem (IFRAME SNAPSHOT) -->
                     <a href="https://binyan-shalem.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
-                        <div class="h-48 overflow-hidden">
-                            <img src="https://placehold.co/800x480/991B1B/ffffff?text=Non-Profit+Organization" 
-                                 class="w-full h-full object-cover transition-default group-hover:scale-110" 
-                                 alt="Preview of Binyan Shalem website">
+                        <div class="h-48 overflow-hidden relative">
+                            <div class="iframe-container transition-default group-hover:scale-110">
+                                <iframe src="https://binyan-shalem.com" class="iframe-snapshot" title="Binyan Shalem Preview"></iframe>
+                                <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
+                            </div>
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Binyan Shalem</h3>
@@ -234,12 +274,13 @@
                         </div>
                     </a>
 
-                    <!-- Project 4: Torat Yosef Raffle -->
+                    <!-- Project 4: Torat Yosef Raffle (IFRAME SNAPSHOT) -->
                     <a href="https://toratyosefsummerraffle.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
-                        <div class="h-48 overflow-hidden">
-                            <img src="https://placehold.co/800x480/F59E0B/ffffff?text=Raffle+Fundraising+Site" 
-                                 class="w-full h-full object-cover transition-default group-hover:scale-110" 
-                                 alt="Preview of Torat Yosef Raffle website">
+                        <div class="h-48 overflow-hidden relative">
+                            <div class="iframe-container transition-default group-hover:scale-110">
+                                <iframe src="https://toratyosefsummerraffle.com" class="iframe-snapshot" title="Torat Yosef Raffle Preview"></iframe>
+                                <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
+                            </div>
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Torat Yosef Raffle</h3>
@@ -269,7 +310,13 @@
 
     <!-- Footer -->
     <footer class="py-8 text-center text-zinc-500 text-sm bg-black">
-        &copy; 2025 Setton Source. Built with precision and passion.
+        <div class="container mx-auto flex justify-center items-center space-x-6">
+            <span>&copy; 2025 Setton Source. Built with precision and passion.</span>
+            <!-- NEW ADMIN LINK -->
+            <a href="admin_dashboard.html" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
+                <i data-lucide="lock" class="w-4 h-4 mr-1"></i> Admin
+            </a>
+        </div>
     </footer>
 
     <!-- Quote Generation Modal -->
@@ -287,7 +334,7 @@
 
                 <!-- Step 1: Site Requirements (Initial Step) -->
                 <div id="step-1-content" class="space-y-6">
-                    <!-- 1. Number of Pages -->
+                    <!-- 1. Number of Pages (CLEAN LABELS) -->
                     <div>
                         <label class="block text-lg font-semibold mb-3 text-zinc-300">1. How many unique pages will your site require?</label>
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 custom-radio">
@@ -313,7 +360,7 @@
                         </div>
                     </div>
 
-                    <!-- 2. Backend/Database Requirement -->
+                    <!-- 2. Backend/Database Requirement (WITH INFO BUTTON) -->
                     <div>
                         <div class="flex items-center mb-3">
                             <label class="block text-lg font-semibold text-zinc-300">2. Will you require a backend/database?</label>
@@ -331,7 +378,7 @@
                         </div>
                     </div>
 
-                    <!-- 3. Site Type / Key Features -->
+                    <!-- 3. Site Type / Key Features (WITH INFO BUTTONS) -->
                     <div>
                         <label class="block text-lg font-semibold mb-3 text-zinc-300">3. Select the key features needed:</label>
                         <div class="space-y-3">
@@ -370,14 +417,11 @@
                         </div>
                     </div>
 
-                    <!-- 4. Color Scheme -->
+                    <!-- 4. Color Scheme (WITH INFO BUTTON) -->
                     <div>
                         <div class="flex items-center mb-3">
                             <label class="block text-lg font-semibold text-zinc-300">4. Do you have a defined color scheme?</label>
                             <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="color-info"></i>
-                        </div>
-                        <div id="color-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
-                            A Custom Branding/Color Audit means working together to define the perfect colors, fonts, and style guide for your business, ensuring visual consistency and maximum impact.
                         </div>
                         <div class="grid grid-cols-2 gap-3 custom-radio">
                             <input type="radio" id="colors-yes" name="colors" value="yes" data-cost="0" class="hidden" checked>
@@ -429,7 +473,7 @@
                             <input type="radio" id="logo-yes" name="logo-status" value="yes" data-cost="0" class="hidden" checked>
                             <label for="logo-yes" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">Yes, I have one.</label>
                             
-                            <!-- $100 for logo creation service -->
+                            <!-- $100 for logo creation service, label is clean -->
                             <input type="radio" id="logo-no" name="logo-status" value="no" data-cost="100" class="hidden">
                             <label for="logo-no" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">No, create one</label>
                         </div>
@@ -476,28 +520,25 @@
     <!-- Firebase SDK Imports (MUST use type="module") -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // setLogLevel('Debug'); // Uncomment to debug Firebase in console
-
-        // Initialize Lucide icons to render the help-circle buttons -- THIS WAS MISSING!
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        // --- ADDED: ENABLE FIREBASE DEBUG LOGGING ---
+        setLogLevel('debug'); 
 
         // Global variables provided by the Canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-setton-source';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
-        // Default (or provided) Firebase configuration
+        // Use provided config with fallback for safety
         const userProvidedConfig = {
-            apiKey: "YOUR_FALLBACK_API_KEY", // Placeholder - Canvas environment provides actual config
-            authDomain: "your-project-id.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project-id.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:1234567890abcdef",
+            apiKey: "AIzaSyCcUMZmKwdOcUj4KszvTkPKlo-HmiVCXZU",
+            authDomain: "setton-source-68177.firebaseapp.com",
+            projectId: "setton-source-68177",
+            storageBucket: "setton-source-68177.firebasestorage.app",
+            messagingSenderId: "153708206059",
+            appId: "1:153708206059:web:14cc935233eee4ecdb72bae",
+            measurementId: "G-YW9WN4489T"
         };
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userProvidedConfig;
 
@@ -510,29 +551,60 @@
             db = getFirestore(app);
             auth = getAuth(app);
             
-            // Handle authentication using custom token or anonymous sign-in
-            if (initialAuthToken) {
-                signInWithCustomToken(auth, initialAuthToken).then(userCredential => {
-                    userId = userCredential.user.uid;
-                    console.log("Firebase signed in with custom token. User ID:", userId);
-                }).catch(error => {
-                    console.error("Custom token sign-in failed. Falling back to anonymous:", error);
-                    signInAnonymously(auth).then(userCredential => {
-                        userId = userCredential.user.uid;
-                    }).catch(err => console.error("Anonymous sign-in failed:", err));
-                });
-            } else {
-                signInAnonymously(auth).then(userCredential => {
-                    userId = userCredential.user.uid;
-                    console.log("Firebase signed in anonymously. User ID:", userId);
-                }).catch(err => console.error("Anonymous sign-in failed:", err));
-            }
+            // --- REVISED AUTH LOGIC FOR ROBUSTNESS using onAuthStateChanged ---
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    try {
+                        // Attempt anonymous sign-in if no user is found
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Authentication failed during initialization or fallback:", error);
+                    }
+                }
+                
+                // Set userId after successful sign-in or attempt
+                userId = auth.currentUser?.uid || 'anonymous-user';
+                console.log("Firebase Auth Ready. User ID:", userId);
+            });
+            // --- END REVISED AUTH LOGIC ---
+
         } catch (e) {
             console.error("Firebase initialization error:", e);
         }
 
         // ------------------
-        // 1. Header Scroll Logic
+        // DOM Elements and State
+        // ------------------
+        const quoteModal = document.getElementById('quote-modal');
+        const openButtons = document.querySelectorAll('#open-quote-modal, #hero-quote-button, #footer-quote-button');
+        const closeButton = document.getElementById('close-quote-modal');
+        const quoteForm = document.getElementById('quote-form');
+        const quoteResult = document.getElementById('quote-result');
+        const stepDisplay = document.getElementById('current-step-display');
+        const prevStepBtn = document.getElementById('prev-step');
+        const nextStepBtn = document.getElementById('next-step');
+        const submitQuoteBtn = document.getElementById('submit-quote');
+        const statusDiv = document.getElementById('submission-status');
+        const statusMessage = document.getElementById('status-message');
+        const finalPriceDisplay = document.getElementById('final-price-display');
+        const pricePreview = document.getElementById('quote-price-preview');
+
+        const stepContents = [
+            document.getElementById('step-1-content'),
+            document.getElementById('step-2-content'),
+            document.getElementById('step-3-content')
+        ];
+        let currentStep = 0; // 0-indexed
+
+        // Base Price for a simple 1-page static site is $1000
+        const BASE_PRICE = 1000;
+
+        // ------------------
+        // 1. Header Scroll Logic (Kept from previous version)
         // ------------------
         const header = document.getElementById('main-header');
         const scrollThreshold = 50;
@@ -549,7 +621,7 @@
         updateHeader();
 
         // ------------------
-        // 2. Typing Indicator Logic
+        // 2. Typing Indicator Logic (Kept from previous version)
         // ------------------
         const typewriterTextElement = document.getElementById('typewriter-text');
         const phrases = [
@@ -600,29 +672,6 @@
         // 3. Quote Modal & Step Logic
         // ------------------
 
-        const quoteModal = document.getElementById('quote-modal');
-        const openButtons = document.querySelectorAll('#open-quote-modal, #hero-quote-button, #footer-quote-button');
-        const closeButton = document.getElementById('close-quote-modal');
-        const quoteForm = document.getElementById('quote-form');
-        const quoteResult = document.getElementById('quote-result');
-        const stepDisplay = document.getElementById('current-step-display');
-        const prevStepBtn = document.getElementById('prev-step');
-        const nextStepBtn = document.getElementById('next-step');
-        const submitQuoteBtn = document.getElementById('submit-quote');
-        const statusDiv = document.getElementById('submission-status');
-        const statusMessage = document.getElementById('status-message');
-        const finalPriceDisplay = document.getElementById('final-price-display');
-        const pricePreview = document.getElementById('quote-price-preview');
-
-        const stepContents = [
-            document.getElementById('step-1-content'),
-            document.getElementById('step-2-content'),
-            document.getElementById('step-3-content')
-        ];
-        let currentStep = 0; // 0-indexed
-
-        const BASE_PRICE = 1000; // Base Price for a simple 1-page static site is $1000
-
         function updateStepDisplay() {
             // Hide all step content, then show the current one
             stepContents.forEach((step, index) => {
@@ -652,27 +701,20 @@
                 const name = document.getElementById('contact-name').value;
                 const email = document.getElementById('contact-email').value;
                 const phone = document.getElementById('contact-phone').value;
-                
-                // Function to display error message without using alert()
-                const displayError = (msg) => {
-                    statusDiv.classList.remove('hidden', 'bg-green-600/50', 'bg-[#3a3a5e]');
-                    statusDiv.classList.add('bg-yellow-600/50');
-                    statusMessage.textContent = msg;
-                    finalPriceDisplay.textContent = '';
-                    setTimeout(() => { statusDiv.classList.add('hidden'); }, 3000);
-                };
 
                 if (!name || !email || !phone) {
-                    displayError('Please fill in all required contact fields.');
+                    alertUser('Please fill in all required contact fields.', 'yellow');
                     return false;
                 }
-                // Simple email validation
+                // Simple email validation (can be more robust)
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(email)) {
-                    displayError('Please enter a valid email address.');
+                    alertUser('Please enter a valid email address.', 'yellow');
                     return false;
                 }
             }
+            // Step 1 and Step 3 currently require no complex validation, 
+            // but structure is ready for future checks.
             return true;
         }
 
@@ -687,6 +729,18 @@
                 currentStep = nextStep;
                 updateStepDisplay();
             }
+        }
+
+        function alertUser(message, color) {
+            // Note: Using the submission status div as a temporary alert box
+            statusDiv.classList.remove('hidden');
+            statusDiv.classList.remove('bg-green-600/50', 'bg-yellow-600/50', 'bg-red-600/50');
+            statusDiv.classList.add(color === 'yellow' ? 'bg-yellow-600/50' : (color === 'red' ? 'bg-red-600/50' : 'bg-green-600/50'));
+            statusMessage.textContent = message;
+            finalPriceDisplay.textContent = '';
+            
+            // Hide alert after 3 seconds
+            setTimeout(() => { statusDiv.classList.add('hidden'); }, 3000);
         }
 
         prevStepBtn.addEventListener('click', () => changeStep(-1));
@@ -728,7 +782,7 @@
         });
 
         // ------------------
-        // 4. Quote Calculation and Submission Logic (Firebase)
+        // 4. Quote Calculation and Submission Logic
         // ------------------
         function calculateQuote() {
             let totalCost = BASE_PRICE;
@@ -766,12 +820,10 @@
         async function submitQuote(e) {
             e.preventDefault();
             
+            // Check if userId is available (authentication complete)
             if (!db || !userId) {
-                // Display error message in the status div
-                statusDiv.classList.remove('hidden', 'bg-green-600/50', 'bg-yellow-600/50', 'bg-[#3a3a5e]');
-                statusDiv.classList.add('bg-red-600/50');
-                statusMessage.textContent = 'System is not authenticated. Please try again or refresh.';
-                finalPriceDisplay.textContent = '';
+                alertUser('System is not authenticated. Please wait a moment and try again.', 'red');
+                // The onAuthStateChanged listener will handle the auth, no need to call authSetup here.
                 return;
             }
 
@@ -792,8 +844,7 @@
             // 3. Gather Project Details (Step 3)
             quoteData.projectName = document.getElementById('project-name').value || 'N/A';
             quoteData.projectUrl = document.getElementById('project-url').value || 'N/A';
-            // Ensure logo status is captured
-            quoteData.logoStatus = quoteForm.querySelector('input[name="logo-status"]:checked')?.value || 'yes';
+            quoteData.logoStatus = quoteForm.querySelector('input[name="logo-status"]:checked').value;
             
             // 4. Add Final Price and Metadata
             quoteData.finalEstimate = cost.raw;
@@ -806,24 +857,21 @@
             statusDiv.classList.add('hidden');
 
             try {
-                // Store quotes in a private collection for the user
-                const collectionPath = `artifacts/${appId}/users/${userId}/quotes`;
+                // FIX: Write to public collection so Admin Dashboard can see it.
+                const collectionPath = `quotes`;
                 const docRef = await addDoc(collection(db, collectionPath), quoteData);
                 
-                // Success - Display final price clearly
+                // Success
+                console.log(`Firestore Write Success: Document written with ID: ${docRef.id} to collection: ${collectionPath}`);
                 statusMessage.textContent = 'Quote Submitted Successfully!';
-                finalPriceDisplay.textContent = cost.formatted;
-                statusDiv.classList.remove('hidden', 'bg-yellow-600/50', 'bg-red-600/50');
+                finalPriceDisplay.textContent = `Final Estimate: ${cost.formatted}`;
+                statusDiv.classList.remove('hidden');
+                statusDiv.classList.remove('bg-yellow-600/50', 'bg-red-600/50');
                 statusDiv.classList.add('bg-green-600/50');
                 
             } catch (error) {
                 console.error("Error writing document to Firestore: ", error);
-                
-                // Submission Failed - Display error
-                statusDiv.classList.remove('hidden', 'bg-green-600/50', 'bg-yellow-600/50', 'bg-[#3a3a5e]');
-                statusDiv.classList.add('bg-red-600/50');
-                statusMessage.textContent = 'Submission Failed. Please try again.';
-                finalPriceDisplay.textContent = '';
+                alertUser('Submission Failed. Please check console for errors.', 'red');
             } finally {
                 submitQuoteBtn.disabled = false;
                 submitQuoteBtn.textContent = 'Submit Quote';
@@ -835,7 +883,7 @@
         quoteForm.addEventListener('submit', submitQuote);
 
         // ------------------
-        // 5. Info Toggle Logic
+        // 5. Info Toggle Logic (Kept from previous version)
         // ------------------
         function setupInfoToggles() {
             document.querySelectorAll('[data-info-target]').forEach(icon => {
@@ -859,8 +907,15 @@
         }
         
         setupInfoToggles();
+        // Initial calculation when the page loads
         document.addEventListener('DOMContentLoaded', calculateQuote);
         
+        // --- Initialize Lucide icons after DOM load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
     </script>
 </body>
 </html>
