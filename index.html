@@ -206,12 +206,17 @@
     <!-- Header: Transparent and Fixed -->
     <header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-default py-4">
         <div class="container mx-auto px-6 flex justify-between items-center">
-            <!-- Updated to Setton Source -->
-            <a href="#hero" class="text-2xl font-black text-white hover:text-cyan-400 transition-default">Setton Source<span class="text-[var(--accent-color)]">.</span></a>
+            <!-- UPDATED: Increased logo size to w-12 h-12 -->
+            <a href="#" class="flex items-center space-x-2 text-2xl font-black text-white hover:text-cyan-400 transition-default">
+                <img 
+                    src="https://raw.githubusercontent.com/Setton-Source/Setton-Source/refs/heads/main/assets/lgo.png" 
+                    alt="Setton Source Logo" 
+                    class="w-12 h-12 object-contain"
+                />
+                <span>Setton Source<span class="text-[var(--accent-color)]">.</span></span>
+            </a>
             <nav class="hidden md:flex space-x-8 font-medium">
-                <a href="#hero" class="text-zinc-300 hover:text-white transition-default">Home</a>
-                <a href="#work" class="text-zinc-300 hover:text-white transition-default">My Work</a>
-                <a href="#contact" class="text-zinc-300 hover:text-white transition-default">Contact</a>
+                <!-- REMOVED DEEP LINKS -->
             </nav>
             <button id="open-quote-modal" class="py-2 px-6 bg-[var(--accent-color)] text-[var(--primary-color)] font-bold rounded-full shadow-lg hover:shadow-[0_0_15px_rgba(0,210,255,0.7)] transition-default transform hover:scale-105">
                 Get Instant Quote
@@ -341,7 +346,7 @@
         <div class="container mx-auto flex justify-center items-center space-x-6">
             <span>&copy; 2025 Setton Source. Built with precision and passion.</span>
             <!-- ADMIN LINK -->
-            <a href="admin/" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
+            <a href="admin_dashboard.html" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
                 <i data-lucide="lock" class="w-4 h-4 mr-1"></i> Admin
             </a>
         </div>
@@ -368,12 +373,35 @@
 
                 <!-- Step 1: Site Requirements (Initial Step) -->
                 <div id="step-1-content" class="space-y-6">
-                    <!-- 1. Number of Pages (CLEAN LABELS) -->
+                    
+                    <!-- 1. Project Type (NEW) -->
                     <div>
-                        <label class="block text-lg font-semibold mb-3 text-zinc-300">1. How many unique pages will your site require?</label>
+                        <label class="block text-lg font-semibold mb-3 text-zinc-300">1. What is the primary purpose of your site?</label>
+                        <div id="project-type-group" class="grid grid-cols-2 sm:grid-cols-3 gap-3 custom-radio">
+                            <input type="radio" id="type-fundraiser" name="projectType" value="Fundraiser/Event" class="hidden">
+                            <label for="type-fundraiser" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Fundraiser/Event</label>
+
+                            <input type="radio" id="type-shop" name="projectType" value="E-commerce/Shop" data-cost="100" class="hidden">
+                            <label for="type-shop" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Shop Site</label>
+
+                            <input type="radio" id="type-portfolio" name="projectType" value="Portfolio/Brochure" class="hidden">
+                            <label for="type-portfolio" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Portfolio</label>
+
+                            <input type="radio" id="type-info" name="projectType" value="Informational" class="hidden"> <!-- REMOVED DEFAULT CHECK -->
+                            <label for="type-info" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Informational</label>
+                            
+                            <input type="radio" id="type-custom" name="projectType" value="Custom App" data-cost="1000" class="hidden">
+                            <label for="type-custom" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Custom App</label>
+                        </div>
+                    </div>
+
+
+                    <!-- 2. Number of Pages (CLEAN LABELS) -->
+                    <div>
+                        <label class="block text-lg font-semibold mb-3 text-zinc-300">2. How many unique pages will your site require?</label>
                         <div id="pages-group" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 custom-radio">
-                            <!-- 1 Page: $1,000 (BASE) - Removed 'checked' attribute -->
-                            <input type="radio" id="pages-1" name="pages" value="1" data-cost="0" class="hidden">
+                            <!-- 1 Page: $1,000 (BASE) -->
+                            <input type="radio" id="pages-1" name="pages" value="1" data-cost="0" class="hidden"> <!-- REMOVED DEFAULT CHECK -->
                             <label for="pages-1" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">1 Page</label>
 
                             <!-- 3 Pages: $1,500 (+$500) -->
@@ -394,17 +422,17 @@
                         </div>
                     </div>
 
-                    <!-- 2. Backend/Database Requirement (WITH INFO BUTTON) -->
+                    <!-- 3. Backend/Database Requirement (WITH INFO BUTTON) -->
                     <div>
                         <div class="flex items-center mb-3">
-                            <label class="block text-lg font-semibold text-zinc-300">2. Will you require a backend/database?</label>
+                            <label class="block text-lg font-semibold text-zinc-300">3. Will you require a backend/database?</label>
                             <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="backend-info"></i>
                         </div>
                         <div id="backend-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
                             The backend is the brain of your website. It's needed for features like user logins, storing product data, saving form entries, or handling any dynamic content (content that changes based on user actions or time).
                         </div>
                         <div class="grid grid-cols-2 gap-3 custom-radio">
-                            <input type="radio" id="backend-no" name="backend" value="no" data-cost="0" class="hidden" checked>
+                            <input type="radio" id="backend-no" name="backend" value="no" data-cost="0" class="hidden"> <!-- REMOVED DEFAULT CHECK -->
                             <label for="backend-no" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">No Backend (Static)</label>
 
                             <input type="radio" id="backend-yes" name="backend" value="yes" data-cost="800" class="hidden">
@@ -412,9 +440,9 @@
                         </div>
                     </div>
 
-                    <!-- 3. Site Type / Key Features (WITH INFO BUTTONS) -->
+                    <!-- 4. Site Type / Key Features (WITH INFO BUTTONS) -->
                     <div>
-                        <label class="block text-lg font-semibold mb-3 text-zinc-300">3. Select the key features needed:</label>
+                        <label class="block text-lg font-semibold mb-3 text-zinc-300">4. Select the key features needed:</label>
                         <div class="space-y-3">
                             <div class="flex flex-col">
                                 <div class="flex items-center">
@@ -451,14 +479,14 @@
                         </div>
                     </div>
 
-                    <!-- 4. Color Scheme (WITH INFO BUTTON) -->
+                    <!-- 5. Color Scheme (WITH INFO BUTTON) -->
                     <div>
                         <div class="flex items-center mb-3">
-                            <label class="block text-lg font-semibold text-zinc-300">4. Do you have a defined color scheme?</label>
+                            <label class="block text-lg font-semibold text-zinc-300">5. Do you have a defined color scheme?</label>
                             <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="color-info"></i>
                         </div>
                         <div class="grid grid-cols-2 gap-3 custom-radio">
-                            <input type="radio" id="colors-yes" name="colors" value="yes" data-cost="0" class="hidden" checked>
+                            <input type="radio" id="colors-yes" name="colors" value="yes" data-cost="0" class="hidden"> <!-- REMOVED DEFAULT CHECK -->
                             <label for="colors-yes" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">Yes (Standard)</label>
 
                             <input type="radio" id="colors-custom" name="colors" value="custom" data-cost="150" class="hidden">
@@ -511,7 +539,7 @@
                             <label for="url-owned" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">I own the domain.</label>
                             
                             <input type="radio" id="url-buy" name="url-status" value="buy" data-cost="0" class="hidden">
-                            <label for="url-buy" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">Need help acquiring it.</label>
+                            <label for="url-buy" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">Need help acquiring it.</label>
                         </div>
                     </div>
 
@@ -530,7 +558,7 @@
                             
                             <!-- $100 for logo creation service, label is clean -->
                             <input type="radio" id="logo-no" name="logo-status" value="no" data-cost="100" class="hidden">
-                            <label for="logo-no" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">No, create one</label>
+                            <label for="logo-no" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">No, create one</label>
                         </div>
                         <p class="text-xs text-zinc-500 mt-2">Note: This is an estimate for a basic design. Complex branding will require a custom quote. The logo creation service adds $100 to your total.</p>
                     </div>
@@ -650,6 +678,7 @@
         const progressBar = document.getElementById('quote-progress-bar');
         
         // NEW ELEMENTS for validation targeting
+        const projectTypeGroup = document.getElementById('project-type-group'); // NEW
         const pagesGroup = document.getElementById('pages-group');
         const urlStatusGroup = document.getElementById('url-status-group');
         const disclaimerText = document.getElementById('disclaimer-text');
@@ -791,7 +820,13 @@
                 // Remove input text errors
                 quoteForm.querySelectorAll('.input-text').forEach(el => el.classList.remove('input-error'));
                 // Remove group container errors
-                [pagesGroup, urlStatusGroup].forEach(el => el && el.classList.remove('error-group-border'));
+                [projectTypeGroup, pagesGroup, urlStatusGroup].forEach(el => el && el.classList.remove('error-group-border'));
+                
+                // Get the elements containing the radio button groups for Q3 and Q5 by looking for their closest wrapper div.grid
+                const backendGroup = document.getElementById('backend-no')?.closest('div.grid');
+                const colorsGroup = document.getElementById('colors-yes')?.closest('div.grid');
+                if (backendGroup) backendGroup.classList.remove('error-group-border');
+                if (colorsGroup) colorsGroup.classList.remove('error-group-border');
             };
             
             // Clear all existing error styles at the start
@@ -802,12 +837,41 @@
 
 
             if (stepIndex === 0) { // Step 1: Site Requirements
+                const projectTypeSelected = quoteForm.querySelector('input[name="projectType"]:checked'); // NEW Check
                 const pagesSelected = quoteForm.querySelector('input[name="pages"]:checked');
+                const backendSelected = quoteForm.querySelector('input[name="backend"]:checked'); // Q3 Check
+                const colorsSelected = quoteForm.querySelector('input[name="colors"]:checked'); // Q5 Check
                 
+                // Get radio group wrappers for validation highlighting
+                const backendGroup = document.getElementById('backend-no').closest('div.grid');
+                const colorsGroup = document.getElementById('colors-yes').closest('div.grid');
+                
+                // 1. Project Type check
+                if (!projectTypeSelected) {
+                    isValid = false;
+                    projectTypeGroup.classList.add('error-group-border');
+                    if (!firstInvalidElement) firstInvalidElement = projectTypeGroup;
+                }
+                
+                // 2. Pages check
                 if (!pagesSelected) {
                     isValid = false;
-                    pagesGroup.classList.add('error-group-border');
                     if (!firstInvalidElement) firstInvalidElement = pagesGroup;
+                    pagesGroup.classList.add('error-group-border');
+                }
+                
+                // 3. Backend check
+                if (!backendSelected) {
+                    isValid = false;
+                    if (!firstInvalidElement) firstInvalidElement = backendGroup;
+                    backendGroup.classList.add('error-group-border');
+                }
+                
+                // 5. Color Scheme check
+                if (!colorsSelected) {
+                    isValid = false;
+                    if (!firstInvalidElement) firstInvalidElement = colorsGroup;
+                    colorsGroup.classList.add('error-group-border');
                 }
             }
 
@@ -950,8 +1014,8 @@
                 const cost = parseInt(input.getAttribute('data-cost') || '0', 10);
 
                 if (input.type === 'radio' && input.checked) {
-                    // Cost is added for page count, backend, colors, and logo status
-                    if (['pages', 'backend', 'colors', 'logo-status'].includes(input.name)) {
+                    // Cost is added for page count, backend, colors, logo status, and PROJECT TYPE
+                    if (['projectType', 'pages', 'backend', 'colors', 'logo-status'].includes(input.name)) {
                         totalCost += cost;
                     }
                 } else if (input.type === 'checkbox' && input.checked) {
@@ -1008,6 +1072,7 @@
             
             // 4. Add Final Price and Metadata
             quoteData.finalEstimate = cost.raw;
+            quoteData.formattedEstimate = cost.formatted; // Add formatted value for easier debugging/display
             quoteData.timestamp = new Date().toISOString();
             quoteData.userId = userId;
 
@@ -1018,7 +1083,7 @@
 
             try {
                 // Write to public collection using 'quotes' instead of 'artifacts'
-                const collectionPath = `quotes`;
+                const collectionPath = `quotes/${appId}/public/data/quotes`;
                 const docRef = await addDoc(collection(db, collectionPath), quoteData);
                 
                 // Success
@@ -1096,7 +1161,7 @@
                 if (keyPressHistory.length === SECRET_CODE.length && keyPressHistory.every((val, index) => val === SECRET_CODE[index])) {
                     console.log("Secret Admin Code Activated! Redirecting...");
                     keyPressHistory = []; 
-                    window.location.href = 'admin/';
+                    window.location.href = 'admin_dashboard.html';
                 }
             } else {
                 // If a non-alphabetic key is pressed, reset the sequence
