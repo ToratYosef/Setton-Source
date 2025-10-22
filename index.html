@@ -214,9 +214,13 @@
         #typewriter-text {
             border-right-color: white !important;
             animation: blink 0.7s step-end infinite;
-            white-space: nowrap;
+            display: block;
+            max-width: 100%;
+            white-space: normal;
             overflow: hidden;
-            display: inline-block;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            padding-right: 0.15em;
         }
 
         .input-text:focus {
