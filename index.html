@@ -12,91 +12,103 @@
   <style>
     :root {
       color-scheme: dark;
+      --accent-cyan: #47e8ff;
+      --accent-magenta: #ff72d4;
+      --accent-amber: #f9c74f;
+      --slate-950: #020617;
+      --slate-900: #030b1f;
     }
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: "Manrope", system-ui, sans-serif;
-      background: radial-gradient(circle at top left, rgba(0,210,255,0.25), transparent 45%),
-                  radial-gradient(circle at bottom right, rgba(120,57,255,0.3), transparent 40%),
-                  #030712;
-      color: #f9fafb;
+      background:
+        radial-gradient(circle at 8% 12%, rgba(71, 232, 255, 0.16), transparent 55%),
+        radial-gradient(circle at 85% 20%, rgba(255, 114, 212, 0.18), transparent 60%),
+        radial-gradient(circle at 12% 78%, rgba(249, 199, 79, 0.12), transparent 65%),
+        linear-gradient(135deg, #020617, #050215 45%, #08091f 85%);
+      color: #f8fafc;
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
     }
+    a { color: inherit; }
     .noise-overlay {
       pointer-events: none;
       position: fixed;
       inset: 0;
       background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-      opacity: 0.02;
+      opacity: 0.05;
       mix-blend-mode: screen;
     }
     .glass-card {
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      background: linear-gradient(135deg, rgba(15,23,42,0.78), rgba(15,23,42,0.55));
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 20px 35px rgba(2,8,23,0.4);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.52));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 28px 60px rgba(2, 6, 23, 0.55);
       position: relative;
       overflow: hidden;
     }
     .glass-surface {
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      background: rgba(15,23,42,0.58);
-      border: 1px solid rgba(255,255,255,0.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(15, 23, 42, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
     .glass-veil {
       position: absolute;
-      inset: -80% -60% -40% -60%;
-      background: radial-gradient(circle at 20% 30%, rgba(0,210,255,0.28), rgba(0,210,255,0)),
-                  radial-gradient(circle at 80% 20%, rgba(120,57,255,0.25), rgba(120,57,255,0)),
-                  radial-gradient(circle at 50% 80%, rgba(56,189,248,0.18), rgba(56,189,248,0));
+      inset: -80% -50% -40% -60%;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(71, 232, 255, 0.35), rgba(71, 232, 255, 0)),
+        radial-gradient(circle at 70% 20%, rgba(255, 114, 212, 0.28), rgba(255, 114, 212, 0)),
+        radial-gradient(circle at 60% 85%, rgba(249, 199, 79, 0.25), rgba(249, 199, 79, 0));
       opacity: 0.45;
       pointer-events: none;
-      filter: blur(60px);
+      filter: blur(70px);
     }
-    .focus-ring:focus-visible {
-      outline: 2px solid rgba(0,210,255,0.45);
-      outline-offset: 2px;
+    .aurora, .aurora-second {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(90px);
+      opacity: 0.45;
+      pointer-events: none;
     }
     .aurora {
-      position: absolute;
-      inset: -30% -20% auto -20%;
+      inset: -25% auto auto -25%;
+      width: 60vw;
       height: 60vh;
-      background: radial-gradient(circle, rgba(0,210,255,0.35) 0%, rgba(0,210,255,0) 65%);
-      filter: blur(60px);
-      opacity: 0.45;
+      background: radial-gradient(circle, rgba(71, 232, 255, 0.4) 0%, rgba(71, 232, 255, 0) 70%);
     }
     .aurora-second {
-      position: absolute;
-      inset: auto -15% -30% 40%;
+      inset: auto -20% -30% 40%;
+      width: 45vw;
       height: 55vh;
-      background: radial-gradient(circle, rgba(120,57,255,0.3) 0%, rgba(120,57,255,0) 70%);
-      filter: blur(60px);
-      opacity: 0.45;
+      background: radial-gradient(circle, rgba(255, 114, 212, 0.35) 0%, rgba(255, 114, 212, 0) 75%);
     }
     .layout-cluster {
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      background: linear-gradient(140deg, rgba(15,23,42,0.68), rgba(15,23,42,0.48));
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 22px 45px rgba(1,5,20,0.4);
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.48));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 22px 45px rgba(1, 5, 20, 0.4);
     }
     .iframe-shell {
       position: relative;
       border-radius: 28px;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: linear-gradient(145deg, rgba(15,23,42,0.95), rgba(15,23,42,0.4));
-      box-shadow: 0 25px 60px rgba(2,8,23,0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.4));
+      box-shadow: 0 25px 60px rgba(2, 8, 23, 0.6);
     }
     .iframe-shell::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top left, rgba(56,189,248,0.35), transparent 60%),
-                  radial-gradient(circle at bottom right, rgba(168,85,247,0.25), transparent 70%);
+      background: radial-gradient(circle at top left, rgba(71, 232, 255, 0.35), transparent 60%),
+                  radial-gradient(circle at bottom right, rgba(255, 114, 212, 0.25), transparent 70%);
       opacity: 0.7;
       pointer-events: none;
     }
@@ -114,11 +126,181 @@
       border-radius: 24px;
       background: #020617;
     }
+    .tagline {
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1.6rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      background: linear-gradient(120deg, rgba(71, 232, 255, 0.92), rgba(255, 114, 212, 0.92));
+      color: #020617;
+      box-shadow: 0 18px 35px rgba(71, 232, 255, 0.25);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 45px rgba(255, 114, 212, 0.32);
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.85rem 1.4rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: rgba(203, 213, 225, 0.9);
+      transition: border-color 0.25s ease, color 0.25s ease;
+    }
+    .btn-secondary:hover {
+      color: #fff;
+      border-color: rgba(71, 232, 255, 0.55);
+    }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.2rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: rgba(203, 213, 225, 0.85);
+      font-weight: 600;
+      transition: border-color 0.25s ease, color 0.25s ease;
+    }
+    .btn-ghost:hover {
+      color: #f8fafc;
+      border-color: rgba(71, 232, 255, 0.55);
+    }
+    .focus-ring:focus-visible {
+      outline: 2px solid rgba(71, 232, 255, 0.6);
+      outline-offset: 2px;
+    }
     .gradient-divider {
-      width: 120px;
+      width: 140px;
       height: 2px;
-      background: linear-gradient(90deg, rgba(34,211,238,0), rgba(34,211,238,0.65), rgba(168,85,247,0));
+      background: linear-gradient(90deg, rgba(71, 232, 255, 0), rgba(71, 232, 255, 0.8), rgba(255, 114, 212, 0));
       margin: 0 auto;
+    }
+    footer {
+      margin-top: 8rem;
+      background: linear-gradient(180deg, rgba(2, 6, 23, 0), rgba(2, 6, 23, 0.82) 55%, #010313 95%);
+    }
+    .footer-backdrop {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(71, 232, 255, 0.18), rgba(71, 232, 255, 0) 55%),
+        radial-gradient(circle at 95% 15%, rgba(255, 114, 212, 0.22), rgba(255, 114, 212, 0) 60%),
+        radial-gradient(circle at 50% 100%, rgba(249, 199, 79, 0.18), rgba(249, 199, 79, 0) 65%);
+      opacity: 0.75;
+      pointer-events: none;
+    }
+    .footer-cta {
+      position: relative;
+      overflow: hidden;
+    }
+    .footer-cta::before {
+      content: "";
+      position: absolute;
+      inset: -45% -25% auto -25%;
+      height: 220%;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(71, 232, 255, 0.35), rgba(71, 232, 255, 0)),
+        radial-gradient(circle at 75% 35%, rgba(255, 114, 212, 0.3), rgba(255, 114, 212, 0));
+      opacity: 0.65;
+      pointer-events: none;
+    }
+    .footer-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.75rem 0;
+      font-weight: 500;
+      color: rgba(203, 213, 225, 0.88);
+      transition: color 0.25s ease;
+    }
+    .footer-link:hover {
+      color: #f8fafc;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+      z-index: 60;
+    }
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-panel {
+      width: 100%;
+      max-width: min(1000px, 100%);
+      transform: translateY(32px);
+      transition: transform 0.3s ease;
+    }
+    .modal.active .modal-panel {
+      transform: translateY(0);
+    }
+    body.modal-open {
+      overflow: hidden;
+    }
+    [data-step-panel] {
+      display: none;
+    }
+    [data-step-panel].active {
+      display: block;
+    }
+    .stepper {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .step-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(71, 232, 255, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      font-weight: 600;
+      transition: all 0.25s ease;
+    }
+    .step-dot.active {
+      background: linear-gradient(135deg, rgba(71, 232, 255, 0.85), rgba(255, 114, 212, 0.85));
+      color: #020617;
+      border-color: transparent;
+      box-shadow: 0 0 25px rgba(71, 232, 255, 0.35);
+    }
+    .step-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(71, 232, 255, 0.05), rgba(71, 232, 255, 0.6));
+      opacity: 0.6;
+    }
+    .modal-grid {
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+    }
+    .estimate-summary {
+      position: sticky;
+      top: 1.5rem;
     }
     @media (max-width: 1024px) {
       header .flex {
@@ -132,23 +314,26 @@
         justify-content: center;
       }
     }
+    @media (max-width: 900px) {
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+      .estimate-summary {
+        position: static;
+      }
+    }
     @media (max-width: 768px) {
       body {
-        background: radial-gradient(circle at top, rgba(14,165,233,0.35), transparent 55%),
-                    radial-gradient(circle at bottom, rgba(147,51,234,0.28), transparent 60%),
-                    #030712;
+        background:
+          radial-gradient(circle at top, rgba(71, 232, 255, 0.28), transparent 55%),
+          radial-gradient(circle at bottom, rgba(255, 114, 212, 0.24), transparent 60%),
+          #030617;
       }
       .glass-card {
         border-radius: 26px;
       }
-      .layout-cluster {
-        border-radius: 26px;
-      }
-      .iframe-shell {
-        border-radius: 24px;
-      }
-      .iframe-ratio {
-        padding-top: 72%;
+      .modal {
+        padding: 1rem;
       }
     }
   </style>
@@ -158,90 +343,100 @@
   <div class="aurora"></div>
   <div class="aurora-second"></div>
 
-  <header class="relative z-10">
+  <header id="top" class="relative z-10 overflow-hidden">
     <div class="glass-veil"></div>
-    <div class="max-w-6xl mx-auto px-6 pt-12 pb-8">
-      <div class="flex flex-wrap lg:flex-nowrap items-center gap-10">
-        <div class="flex-1 space-y-6">
-          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-cyan-200/80 text-sm uppercase tracking-[0.3em]">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
-            Futuristic web experiences
+    <div class="max-w-6xl mx-auto px-6 pt-16 pb-12">
+      <div class="grid gap-12 lg:grid-cols-[1.1fr,0.9fr] items-center">
+        <div class="space-y-8">
+          <span class="tagline inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-xs tracking-[0.35em] text-cyan-100/80">
+            <i data-lucide="scan-search" class="w-4 h-4"></i>
+            Instant project intelligence
           </span>
           <h1 class="font-[700] text-4xl md:text-5xl lg:text-6xl leading-tight text-slate-50">
-            Get an instant estimate that makes your vision impossible to ignore.
+            Build unforgettable digital experiences with precision-crafted delivery.
           </h1>
           <p class="text-lg md:text-xl text-slate-300/90 max-w-2xl">
-            Services that fuse design aesthetics with resilient engineering. Every engagement is tuned to measurable outcomes—speed, conversion, retention, and brand lift.
+            From conversion-obsessed marketing sites to resilient product platforms, Setton Source blends engineering rigor with cinematic design. Answer a few guided prompts to generate a launch-ready roadmap.
           </p>
-          <p class="text-base md:text-lg text-slate-300/80 max-w-2xl">
-            Answer a few high-impact questions and watch a live quote adapt to your scope. When you submit, your roadmap lands directly in our real-time dashboard for a rapid follow-up.
-          </p>
-          <div class="flex flex-wrap gap-4 text-sm text-slate-300/80">
-            <div class="glass-surface px-4 py-3 rounded-xl flex items-center gap-3">
-              <i data-lucide="timer" class="w-5 h-5 text-cyan-300"></i>
-              Replies within 12 hours
+          <div class="flex flex-wrap gap-4">
+            <button type="button" class="btn-primary focus-ring" data-open-quote>
+              Get instant quote
+              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            </button>
+            <a href="#work" class="btn-secondary">
+              See recent builds
+              <i data-lucide="sparkle" class="w-4 h-4"></i>
+            </a>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-slate-300/85">
+            <div class="glass-surface rounded-2xl p-4">
+              <p class="text-xs uppercase tracking-[0.3em] text-cyan-100/60">Avg response</p>
+              <p class="text-lg font-semibold text-slate-50">&lt; 12 hrs</p>
             </div>
-            <div class="glass-surface px-4 py-3 rounded-xl flex items-center gap-3">
-              <i data-lucide="rocket" class="w-5 h-5 text-purple-300"></i>
-              Launch-ready in 4–6 weeks
+            <div class="glass-surface rounded-2xl p-4">
+              <p class="text-xs uppercase tracking-[0.3em] text-cyan-100/60">Launch window</p>
+              <p class="text-lg font-semibold text-slate-50">4 – 6 wks</p>
             </div>
-            <div class="glass-surface px-4 py-3 rounded-xl flex items-center gap-3">
-              <i data-lucide="activity" class="w-5 h-5 text-emerald-300"></i>
-              Conversion-first strategy
+            <div class="glass-surface rounded-2xl p-4">
+              <p class="text-xs uppercase tracking-[0.3em] text-cyan-100/60">Retention lift</p>
+              <p class="text-lg font-semibold text-slate-50">+28%</p>
+            </div>
+            <div class="glass-surface rounded-2xl p-4">
+              <p class="text-xs uppercase tracking-[0.3em] text-cyan-100/60">Launch partners</p>
+              <p class="text-lg font-semibold text-slate-50">42 startups</p>
             </div>
           </div>
         </div>
-        <div class="w-full max-w-sm mx-auto lg:mx-0 glass-card rounded-3xl p-6 text-slate-200">
-          <p class="uppercase text-xs tracking-[0.25em] text-slate-400 mb-4">Top Deliverables</p>
-          <ul class="space-y-4">
-            <li class="flex items-start gap-3">
-              <span class="w-10 h-10 rounded-2xl glass-surface flex items-center justify-center">
-                <i data-lucide="layout-dashboard" class="w-5 h-5 text-cyan-300"></i>
+        <div class="glass-card rounded-3xl p-8 space-y-6 text-slate-200">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.28em] text-cyan-200/80">
+            <i data-lucide="radar" class="w-4 h-4"></i>
+            Why teams choose us
+          </div>
+          <h2 class="text-2xl font-semibold text-slate-50">Obsessed with results, not deliverables.</h2>
+          <ul class="space-y-4 text-sm text-slate-300/80">
+            <li class="flex gap-3">
+              <span class="w-11 h-11 rounded-2xl glass-surface flex items-center justify-center">
+                <i data-lucide="sparkles" class="w-5 h-5 text-cyan-300"></i>
               </span>
-              <div>
-                <p class="font-semibold text-slate-100">Immersive hero systems</p>
-                <p class="text-sm text-slate-400">Glassmorphism layers, motion cues, and on-brand art direction.</p>
-              </div>
+              Cinematic hero systems, dynamic art direction, and motion-driven storytelling tuned to your brand voice.
             </li>
-            <li class="flex items-start gap-3">
-              <span class="w-10 h-10 rounded-2xl glass-surface flex items-center justify-center">
-                <i data-lucide="chart-no-axes-combined" class="w-5 h-5 text-purple-300"></i>
+            <li class="flex gap-3">
+              <span class="w-11 h-11 rounded-2xl glass-surface flex items-center justify-center">
+                <i data-lucide="cpu" class="w-5 h-5 text-purple-300"></i>
               </span>
-              <div>
-                <p class="font-semibold text-slate-100">High-performance builds</p>
-                <p class="text-sm text-slate-400">Next.js, Firebase, automations, and analytics-ready rollouts.</p>
-              </div>
+              Firebase, Next.js, automations, and analytics baked in from day zero for measurable outcomes.
             </li>
-            <li class="flex items-start gap-3">
-              <span class="w-10 h-10 rounded-2xl glass-surface flex items-center justify-center">
-                <i data-lucide="sparkle" class="w-5 h-5 text-emerald-300"></i>
+            <li class="flex gap-3">
+              <span class="w-11 h-11 rounded-2xl glass-surface flex items-center justify-center">
+                <i data-lucide="bot" class="w-5 h-5 text-emerald-300"></i>
               </span>
-              <div>
-                <p class="font-semibold text-slate-100">Conversion architecture</p>
-                <p class="text-sm text-slate-400">Frictionless flows, CRO sprints, and launch support baked in.</p>
-              </div>
+              Conversion-first flows, CRO sprints, and lifecycle strategy to keep momentum after launch.
             </li>
           </ul>
+          <div class="glass-surface rounded-2xl p-4 text-sm text-slate-300/80">
+            <p class="uppercase tracking-[0.3em] text-xs text-cyan-100/60 mb-2">Quick note</p>
+            <p>Share your wishlist via the quote flow and we’ll send a curated scope with pricing, timeline, and opportunities to delight.</p>
+          </div>
         </div>
       </div>
     </div>
   </header>
 
-  <main class="relative z-10 pb-24 space-y-16">
-    <section class="px-6 sm:px-8 lg:px-16">
+  <main class="relative z-10 pb-24 space-y-20">
+    <section id="services" class="px-6 sm:px-8 lg:px-16">
       <div class="max-w-6xl mx-auto text-center space-y-6">
         <span class="inline-flex items-center justify-center gap-2 px-6 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.35em] text-cyan-200/80">
           <i data-lucide="beaker" class="w-4 h-4"></i>
           Strategic capabilities
         </span>
-        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Services that scale from launch to lifecycle</h2>
+        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Services that scale from launch to lifecycle.</h2>
         <p class="text-base md:text-lg text-slate-300/90 max-w-3xl mx-auto">
           Every engagement is tuned to measurable outcomes—speed, conversion, retention, and brand lift.
         </p>
         <div class="gradient-divider"></div>
       </div>
-      <div class="max-w-6xl mx-auto mt-10 grid gap-6 lg:gap-8 md:grid-cols-2 xl:grid-cols-3">
-        <article class="layout-cluster rounded-3xl p-8 space-y-5">
+      <div class="max-w-6xl mx-auto mt-12 grid gap-6 lg:gap-8 md:grid-cols-2 xl:grid-cols-3">
+        <article class="layout-cluster rounded-3xl p-8 space-y-5 glass-card">
           <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl glass-surface text-xs uppercase tracking-[0.3em] text-cyan-200/80">
             <i data-lucide="rocket" class="w-4 h-4"></i>
             Launch Kits
@@ -253,7 +448,7 @@
             <li class="flex gap-3"><i data-lucide="palette" class="w-4 h-4 text-purple-300 mt-1"></i> Identity-aligned visuals, content design, and analytics instrumentation.</li>
           </ul>
         </article>
-        <article class="layout-cluster rounded-3xl p-8 space-y-5">
+        <article class="layout-cluster rounded-3xl p-8 space-y-5 glass-card">
           <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl glass-surface text-xs uppercase tracking-[0.3em] text-emerald-200/80">
             <i data-lucide="grid" class="w-4 h-4"></i>
             Product
@@ -265,7 +460,7 @@
             <li class="flex gap-3"><i data-lucide="cloud" class="w-4 h-4 text-sky-300 mt-1"></i> Cloud functions, Firestore, and serverless APIs to connect operations.</li>
           </ul>
         </article>
-        <article class="layout-cluster rounded-3xl p-8 space-y-5 md:col-span-2 xl:col-span-1">
+        <article class="layout-cluster rounded-3xl p-8 space-y-5 glass-card md:col-span-2 xl:col-span-1">
           <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl glass-surface text-xs uppercase tracking-[0.3em] text-amber-200/80">
             <i data-lucide="activity" class="w-4 h-4"></i>
             Optimization
@@ -279,268 +474,53 @@
         </article>
       </div>
     </section>
-    <section class="px-0 sm:px-4 lg:px-10">
-      <div class="relative w-full overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/5 to-emerald-500/10"></div>
-        <div class="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-cyan-400/20 blur-[80px]"></div>
-        <div class="absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-purple-500/20 blur-[90px]"></div>
-        <div class="glass-card rounded-none sm:rounded-[38px] p-6 sm:p-8 lg:p-12 shadow-2xl w-full">
-          <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
-            <h2 class="text-2xl md:text-3xl font-semibold text-slate-50">Project Blueprint</h2>
-            <span class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-slate-400">
-              <i data-lucide="cpu" class="w-4 h-4"></i>
-              Powered by Firebase
+
+    <section id="quote-flow" class="px-6 sm:px-8 lg:px-16">
+      <div class="max-w-6xl mx-auto glass-card rounded-[38px] p-10 lg:p-14 space-y-10">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div class="space-y-3">
+            <span class="tagline inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-xs tracking-[0.3em] text-cyan-200/80">
+              <i data-lucide="workflow" class="w-4 h-4"></i>
+              Guided quoting
             </span>
+            <h2 class="text-3xl font-semibold text-slate-50">Three steps to a living quote.</h2>
+            <p class="text-base text-slate-300/85 max-w-2xl">Open the hero button to explore functionality, design, and delivery preferences. The modal keeps a running total so you can experiment before sending us context.</p>
           </div>
-          <form id="quote-form" class="space-y-10">
-            <div class="grid md:grid-cols-2 gap-6">
-              <label class="space-y-2 text-sm">
-                <span class="uppercase tracking-[0.3em] text-slate-400">Your Name</span>
-                <input type="text" id="name" name="name" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="Jordan Founder" />
-              </label>
-              <label class="space-y-2 text-sm">
-                <span class="uppercase tracking-[0.3em] text-slate-400">Email</span>
-                <input type="email" id="email" name="email" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="you@brand.com" />
-              </label>
-              <label class="space-y-2 text-sm">
-                <span class="uppercase tracking-[0.3em] text-slate-400">Phone</span>
-                <input type="tel" id="phone" name="phone" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="(555) 123-4567" />
-              </label>
-              <label class="space-y-2 text-sm">
-                <span class="uppercase tracking-[0.3em] text-slate-400">Company / Brand</span>
-                <input type="text" id="project-name" name="project-name" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="NovaLabs" />
-              </label>
+          <button type="button" class="btn-primary focus-ring" data-open-quote>Start the flow</button>
+        </div>
+        <div class="grid gap-6 lg:grid-cols-3 text-sm text-slate-300/85">
+          <div class="glass-surface rounded-3xl p-6 space-y-3">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl glass-card">
+              <i data-lucide="sliders-horizontal" class="w-5 h-5 text-cyan-300"></i>
             </div>
-
-            <div class="grid lg:grid-cols-2 gap-8">
-              <div class="space-y-4">
-                <label class="space-y-3 block">
-                  <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Project Type</span>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button type="button" data-project-type="landing" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
-                      <i data-lucide="sparkles" class="w-5 h-5 text-cyan-300 mb-3"></i>
-                      <p class="font-semibold text-slate-100">Launch Page</p>
-                      <p class="text-xs text-slate-400">Single page or microsite momentum.</p>
-                    </button>
-                    <button type="button" data-project-type="marketing" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
-                      <i data-lucide="layers" class="w-5 h-5 text-purple-300 mb-3"></i>
-                      <p class="font-semibold text-slate-100">Marketing Site</p>
-                      <p class="text-xs text-slate-400">Multi-page presence & storytelling.</p>
-                    </button>
-                    <button type="button" data-project-type="ecommerce" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
-                      <i data-lucide="shopping-bag" class="w-5 h-5 text-emerald-300 mb-3"></i>
-                      <p class="font-semibold text-slate-100">E-commerce</p>
-                      <p class="text-xs text-slate-400">Storefronts, subscriptions, funnels.</p>
-                    </button>
-                    <button type="button" data-project-type="webapp" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
-                      <i data-lucide="blocks" class="w-5 h-5 text-amber-300 mb-3"></i>
-                      <p class="font-semibold text-slate-100">Web App / Portal</p>
-                      <p class="text-xs text-slate-400">Dashboards, portals, internal tools.</p>
-                    </button>
-                  </div>
-                </label>
-
-                <div class="grid gap-5 sm:grid-cols-2">
-                  <label class="space-y-2 block text-sm">
-                    <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Core Pages</span>
-                    <input type="range" id="pages" min="1" max="12" step="1" value="3" class="w-full" />
-                    <div class="flex justify-between text-xs text-slate-400">
-                      <span>1</span><span id="pages-output" class="text-cyan-300 text-sm font-semibold">3 pages</span><span>12</span>
-                    </div>
-                  </label>
-                  <label class="space-y-2 block text-sm">
-                    <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Backend & Integrations</span>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                      <button type="button" data-backend="no" class="backend-option glass-surface rounded-xl px-3 py-3 border border-transparent hover:border-cyan-400/60 transition focus-ring">No</button>
-                      <button type="button" data-backend="yes" class="backend-option glass-surface rounded-xl px-3 py-3 border border-transparent hover:border-cyan-400/60 transition focus-ring">Yes</button>
-                    </div>
-                    <p class="text-xs text-slate-500">APIs, auth, dashboards, automations.</p>
-                  </label>
-                </div>
-              </div>
-
-              <div class="space-y-6">
-                <fieldset class="space-y-3">
-                  <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Key Features</span>
-                  <div class="grid sm:grid-cols-2 gap-3 text-sm">
-                    <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
-                      <input type="checkbox" id="feature-ecommerce" class="mt-1 accent-cyan-400" />
-                      <div>
-                        <p class="font-semibold text-slate-100">Payments / Storefront</p>
-                        <p class="text-xs text-slate-400">Shop, donations, booking flow.</p>
-                      </div>
-                    </label>
-                    <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
-                      <input type="checkbox" id="feature-admin" class="mt-1 accent-purple-400" />
-                      <div>
-                        <p class="font-semibold text-slate-100">Admin / CMS</p>
-                        <p class="text-xs text-slate-400">Manageable content, data tools.</p>
-                      </div>
-                    </label>
-                    <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
-                      <input type="checkbox" id="feature-support" class="mt-1 accent-emerald-400" />
-                      <div>
-                        <p class="font-semibold text-slate-100">Live Support</p>
-                        <p class="text-xs text-slate-400">Chat, support desk, knowledge base.</p>
-                      </div>
-                    </label>
-                    <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
-                      <input type="checkbox" id="feature-automation" class="mt-1 accent-amber-300" />
-                      <div>
-                        <p class="font-semibold text-slate-100">Automation</p>
-                        <p class="text-xs text-slate-400">Workflows, CRM, analytics boosts.</p>
-                      </div>
-                    </label>
-                  </div>
-                </fieldset>
-
-                <div class="space-y-4">
-                  <span class="uppercase tracking-[0.3em] text-xs text-slate-400 block">Brand & Assets</span>
-                  <label class="glass-surface rounded-2xl p-4 flex items-center justify-between text-sm cursor-pointer border border-transparent hover:border-cyan-400/50 transition">
-                    <div>
-                      <p class="font-semibold text-slate-100">Logo ready to use?</p>
-                      <p class="text-xs text-slate-400">If not, we include a rapid brand refresh (+$180).</p>
-                    </div>
-                    <select id="logo-status" class="glass-surface rounded-xl px-3 py-2 focus-ring">
-                      <option value="yes">Yes, ready</option>
-                      <option value="no">Need help</option>
-                    </select>
-                  </label>
-                  <label class="glass-surface rounded-2xl p-4 flex items-center justify-between text-sm cursor-pointer border border-transparent hover:border-cyan-400/50 transition">
-                    <div>
-                      <p class="font-semibold text-slate-100">Do you already own a URL?</p>
-                      <p class="text-xs text-slate-400">If not, we secure domains + hosting setup.</p>
-                    </div>
-                    <select id="url-status" class="glass-surface rounded-xl px-3 py-2 focus-ring">
-                      <option value="live">I have one</option>
-                      <option value="buy">Need to purchase</option>
-                    </select>
-                  </label>
-                  <label class="glass-surface rounded-2xl p-4 flex flex-col gap-3 text-sm border border-transparent hover:border-cyan-400/50 transition">
-                    <p class="font-semibold text-slate-100">Link to current site or inspiration (optional)</p>
-                    <input type="url" id="project-url" placeholder="https://" class="glass-surface rounded-xl px-3 py-2 focus-ring placeholder:text-slate-500" />
-                  </label>
-                </div>
-
-                <label class="space-y-3 block">
-                  <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Timeline</span>
-                  <select id="timeline" class="glass-surface rounded-2xl px-4 py-3 focus-ring">
-                    <option value="standard">Standard (4-6 weeks)</option>
-                    <option value="accelerated">Accelerated (2-3 weeks)</option>
-                    <option value="rapid">Rapid Sprint (10 days)</option>
-                  </select>
-                </label>
-              </div>
+            <h3 class="text-xl font-semibold text-slate-50">Step 1 · Functionality</h3>
+            <p>Choose your experience type, scope, and back-end needs. Add optional features and see the estimate respond instantly.</p>
+          </div>
+          <div class="glass-surface rounded-3xl p-6 space-y-3">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl glass-card">
+              <i data-lucide="paintbrush" class="w-5 h-5 text-purple-300"></i>
             </div>
-
-            <label class="space-y-3 block text-sm">
-              <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Project Narrative</span>
-              <textarea id="project-description" rows="5" class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="Tell us about the product, target audience, features, and success metrics."></textarea>
-            </label>
-
-            <section aria-live="polite" class="space-y-4 rounded-3xl glass-surface border border-white/5 p-6">
-              <div class="flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Projected investment</p>
-                  <p class="text-3xl font-semibold text-slate-50" id="estimate-total">$5,200</p>
-                </div>
-                <span class="px-4 py-2 rounded-full glass-surface text-xs text-cyan-200/90 uppercase tracking-[0.3em]">Live</span>
-              </div>
-              <div id="estimate-pill" class="rounded-2xl glass-surface p-4 text-sm text-slate-300/90">
-                This includes design, development, QA, launch support, and the selected feature stack.
-              </div>
-              <div class="space-y-3" id="estimate-breakdown"></div>
-              <ul class="space-y-2 text-xs text-slate-400/90">
-                <li class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-cyan-300"></i> Real humans reviewing every request.</li>
-                <li class="flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-300"></i> Securely stored in Firebase and synced to our admin command center.</li>
-                <li class="flex items-center gap-2"><i data-lucide="clock-4" class="w-4 h-4 text-purple-300"></i> Follow-up call slots delivered instantly.</li>
-              </ul>
-            </section>
-
-            <button type="submit" id="submit-button" class="w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-400 to-emerald-400 text-slate-900 font-semibold py-4 text-lg shadow-[0_18px_35px_rgba(0,210,255,0.22)] transition hover:brightness-110">
-              <i data-lucide="send" class="w-5 h-5"></i>
-              Submit Quote Request
-            </button>
-          </form>
+            <h3 class="text-xl font-semibold text-slate-50">Step 2 · Design DNA</h3>
+            <p>Share the vibe you’re chasing, brand asset readiness, and domain status so we can plan creative direction out of the gate.</p>
+          </div>
+          <div class="glass-surface rounded-3xl p-6 space-y-3">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl glass-card">
+              <i data-lucide="messages-square" class="w-5 h-5 text-emerald-300"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-slate-50">Step 3 · Contact &amp; context</h3>
+            <p>Tell us who to collaborate with and drop comments, inspirations, or KPIs. We respond with a tailored scope in under 12 hours.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="max-w-5xl mx-auto px-6">
-      <div class="rounded-3xl border border-white/10 bg-slate-950/40 p-8 space-y-5">
-        <h3 class="text-xl font-semibold text-slate-100">Why teams choose Setton Source</h3>
-        <p class="text-sm text-slate-400">Founders, schools, and nonprofits lean on our fusion of cinematic design and dependable engineering to ship launches that convert.</p>
-        <ul class="space-y-3 text-sm text-slate-300">
-          <li class="flex gap-3"><i data-lucide="diamond" class="w-4 h-4 text-cyan-300 mt-1"></i> Glassmorphism visuals with meticulous motion design.</li>
-          <li class="flex gap-3"><i data-lucide="git-branch" class="w-4 h-4 text-purple-300 mt-1"></i> Full-stack builds powered by Next.js, Firebase, and automation.</li>
-          <li class="flex gap-3"><i data-lucide="gauge" class="w-4 h-4 text-emerald-300 mt-1"></i> Launch analytics, CRO experiments, and growth retainers baked in.</li>
-        </ul>
-        <a href="admin/index.html" class="inline-flex items-center gap-2 text-sm text-cyan-300 hover:text-cyan-200 transition">
-          Access admin dashboard
-          <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-        </a>
-      </div>
-    </section>
-
-    <section class="px-6 sm:px-10">
-      <div class="max-w-6xl mx-auto text-center space-y-6">
-        <span class="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.35em] text-cyan-200/80">
-          <i data-lucide="coins" class="w-4 h-4"></i>
-          Transparent pricing
-        </span>
-        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Transparent pricing calibrated slightly below the industry average.</h2>
-        <div class="text-base md:text-lg text-slate-300/90 max-w-3xl mx-auto space-y-3">
-          <p>Strategic builds usually begin at $850 for a conversion-ready single page—most agencies sit around $1,000+.</p>
-          <p>Scale with add-ons and integrations as you need them.</p>
-        </div>
-      </div>
-      <div class="max-w-6xl mx-auto mt-12 grid gap-6 lg:grid-cols-3">
-        <article class="layout-cluster rounded-3xl p-8 space-y-6 text-left">
-          <div class="flex items-center justify-between">
-            <h3 class="text-2xl font-semibold text-slate-50">Launch Starter</h3>
-            <span class="glass-surface px-4 py-2 rounded-2xl text-xs uppercase tracking-[0.3em] text-cyan-200/80">$850</span>
-          </div>
-          <p class="text-sm md:text-base text-slate-300/90">Perfect for single-page launches, early-stage startups, and campaign landers.</p>
-          <ul class="space-y-3 text-sm text-slate-300/80">
-            <li class="flex gap-3"><i data-lucide="sparkles" class="w-4 h-4 text-cyan-300 mt-1"></i> Glass-inspired hero, responsive layout, and type systems.</li>
-            <li class="flex gap-3"><i data-lucide="search" class="w-4 h-4 text-purple-300 mt-1"></i> SEO-ready build with analytics baseline.</li>
-            <li class="flex gap-3"><i data-lucide="refresh-cw" class="w-4 h-4 text-emerald-300 mt-1"></i> 1 round of revisions + launch support.</li>
-          </ul>
-        </article>
-        <article class="layout-cluster rounded-3xl p-8 space-y-6 text-left border border-cyan-400/30 shadow-[0_35px_80px_rgba(8,47,73,0.35)]">
-          <div class="flex items-center justify-between">
-            <h3 class="text-2xl font-semibold text-slate-50">Growth Suite</h3>
-            <span class="glass-surface px-4 py-2 rounded-2xl text-xs uppercase tracking-[0.3em] text-purple-200/80">$1.6K–$3.4K</span>
-          </div>
-          <p class="text-sm md:text-base text-slate-300/90">Multi-page builds with CMS, e-commerce flows, or gated experiences.</p>
-          <ul class="space-y-3 text-sm text-slate-300/80">
-            <li class="flex gap-3"><i data-lucide="layout-grid" class="w-4 h-4 text-cyan-300 mt-1"></i> 3–7 custom pages, modular sections, and animation systems.</li>
-            <li class="flex gap-3"><i data-lucide="server-cog" class="w-4 h-4 text-emerald-300 mt-1"></i> Backend integrations, membership portals, or store setup.</li>
-            <li class="flex gap-3"><i data-lucide="line-chart" class="w-4 h-4 text-purple-300 mt-1"></i> 2 months of analytics &amp; CRO insights.</li>
-          </ul>
-        </article>
-        <article class="layout-cluster rounded-3xl p-8 space-y-6 text-left">
-          <div class="flex items-center justify-between">
-            <h3 class="text-2xl font-semibold text-slate-50">Scale Partnerships</h3>
-            <span class="glass-surface px-4 py-2 rounded-2xl text-xs uppercase tracking-[0.3em] text-emerald-200/80">Custom</span>
-          </div>
-          <p class="text-sm md:text-base text-slate-300/90">Retainers for active product teams needing continuous iteration &amp; feature shipping.</p>
-          <ul class="space-y-3 text-sm text-slate-300/80">
-            <li class="flex gap-3"><i data-lucide="goal" class="w-4 h-4 text-emerald-300 mt-1"></i> Quarterly roadmaps &amp; experiment pipelines.</li>
-            <li class="flex gap-3"><i data-lucide="book-open-check" class="w-4 h-4 text-cyan-300 mt-1"></i> Design systems, design/dev sync, and product analytics.</li>
-            <li class="flex gap-3"><i data-lucide="messages-square" class="w-4 h-4 text-purple-300 mt-1"></i> Priority response &amp; dedicated communication hub.</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section class="px-6 sm:px-10">
+    <section id="work" class="px-6 sm:px-10">
       <div class="max-w-6xl mx-auto text-center space-y-6">
         <span class="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.35em] text-cyan-200/80">
           <i data-lucide="monitor-smartphone" class="w-4 h-4"></i>
           Selected builds
         </span>
-        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Selected builds with immersive glass interfaces.</h2>
+        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Immersive interfaces that turn visitors into fans.</h2>
         <p class="text-base md:text-lg text-slate-300/90 max-w-3xl mx-auto">Dive into a few recent experiences. Each project pairs tactile UI with measurable outcomes.</p>
       </div>
       <div class="max-w-6xl mx-auto mt-12 grid gap-10 lg:grid-cols-2">
@@ -616,16 +596,359 @@
     </section>
   </main>
 
-  <footer class="relative z-10 border-t border-white/5">
-    <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-4 items-center justify-between text-xs text-slate-500">
-      <p>&copy; 2025 Setton Source. Crafted in NYC.</p>
-      <div class="flex gap-4">
-        <span>hello@settonsource.com</span>
-        <span class="hidden md:inline">|</span>
-        <span>Instagram · LinkedIn · Behance</span>
+  <footer class="relative z-10 mt-32">
+    <div class="footer-backdrop"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pb-16">
+      <div class="footer-cta glass-card rounded-[36px] px-8 py-10 md:px-12 md:py-12">
+        <div class="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+          <div class="space-y-4 max-w-2xl">
+            <span class="text-xs uppercase tracking-[0.3em] text-cyan-200/80">Let’s build together</span>
+            <h3 class="text-3xl font-semibold text-slate-50">Launch-ready in weeks, with a team that sweats every detail.</h3>
+            <p class="text-sm md:text-base text-slate-300/85">We partner with founders and marketing leads to ship products, flagship sites, and lifecycle systems that convert.</p>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+              <button type="button" class="btn-primary focus-ring justify-center" data-open-quote>
+                Get a scoped quote
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+              </button>
+              <a href="mailto:hello@settonsource.com?subject=Project%20inquiry" class="btn-secondary focus-ring justify-center">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+                Email us
+              </a>
+            </div>
+          </div>
+          <div class="glass-surface rounded-3xl p-6 space-y-4 text-sm text-slate-300/85 max-w-sm">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-cyan-400/15 flex items-center justify-center">
+                <i data-lucide="clock" class="w-5 h-5 text-cyan-200"></i>
+              </span>
+              <div>
+                <p class="font-semibold text-slate-100">Response time</p>
+                <p>Under 12 hours on weekdays.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-purple-400/15 flex items-center justify-center">
+                <i data-lucide="calendar-check" class="w-5 h-5 text-purple-200"></i>
+              </span>
+              <div>
+                <p class="font-semibold text-slate-100">Kickoff availability</p>
+                <p>Next sprint opens in two weeks.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-16 grid gap-12 lg:grid-cols-[1.3fr,0.9fr]">
+        <div class="space-y-5 text-slate-300/90">
+          <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Setton Source</p>
+          <h4 class="text-2xl font-semibold text-slate-50">Product, marketing, and lifecycle builds that keep momentum.</h4>
+          <p class="text-sm">We blend product strategy, design systems, and Firebase-first engineering to deliver measurable lift for growing teams.</p>
+          <div class="flex flex-wrap gap-3 text-xs uppercase tracking-[0.28em] text-slate-400">
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface">
+              <i data-lucide="map-pin" class="w-4 h-4"></i>
+              NYC · Remote
+            </span>
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface">
+              <i data-lucide="message-square" class="w-4 h-4"></i>
+              Slack &amp; async friendly
+            </span>
+          </div>
+        </div>
+        <div class="grid gap-8 sm:grid-cols-2 text-sm text-slate-300/85">
+          <div class="space-y-3">
+            <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Navigation</p>
+            <a href="#top" class="footer-link">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              Overview
+            </a>
+            <a href="#services" class="footer-link">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              Services
+            </a>
+            <a href="#quote-flow" class="footer-link">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              Quote flow
+            </a>
+            <a href="#work" class="footer-link">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              Work
+            </a>
+          </div>
+          <div class="space-y-3">
+            <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Connect</p>
+            <a href="mailto:hello@settonsource.com" class="footer-link">
+              <i data-lucide="mail" class="w-4 h-4"></i>
+              hello@settonsource.com
+            </a>
+            <a href="https://cal.com/settonsource/intro" target="_blank" rel="noopener" class="footer-link">
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Book an intro call
+            </a>
+            <a href="https://www.linkedin.com/company/setton-source" target="_blank" rel="noopener" class="footer-link">
+              <i data-lucide="linkedin" class="w-4 h-4"></i>
+              LinkedIn
+            </a>
+            <a href="https://www.instagram.com/settonsource" target="_blank" rel="noopener" class="footer-link">
+              <i data-lucide="instagram" class="w-4 h-4"></i>
+              Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="mt-16 border-t border-white/10 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs text-slate-500">
+        <p>© 2025 Setton Source. All rights reserved.</p>
+        <div class="flex flex-wrap gap-4 text-slate-400">
+          <span class="inline-flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            Privacy-first builds
+          </span>
+          <span class="inline-flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            Firebase partner
+          </span>
+        </div>
       </div>
     </div>
   </footer>
+
+  <div id="quote-modal" class="modal hidden">
+    <div class="modal-panel glass-card rounded-[36px] p-6 sm:p-8 lg:p-10">
+      <div class="flex items-start justify-between gap-6 flex-wrap">
+        <div>
+          <p class="text-xs uppercase tracking-[0.3em] text-cyan-200/80">Instant quote flow</p>
+          <h2 class="text-2xl font-semibold text-slate-50 mt-2">Map the build in three guided steps.</h2>
+        </div>
+        <button type="button" class="glass-surface rounded-full p-2 focus-ring" data-close-modal>
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="stepper mt-6">
+        <div class="text-center">
+          <div class="step-dot active" data-step-dot="1">1</div>
+          <p class="text-xs mt-2 text-slate-400" data-step-label="1">Functionality</p>
+        </div>
+        <span class="step-line"></span>
+        <div class="text-center">
+          <div class="step-dot" data-step-dot="2">2</div>
+          <p class="text-xs mt-2 text-slate-400" data-step-label="2">Design DNA</p>
+        </div>
+        <span class="step-line"></span>
+        <div class="text-center">
+          <div class="step-dot" data-step-dot="3">3</div>
+          <p class="text-xs mt-2 text-slate-400" data-step-label="3">Contact &amp; Context</p>
+        </div>
+      </div>
+      <form id="quote-form" class="mt-10">
+        <div class="modal-grid">
+          <div class="space-y-10">
+            <div data-step-panel="1" class="space-y-8 active">
+              <div class="space-y-4">
+                <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Project Type</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button type="button" data-project-type="landing" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-cyan-300 mb-3"></i>
+                    <p class="font-semibold text-slate-100">Launch Page</p>
+                    <p class="text-xs text-slate-400">Single page or microsite momentum.</p>
+                  </button>
+                  <button type="button" data-project-type="marketing" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
+                    <i data-lucide="layers" class="w-5 h-5 text-purple-300 mb-3"></i>
+                    <p class="font-semibold text-slate-100">Marketing Site</p>
+                    <p class="text-xs text-slate-400">Multi-page presence &amp; storytelling.</p>
+                  </button>
+                  <button type="button" data-project-type="ecommerce" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
+                    <i data-lucide="shopping-bag" class="w-5 h-5 text-emerald-300 mb-3"></i>
+                    <p class="font-semibold text-slate-100">E-commerce</p>
+                    <p class="text-xs text-slate-400">Storefronts, subscriptions, funnels.</p>
+                  </button>
+                  <button type="button" data-project-type="webapp" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
+                    <i data-lucide="blocks" class="w-5 h-5 text-amber-300 mb-3"></i>
+                    <p class="font-semibold text-slate-100">Web App / Portal</p>
+                    <p class="text-xs text-slate-400">Dashboards, portals, internal tools.</p>
+                  </button>
+                </div>
+              </div>
+              <div class="grid gap-5 sm:grid-cols-2">
+                <label class="space-y-2 block text-sm">
+                  <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Core Pages</span>
+                  <input type="range" id="pages" min="1" max="12" step="1" value="3" class="w-full">
+                  <div class="flex justify-between text-xs text-slate-400">
+                    <span>1</span><span id="pages-output" class="text-cyan-300 text-sm font-semibold">3 pages</span><span>12</span>
+                  </div>
+                </label>
+                <label class="space-y-2 block text-sm">
+                  <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Backend &amp; Integrations</span>
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button type="button" data-backend="no" class="backend-option glass-surface rounded-xl px-3 py-3 border border-transparent hover:border-cyan-400/60 transition focus-ring">No</button>
+                    <button type="button" data-backend="yes" class="backend-option glass-surface rounded-xl px-3 py-3 border border-transparent hover:border-cyan-400/60 transition focus-ring">Yes</button>
+                  </div>
+                  <p class="text-xs text-slate-500">APIs, auth, dashboards, automations.</p>
+                </label>
+              </div>
+              <fieldset class="space-y-3">
+                <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Key Features</span>
+                <div class="grid sm:grid-cols-2 gap-3 text-sm">
+                  <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
+                    <input type="checkbox" id="feature-ecommerce" class="mt-1 accent-cyan-400" />
+                    <div>
+                      <p class="font-semibold text-slate-100">Payments / Storefront</p>
+                      <p class="text-xs text-slate-400">Shop, donations, booking flow.</p>
+                    </div>
+                  </label>
+                  <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
+                    <input type="checkbox" id="feature-admin" class="mt-1 accent-purple-400" />
+                    <div>
+                      <p class="font-semibold text-slate-100">Admin / CMS</p>
+                      <p class="text-xs text-slate-400">Manageable content, data tools.</p>
+                    </div>
+                  </label>
+                  <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
+                    <input type="checkbox" id="feature-support" class="mt-1 accent-emerald-400" />
+                    <div>
+                      <p class="font-semibold text-slate-100">Live Support</p>
+                      <p class="text-xs text-slate-400">Chat, support desk, knowledge base.</p>
+                    </div>
+                  </label>
+                  <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
+                    <input type="checkbox" id="feature-automation" class="mt-1 accent-amber-300" />
+                    <div>
+                      <p class="font-semibold text-slate-100">Automation</p>
+                      <p class="text-xs text-slate-400">Workflows, CRM, analytics boosts.</p>
+                    </div>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div data-step-panel="2" class="space-y-6">
+              <div class="space-y-3">
+                <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Visual Direction</span>
+                <label class="glass-surface rounded-2xl p-4 flex items-center justify-between gap-4 text-sm border border-transparent hover:border-cyan-400/50 transition">
+                  <div>
+                    <p class="font-semibold text-slate-100">Design tone</p>
+                    <p class="text-xs text-slate-400">Helps align art direction and typography.</p>
+                  </div>
+                  <select id="design-tone" class="glass-surface rounded-xl px-3 py-2 focus-ring">
+                    <option value="sleek">Sleek &amp; minimal</option>
+                    <option value="vibrant">Vibrant &amp; playful</option>
+                    <option value="editorial">Editorial &amp; premium</option>
+                    <option value="experimental">Experimental &amp; bold</option>
+                  </select>
+                </label>
+                <label class="glass-surface rounded-2xl p-4 flex items-center justify-between gap-4 text-sm border border-transparent hover:border-cyan-400/50 transition">
+                  <div>
+                    <p class="font-semibold text-slate-100">Interaction level</p>
+                    <p class="text-xs text-slate-400">Choose how much motion &amp; polish you want.</p>
+                  </div>
+                  <select id="interaction-level" class="glass-surface rounded-xl px-3 py-2 focus-ring">
+                    <option value="balanced">Balanced</option>
+                    <option value="minimal">Minimal motion</option>
+                    <option value="immersive">High-immersion</option>
+                  </select>
+                </label>
+              </div>
+              <div class="space-y-4">
+                <span class="uppercase tracking-[0.3em] text-xs text-slate-400 block">Brand &amp; Assets</span>
+                <label class="glass-surface rounded-2xl p-4 flex items-center justify-between text-sm cursor-pointer border border-transparent hover:border-cyan-400/50 transition">
+                  <div>
+                    <p class="font-semibold text-slate-100">Logo ready to use?</p>
+                    <p class="text-xs text-slate-400">If not, we include a rapid brand refresh (+$180).</p>
+                  </div>
+                  <select id="logo-status" class="glass-surface rounded-xl px-3 py-2 focus-ring">
+                    <option value="yes">Yes, ready</option>
+                    <option value="no">Need help</option>
+                  </select>
+                </label>
+                <label class="glass-surface rounded-2xl p-4 flex items-center justify-between text-sm cursor-pointer border border-transparent hover:border-cyan-400/50 transition">
+                  <div>
+                    <p class="font-semibold text-slate-100">Do you already own a URL?</p>
+                    <p class="text-xs text-slate-400">If not, we secure domains + hosting setup.</p>
+                  </div>
+                  <select id="url-status" class="glass-surface rounded-xl px-3 py-2 focus-ring">
+                    <option value="live">I have one</option>
+                    <option value="buy">Need to purchase</option>
+                  </select>
+                </label>
+                <label class="glass-surface rounded-2xl p-4 flex flex-col gap-3 text-sm border border-transparent hover:border-cyan-400/50 transition">
+                  <p class="font-semibold text-slate-100">Link to current site or inspiration (optional)</p>
+                  <input type="url" id="project-url" placeholder="https://" class="glass-surface rounded-xl px-3 py-2 focus-ring placeholder:text-slate-500" />
+                </label>
+              </div>
+            </div>
+
+            <div data-step-panel="3" class="space-y-6">
+              <div class="grid md:grid-cols-2 gap-6">
+                <label class="space-y-2 text-sm">
+                  <span class="uppercase tracking-[0.3em] text-slate-400">Your Name</span>
+                  <input type="text" id="name" name="name" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="Jordan Founder" />
+                </label>
+                <label class="space-y-2 text-sm">
+                  <span class="uppercase tracking-[0.3em] text-slate-400">Email</span>
+                  <input type="email" id="email" name="email" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="you@brand.com" />
+                </label>
+                <label class="space-y-2 text-sm">
+                  <span class="uppercase tracking-[0.3em] text-slate-400">Phone</span>
+                  <input type="tel" id="phone" name="phone" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="(555) 123-4567" />
+                </label>
+                <label class="space-y-2 text-sm">
+                  <span class="uppercase tracking-[0.3em] text-slate-400">Company / Brand</span>
+                  <input type="text" id="project-name" name="project-name" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="NovaLabs" />
+                </label>
+              </div>
+              <label class="space-y-2 text-sm block">
+                <span class="uppercase tracking-[0.3em] text-slate-400">Timeline</span>
+                <select id="timeline" class="glass-surface rounded-2xl px-4 py-3 focus-ring">
+                  <option value="standard">Standard (6–8 weeks)</option>
+                  <option value="accelerated">Accelerated (4–6 weeks)</option>
+                  <option value="rapid">Rapid sprint (2–4 weeks)</option>
+                </select>
+              </label>
+              <label class="space-y-2 text-sm block">
+                <span class="uppercase tracking-[0.3em] text-slate-400">Project goals &amp; comments</span>
+                <textarea id="project-description" rows="4" class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="Share the story, KPI, or inspiration we should know about..."></textarea>
+              </label>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4">
+              <button type="button" id="prev-step" class="btn-ghost focus-ring">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                Previous
+              </button>
+              <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <button type="button" id="next-step" class="btn-primary focus-ring justify-center">
+                  Next step
+                  <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+                <button type="submit" id="submit-button" class="btn-primary focus-ring justify-center hidden">
+                  Submit quote
+                  <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="estimate-summary glass-surface rounded-3xl p-6 space-y-6 text-sm text-slate-300/85">
+            <div>
+              <p class="uppercase tracking-[0.3em] text-xs text-cyan-200/70">Live estimate</p>
+              <h3 class="text-3xl font-semibold text-slate-50 mt-3" id="estimate-total">$0</h3>
+              <p class="text-xs text-slate-400">Totals update as you adjust the scope.</p>
+            </div>
+            <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1" id="estimate-breakdown"></div>
+            <div class="glass-card rounded-2xl p-4 space-y-3">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-cyan-400/20 flex items-center justify-center">
+                  <i data-lucide="sparkles" class="w-5 h-5 text-cyan-200"></i>
+                </span>
+                <div>
+                  <p class="font-semibold text-slate-100">Need something extra?</p>
+                  <p class="text-xs text-slate-400">Add notes in Step 3—we’ll include it in the follow-up scope.</p>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <div id="success-toast" class="fixed bottom-8 right-6 max-w-sm glass-card rounded-2xl p-5 shadow-2xl border border-emerald-400/40 text-emerald-200 hidden">
     <div class="flex items-start gap-3">
@@ -701,9 +1024,19 @@
     const submitButton = document.getElementById('submit-button');
     const successToast = document.getElementById('success-toast');
     const errorToast = document.getElementById('error-toast');
+    const openQuoteButtons = Array.from(document.querySelectorAll('[data-open-quote]'));
+    const quoteModal = document.getElementById('quote-modal');
+    const closeModalButtons = Array.from(document.querySelectorAll('[data-close-modal]'));
+    const stepPanels = Array.from(document.querySelectorAll('[data-step-panel]'));
+    const stepDots = Array.from(document.querySelectorAll('[data-step-dot]'));
+    const stepLabels = Array.from(document.querySelectorAll('[data-step-label]'));
+    const prevStepButton = document.getElementById('prev-step');
+    const nextStepButton = document.getElementById('next-step');
+    const body = document.body;
 
     let selectedProjectType = 'marketing';
     let backendRequirement = 'no';
+    let currentStep = 1;
 
     const formatCurrency = (value) => new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -716,14 +1049,11 @@
         const isActive = button === activeButton;
         button.classList.toggle('border-cyan-400/80', isActive);
         button.classList.toggle('bg-cyan-400/10', isActive);
-        button.classList.toggle('shadow-[0_0_25px_rgba(0,210,255,0.35)]', isActive);
+        button.classList.toggle('shadow-[0_0_25px_rgba(71,232,255,0.35)]', isActive);
       });
     }
 
     projectTypeButtons.forEach((button) => {
-      if (button.dataset.projectType === selectedProjectType) {
-        highlightSelection(projectTypeButtons, button);
-      }
       button.addEventListener('click', () => {
         selectedProjectType = button.dataset.projectType;
         highlightSelection(projectTypeButtons, button);
@@ -732,9 +1062,6 @@
     });
 
     backendButtons.forEach((button) => {
-      if (button.dataset.backend === backendRequirement) {
-        highlightSelection(backendButtons, button);
-      }
       button.addEventListener('click', () => {
         backendRequirement = button.dataset.backend;
         highlightSelection(backendButtons, button);
@@ -759,15 +1086,13 @@
       const urlStatus = document.getElementById('url-status').value;
 
       let total = matrix.base;
-      const breakdownItems = [
-        { label: `${matrix.label} base`, cost: matrix.base },
-      ];
+      const breakdownItems = [{ label: matrix.label, cost: matrix.base }];
 
-      const extraPages = Math.max(0, pages - matrix.includedPages);
-      if (extraPages > 0) {
-        const pageCost = extraPages * matrix.perPage;
-        total += pageCost;
-        breakdownItems.push({ label: `Additional ${extraPages} page${extraPages > 1 ? 's' : ''}`, cost: pageCost });
+      if (pages > matrix.includedPages) {
+        const extraPages = pages - matrix.includedPages;
+        const extraCost = extraPages * matrix.perPage;
+        total += extraCost;
+        breakdownItems.push({ label: `Additional pages (${extraPages})`, cost: extraCost });
       }
 
       if (backendRequirement === 'yes') {
@@ -823,6 +1148,92 @@
       }
     }
 
+    function showStep(step) {
+      const totalSteps = stepPanels.length;
+      currentStep = Math.max(1, Math.min(step, totalSteps));
+      stepPanels.forEach((panel, index) => {
+        panel.classList.toggle('active', index === currentStep - 1);
+      });
+      stepDots.forEach((dot, index) => {
+        dot.classList.toggle('active', index <= currentStep - 1);
+      });
+      stepLabels.forEach((label, index) => {
+        label.classList.toggle('text-cyan-200', index === currentStep - 1);
+        label.classList.toggle('text-slate-400', index !== currentStep - 1);
+      });
+
+      const atStart = currentStep === 1;
+      const atEnd = currentStep === stepPanels.length;
+      prevStepButton.disabled = atStart;
+      prevStepButton.classList.toggle('opacity-40', atStart);
+      nextStepButton.classList.toggle('hidden', atEnd);
+      submitButton.classList.toggle('hidden', !atEnd);
+    }
+
+    function resetFormState() {
+      form.reset();
+      selectedProjectType = 'marketing';
+      backendRequirement = 'no';
+      const defaultProjectButton = projectTypeButtons.find((btn) => btn.dataset.projectType === selectedProjectType);
+      const defaultBackendButton = backendButtons.find((btn) => btn.dataset.backend === backendRequirement);
+      highlightSelection(projectTypeButtons, defaultProjectButton);
+      highlightSelection(backendButtons, defaultBackendButton);
+      pagesRange.value = '3';
+      pagesOutput.textContent = '3 pages';
+      updateEstimate();
+      showStep(1);
+    }
+
+    function openModal() {
+      resetFormState();
+      quoteModal.classList.remove('hidden');
+      requestAnimationFrame(() => quoteModal.classList.add('active'));
+      body.classList.add('modal-open');
+      quoteModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeModal() {
+      quoteModal.classList.remove('active');
+      body.classList.remove('modal-open');
+      quoteModal.setAttribute('aria-hidden', 'true');
+      setTimeout(() => {
+        if (!quoteModal.classList.contains('active')) {
+          quoteModal.classList.add('hidden');
+        }
+      }, 220);
+    }
+
+    openQuoteButtons.forEach((button) => {
+      button.addEventListener('click', openModal);
+    });
+
+    closeModalButtons.forEach((button) => {
+      button.addEventListener('click', closeModal);
+    });
+
+    quoteModal.addEventListener('click', (event) => {
+      if (event.target === quoteModal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && quoteModal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    nextStepButton.addEventListener('click', () => {
+      showStep(currentStep + 1);
+      updateEstimate();
+    });
+
+    prevStepButton.addEventListener('click', () => {
+      if (currentStep > 1) {
+        showStep(currentStep - 1);
+      }
+    });
+
     async function handleSubmit(event) {
       event.preventDefault();
       submitButton.disabled = true;
@@ -838,6 +1249,8 @@
       const logoStatus = document.getElementById('logo-status').value;
       const timeline = document.getElementById('timeline').value;
       const pages = Number(pagesRange.value);
+      const designTone = document.getElementById('design-tone').value;
+      const interactionLevel = document.getElementById('interaction-level').value;
 
       const finalEstimate = updateEstimate();
       const now = new Date();
@@ -857,6 +1270,8 @@
         urlStatus,
         projectUrl: projectUrl || 'N/A',
         logoStatus,
+        designTone,
+        interactionLevel,
         finalEstimate,
         timestamp: now.toISOString(),
         humanTimestamp: now.toLocaleString(),
@@ -869,16 +1284,10 @@
 
       try {
         await addDoc(collection(db, 'quotes'), data);
-        form.reset();
-        selectedProjectType = 'marketing';
-        backendRequirement = 'no';
-        highlightSelection(projectTypeButtons, projectTypeButtons.find(btn => btn.dataset.projectType === selectedProjectType));
-        highlightSelection(backendButtons, backendButtons.find(btn => btn.dataset.backend === backendRequirement));
-        pagesRange.value = '3';
-        pagesOutput.textContent = '3 pages';
-        updateEstimate();
         toggleToast(errorToast, false);
         toggleToast(successToast, true);
+        closeModal();
+        resetFormState();
       } catch (error) {
         console.error('Error saving quote:', error);
         toggleToast(successToast, false);
@@ -891,7 +1300,7 @@
 
     form.addEventListener('submit', handleSubmit);
 
-    updateEstimate();
+    resetFormState();
 
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
