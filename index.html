@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
       color-scheme: dark;
@@ -489,6 +490,661 @@
       font-size: 0.9rem;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
+    .is-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 6, 15, 0.82);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 80;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-panel {
+      width: min(1040px, 95vw);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 32px;
+      box-shadow: var(--shadow-glass);
+      padding: clamp(28px, 4vw, 48px);
+      transform: translateY(24px);
+      transition: transform 0.3s ease;
+      max-height: calc(100vh - 80px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .modal.active .modal-panel {
+      transform: translateY(0);
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .modal-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .modal-brand svg {
+      width: 28px;
+      height: 28px;
+      color: var(--accent-cyan);
+    }
+
+    .modal-eyebrow {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(86, 244, 255, 0.7);
+      margin-bottom: 10px;
+    }
+
+    .modal-headline {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 600;
+      line-height: 1.2;
+      margin: 0;
+      max-width: 32rem;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(16, 19, 35, 0.6);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .icon-button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(86, 244, 255, 0.55);
+      background: rgba(16, 19, 35, 0.85);
+    }
+
+    .icon-button i {
+      width: 20px;
+      height: 20px;
+    }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: rgba(16, 19, 35, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stepper > div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 110px;
+    }
+
+    .step-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(16, 19, 35, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .step-dot.active {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-lilac));
+      border-color: transparent;
+      color: #02030a;
+    }
+
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(86, 244, 255, 0.4), rgba(161, 100, 255, 0.4));
+      opacity: 0.5;
+    }
+
+    .step-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color 0.2s ease;
+    }
+
+    .step-label.active {
+      color: var(--accent-cyan);
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.8fr);
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    .modal-content {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      overflow-y: auto;
+      max-height: calc(70vh - 80px);
+      padding-right: 6px;
+    }
+
+    .modal-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+      background: rgba(86, 244, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .step-panel {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .step-panel.active {
+      display: flex;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .field-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(86, 244, 255, 0.7);
+    }
+
+    .option-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .quote-option {
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(16, 19, 35, 0.55);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .quote-option:hover {
+      border-color: rgba(86, 244, 255, 0.45);
+      color: var(--text-main);
+    }
+
+    .quote-option .option-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(86, 244, 255, 0.16);
+      color: var(--accent-cyan);
+    }
+
+    .quote-option h3 {
+      font-size: 1.05rem;
+      margin: 0;
+      color: var(--text-main);
+    }
+
+    .quote-option p {
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .quote-option.is-active {
+      border-color: rgba(86, 244, 255, 0.65);
+      background: rgba(86, 244, 255, 0.12);
+      color: var(--text-main);
+      box-shadow: 0 14px 32px rgba(86, 244, 255, 0.22);
+    }
+
+    .pill-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+    }
+
+    .pill-option {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 12px 16px;
+      background: rgba(16, 19, 35, 0.55);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .pill-option:hover {
+      border-color: rgba(86, 244, 255, 0.45);
+      color: var(--text-main);
+    }
+
+    .pill-option.is-active {
+      border-color: rgba(86, 244, 255, 0.65);
+      background: rgba(86, 244, 255, 0.12);
+      color: var(--text-main);
+      box-shadow: 0 12px 30px rgba(86, 244, 255, 0.22);
+    }
+
+    .range-field {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .range-output {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .checkbox-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .checkbox-card {
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(16, 19, 35, 0.5);
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .checkbox-card:hover {
+      border-color: rgba(161, 100, 255, 0.45);
+    }
+
+    .checkbox-card input {
+      margin-top: 4px;
+    }
+
+    .checkbox-card span {
+      display: block;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .checkbox-card p {
+      margin: 4px 0 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .input-field,
+    .select-field,
+    .textarea-field {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(16, 19, 35, 0.55);
+      color: var(--text-main);
+      padding: 14px 18px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .input-field::placeholder,
+    .textarea-field::placeholder {
+      color: rgba(208, 214, 239, 0.55);
+    }
+
+    .select-field {
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23f5f7ff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polyline points="6 9 12 15 18 9"/></svg>');
+      background-repeat: no-repeat;
+      background-position: calc(100% - 18px) 50%;
+      background-size: 16px;
+      padding-right: 44px;
+    }
+
+    .input-field:focus,
+    .select-field:focus,
+    .textarea-field:focus {
+      outline: none;
+      border-color: rgba(86, 244, 255, 0.55);
+      box-shadow: 0 0 0 3px rgba(86, 244, 255, 0.15);
+      background: rgba(16, 19, 35, 0.85);
+    }
+
+    .textarea-field {
+      resize: vertical;
+      min-height: 140px;
+    }
+
+    .dual-field-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .quote-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 12px;
+    }
+
+    .quote-footer-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .button-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(16, 19, 35, 0.4);
+      color: var(--text-muted);
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    }
+
+    .button-ghost:hover {
+      border-color: rgba(86, 244, 255, 0.45);
+      color: var(--text-main);
+      background: rgba(16, 19, 35, 0.7);
+    }
+
+    .button-ghost.is-disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .quote-footer-actions .button-primary,
+    .quote-footer-actions .button-secondary {
+      width: 100%;
+    }
+
+    .estimate-summary {
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(16, 19, 35, 0.55);
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .estimate-summary header span {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(86, 244, 255, 0.65);
+    }
+
+    .estimate-summary header h3 {
+      margin: 12px 0 6px;
+      font-size: 2.2rem;
+    }
+
+    .estimate-summary header p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .estimate-breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .estimate-breakdown::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .estimate-breakdown::-webkit-scrollbar-thumb {
+      background: rgba(161, 100, 255, 0.24);
+      border-radius: 4px;
+    }
+
+    .estimate-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: rgba(16, 19, 35, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .estimate-row span:last-child {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .estimate-note {
+      display: flex;
+      gap: 14px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(86, 244, 255, 0.08);
+      border: 1px solid rgba(86, 244, 255, 0.2);
+      color: var(--text-main);
+      align-items: flex-start;
+    }
+
+    .estimate-note .note-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(86, 244, 255, 0.16);
+      color: var(--accent-cyan);
+    }
+
+    .toast {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      z-index: 90;
+      width: min(320px, 90vw);
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(16, 19, 35, 0.85);
+      box-shadow: 0 24px 48px rgba(5, 10, 35, 0.55);
+      padding: 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+    }
+
+    .toast.success .toast-icon {
+      background: rgba(76, 209, 149, 0.18);
+      border-color: rgba(76, 209, 149, 0.4);
+      color: #4cd195;
+    }
+
+    .toast.error .toast-icon {
+      background: rgba(255, 107, 129, 0.18);
+      border-color: rgba(255, 107, 129, 0.4);
+      color: #ff6b81;
+    }
+
+    .toast strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--text-main);
+    }
+
+    .toast p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .form-note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    @media (min-width: 640px) {
+      .quote-footer {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .quote-footer-actions {
+        flex-direction: row;
+      }
+
+      .quote-footer-actions .button-primary,
+      .quote-footer-actions .button-secondary {
+        width: auto;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .modal-panel {
+        padding: 28px 20px;
+      }
+
+      .stepper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+        padding: 18px;
+      }
+
+      .stepper > div {
+        min-width: 0;
+      }
+
+      .step-line {
+        width: 100%;
+      }
+
+      .toast {
+        right: 16px;
+        left: 16px;
+        width: auto;
+      }
+    }
+
     .cta {
       text-align: center;
       padding: clamp(32px, 4vw, 48px);
@@ -601,7 +1257,7 @@
     }
   </style>
 </head>
-<body>
+<body id="top">
   <div class="noise-overlay"></div>
   <div class="aurora"></div>
   <div class="aurora-secondary"></div>
@@ -632,7 +1288,8 @@
           We pair cinematic interfaces with bulletproof product strategy. From lightning-fast marketing launches to complex platform overhauls, we ship outcomes that feel otherworldly—and perform down to the decimal.
         </p>
         <div class="hero-actions">
-          <a href="#contact" class="button-primary">Book a discovery call</a>
+          <button type="button" class="button-primary" data-open-quote>Start instant quote</button>
+          <a href="#contact" class="button-secondary">Book a discovery call</a>
           <a href="#case-studies" class="button-secondary">Browse launch stories</a>
         </div>
       </div>
@@ -781,7 +1438,8 @@
       <h2>Ready for a glass-smooth launch?</h2>
       <p>Share your goals and we’ll assemble a bespoke roadmap with timeline, investment, and the experiments we’d run from week one. Expect a reply in under twelve hours.</p>
       <div class="hero-actions" style="justify-content: center;">
-        <a href="mailto:hello@settonsource.com" class="button-primary">hello@settonsource.com</a>
+        <button type="button" class="button-primary" data-open-quote>Start instant quote</button>
+        <a href="mailto:hello@settonsource.com" class="button-secondary">hello@settonsource.com</a>
         <a href="https://cal.com" class="button-secondary" target="_blank" rel="noopener">Schedule a session</a>
       </div>
     </section>
@@ -821,5 +1479,622 @@
       </div>
     </div>
   </footer>
+
+  <div id="quote-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="quote-modal-title">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <div>
+          <div class="modal-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3l9 5-9 5-9-5 9-5z" />
+              <path d="M21 8v6l-9 5-9-5V8" />
+              <path d="M12 13V8" />
+            </svg>
+            <span>Setton Source</span>
+          </div>
+          <span class="modal-eyebrow">Instant quote flow</span>
+          <h2 id="quote-modal-title" class="modal-headline">Map the build in three guided steps.</h2>
+        </div>
+        <button type="button" class="icon-button" data-close-modal aria-label="Close instant quote">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="stepper">
+        <div>
+          <div class="step-dot active" data-step-dot="1">1</div>
+          <span class="step-label active" data-step-label="1">Functionality</span>
+        </div>
+        <span class="step-line"></span>
+        <div>
+          <div class="step-dot" data-step-dot="2">2</div>
+          <span class="step-label" data-step-label="2">Design DNA</span>
+        </div>
+        <span class="step-line"></span>
+        <div>
+          <div class="step-dot" data-step-dot="3">3</div>
+          <span class="step-label" data-step-label="3">Contact &amp; Context</span>
+        </div>
+      </div>
+      <form id="quote-form" novalidate>
+        <div class="modal-grid">
+          <div class="modal-content">
+            <div class="step-panel active" data-step-panel="1">
+              <div class="field-group">
+                <span class="field-eyebrow">Project type</span>
+                <div class="option-grid">
+                  <button type="button" class="quote-option project-type-option" data-project-type="landing" aria-pressed="false">
+                    <span class="option-icon"><i data-lucide="sparkles"></i></span>
+                    <h3>Launch Page</h3>
+                    <p>Single page or microsite momentum.</p>
+                  </button>
+                  <button type="button" class="quote-option project-type-option" data-project-type="marketing" aria-pressed="false">
+                    <span class="option-icon"><i data-lucide="layers"></i></span>
+                    <h3>Marketing Site</h3>
+                    <p>Multi-page presence &amp; storytelling.</p>
+                  </button>
+                  <button type="button" class="quote-option project-type-option" data-project-type="ecommerce" aria-pressed="false">
+                    <span class="option-icon"><i data-lucide="shopping-bag"></i></span>
+                    <h3>E-commerce</h3>
+                    <p>Storefronts, subscriptions, funnels.</p>
+                  </button>
+                  <button type="button" class="quote-option project-type-option" data-project-type="webapp" aria-pressed="false">
+                    <span class="option-icon"><i data-lucide="blocks"></i></span>
+                    <h3>Web App / Portal</h3>
+                    <p>Dashboards, portals, internal tools.</p>
+                  </button>
+                </div>
+              </div>
+              <div class="dual-field-grid">
+                <label class="range-field">
+                  <span class="field-eyebrow">Core pages</span>
+                  <input type="range" id="pages" min="1" max="12" step="1" value="3" aria-describedby="pages-output">
+                  <div class="range-output">
+                    <span>1</span>
+                    <span id="pages-output">3 pages</span>
+                    <span>12</span>
+                  </div>
+                </label>
+                <div class="field-group">
+                  <span class="field-eyebrow">Backend &amp; integrations</span>
+                  <div class="pill-group" role="group" aria-label="Backend requirements">
+                    <button type="button" class="pill-option backend-option" data-backend="no" aria-pressed="false">No</button>
+                    <button type="button" class="pill-option backend-option" data-backend="yes" aria-pressed="false">Yes</button>
+                  </div>
+                  <p class="form-note">APIs, auth, dashboards, automations.</p>
+                </div>
+              </div>
+              <div class="field-group">
+                <span class="field-eyebrow">Feature boosters</span>
+                <div class="checkbox-grid">
+                  <label class="checkbox-card" for="feature-ecommerce">
+                    <input type="checkbox" id="feature-ecommerce" />
+                    <div>
+                      <span>Payments &amp; commerce</span>
+                      <p>Subscriptions, checkout flows, or gated offers.</p>
+                    </div>
+                  </label>
+                  <label class="checkbox-card" for="feature-admin">
+                    <input type="checkbox" id="feature-admin" />
+                    <div>
+                      <span>Admin / CMS</span>
+                      <p>Manageable content, data tools, and insights.</p>
+                    </div>
+                  </label>
+                  <label class="checkbox-card" for="feature-support">
+                    <input type="checkbox" id="feature-support" />
+                    <div>
+                      <span>Live support suite</span>
+                      <p>Chat, help centers, and customer success flows.</p>
+                    </div>
+                  </label>
+                  <label class="checkbox-card" for="feature-automation">
+                    <input type="checkbox" id="feature-automation" />
+                    <div>
+                      <span>Automation &amp; CRM</span>
+                      <p>Lifecycle journeys, CRM sync, and analytics boosts.</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-panel" data-step-panel="2">
+              <div class="dual-field-grid">
+                <label class="field-group">
+                  <span class="field-eyebrow">Design tone</span>
+                  <select id="design-tone" class="select-field">
+                    <option value="sleek">Sleek &amp; minimal</option>
+                    <option value="vibrant">Vibrant &amp; playful</option>
+                    <option value="editorial">Editorial &amp; premium</option>
+                    <option value="experimental">Experimental &amp; bold</option>
+                  </select>
+                  <p class="form-note">Helps align art direction and typography.</p>
+                </label>
+                <label class="field-group">
+                  <span class="field-eyebrow">Interaction level</span>
+                  <select id="interaction-level" class="select-field">
+                    <option value="balanced">Balanced</option>
+                    <option value="minimal">Minimal motion</option>
+                    <option value="immersive">High-immersion</option>
+                  </select>
+                  <p class="form-note">Choose how much motion &amp; polish you want.</p>
+                </label>
+              </div>
+              <div class="dual-field-grid">
+                <label class="field-group">
+                  <span class="field-eyebrow">Logo ready to use?</span>
+                  <select id="logo-status" class="select-field">
+                    <option value="yes">Yes, ready</option>
+                    <option value="no">Need help</option>
+                  </select>
+                  <p class="form-note">We can include a rapid refresh if you need one.</p>
+                </label>
+                <label class="field-group">
+                  <span class="field-eyebrow">Do you already own a URL?</span>
+                  <select id="url-status" class="select-field">
+                    <option value="live">I have one</option>
+                    <option value="buy">Need to purchase</option>
+                  </select>
+                  <p class="form-note">We’ll secure domains and hosting if you don’t.</p>
+                </label>
+              </div>
+              <label class="field-group">
+                <span class="field-eyebrow">Link to current site or inspiration (optional)</span>
+                <input type="url" id="project-url" class="input-field" placeholder="https://" />
+              </label>
+            </div>
+
+            <div class="step-panel" data-step-panel="3">
+              <div class="dual-field-grid">
+                <label class="field-group">
+                  <span class="field-eyebrow">Your name</span>
+                  <input type="text" id="name" name="name" class="input-field" placeholder="Jordan Founder" required />
+                </label>
+                <label class="field-group">
+                  <span class="field-eyebrow">Email</span>
+                  <input type="email" id="email" name="email" class="input-field" placeholder="you@brand.com" required />
+                </label>
+                <label class="field-group">
+                  <span class="field-eyebrow">Phone</span>
+                  <input type="tel" id="phone" name="phone" class="input-field" placeholder="(555) 123-4567" required />
+                </label>
+                <label class="field-group">
+                  <span class="field-eyebrow">Company / Brand</span>
+                  <input type="text" id="project-name" name="project-name" class="input-field" placeholder="NovaLabs" required />
+                </label>
+              </div>
+              <label class="field-group">
+                <span class="field-eyebrow">Timeline</span>
+                <select id="timeline" class="select-field">
+                  <option value="standard">Standard (6–8 weeks)</option>
+                  <option value="accelerated">Accelerated (4–6 weeks)</option>
+                  <option value="rapid">Rapid sprint (2–4 weeks)</option>
+                </select>
+              </label>
+              <label class="field-group">
+                <span class="field-eyebrow">Project goals &amp; comments</span>
+                <textarea id="project-description" class="textarea-field" rows="4" placeholder="Share the story, KPI, or inspiration we should know about..."></textarea>
+              </label>
+            </div>
+
+            <div class="quote-footer">
+              <button type="button" id="prev-step" class="button-ghost is-disabled">
+                <i data-lucide="arrow-left"></i>
+                <span>Previous</span>
+              </button>
+              <div class="quote-footer-actions">
+                <button type="button" id="next-step" class="button-primary">
+                  <span>Next step</span>
+                  <i data-lucide="arrow-right"></i>
+                </button>
+                <button type="submit" id="submit-button" class="button-primary hidden">
+                  <span>Submit quote</span>
+                  <i data-lucide="send"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="estimate-summary">
+            <header>
+              <span>Live estimate</span>
+              <h3 id="estimate-total">$0</h3>
+              <p>Totals update as you adjust the scope.</p>
+            </header>
+            <div class="estimate-breakdown" id="estimate-breakdown"></div>
+            <div class="estimate-note">
+              <span class="note-icon"><i data-lucide="sparkles"></i></span>
+              <div class="form-note">Need something extra? Add notes in Step 3—we’ll include it in the follow-up scope.</div>
+            </div>
+          </aside>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="success-toast" class="toast success hidden" role="status" aria-live="polite">
+    <div class="toast-icon"><i data-lucide="check"></i></div>
+    <div>
+      <strong>Quote captured!</strong>
+      <p>We just synced your request to our admin dashboard. Expect a personal reply shortly.</p>
+    </div>
+  </div>
+
+  <div id="error-toast" class="toast error hidden" role="status" aria-live="assertive">
+    <div class="toast-icon"><i data-lucide="alert-triangle"></i></div>
+    <div>
+      <strong>Something went wrong</strong>
+      <p>Please try again or email hello@settonsource.com so we can assist manually.</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcUMZmKwdOcUj4KszvTkPKlo-HmiVCXZU",
+      authDomain: "setton-source-68177.firebaseapp.com",
+      projectId: "setton-source-68177",
+      storageBucket: "setton-source-68177.firebasestorage.app",
+      messagingSenderId: "153708206059",
+      appId: "1:153708206059:web:14cc935233eee4ecdb72bae",
+      measurementId: "G-YW9WN4489T"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const pricingMatrix = {
+      landing: { label: "Launch Page", base: 850, includedPages: 1, perPage: 150 },
+      marketing: { label: "Marketing Site", base: 1600, includedPages: 3, perPage: 200 },
+      ecommerce: { label: "E-commerce", base: 2500, includedPages: 4, perPage: 450 },
+      webapp: { label: "Web App / Portal", base: 3200, includedPages: 4, perPage: 500 },
+    };
+
+    const timelinePricing = {
+      standard: { label: "Standard", multiplier: 1 },
+      accelerated: { label: "Accelerated", multiplier: 1.18 },
+      rapid: { label: "Rapid Sprint", multiplier: 1.32 },
+    };
+
+    const backendCost = 950;
+    const featurePricing = {
+      "feature-ecommerce": { label: "Payments & commerce", cost: 600 },
+      "feature-admin": { label: "Admin / CMS", cost: 500 },
+      "feature-support": { label: "Live support suite", cost: 280 },
+      "feature-automation": { label: "Automation & CRM", cost: 500 },
+    };
+    const logoRefreshCost = 50;
+    const domainSetupCost = 50;
+
+    const projectTypeButtons = Array.from(document.querySelectorAll('.project-type-option'));
+    const backendButtons = Array.from(document.querySelectorAll('.backend-option'));
+    const pagesRange = document.getElementById('pages');
+    const pagesOutput = document.getElementById('pages-output');
+    const estimateTotal = document.getElementById('estimate-total');
+    const estimateBreakdown = document.getElementById('estimate-breakdown');
+    const form = document.getElementById('quote-form');
+    const submitButton = document.getElementById('submit-button');
+    const successToast = document.getElementById('success-toast');
+    const errorToast = document.getElementById('error-toast');
+    const openQuoteButtons = Array.from(document.querySelectorAll('[data-open-quote]'));
+    const quoteModal = document.getElementById('quote-modal');
+    const closeModalButtons = Array.from(document.querySelectorAll('[data-close-modal]'));
+    const stepPanels = Array.from(document.querySelectorAll('[data-step-panel]'));
+    const stepDots = Array.from(document.querySelectorAll('[data-step-dot]'));
+    const stepLabels = Array.from(document.querySelectorAll('[data-step-label]'));
+    const prevStepButton = document.getElementById('prev-step');
+    const nextStepButton = document.getElementById('next-step');
+    const body = document.body;
+
+    let selectedProjectType = 'marketing';
+    let backendRequirement = 'no';
+    let currentStep = 1;
+
+    const formatCurrency = (value) => new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0,
+    }).format(Math.round(value));
+
+    function highlightSelection(collection, activeButton) {
+      collection.forEach((button) => {
+        const isActive = button === activeButton;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+      });
+    }
+
+    projectTypeButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        selectedProjectType = button.dataset.projectType;
+        highlightSelection(projectTypeButtons, button);
+        updateEstimate();
+      });
+    });
+
+    backendButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        backendRequirement = button.dataset.backend;
+        highlightSelection(backendButtons, button);
+        updateEstimate();
+      });
+    });
+
+    pagesRange.addEventListener('input', () => {
+      pagesOutput.textContent = `${pagesRange.value} ${pagesRange.value === '1' ? 'page' : 'pages'}`;
+      updateEstimate();
+    });
+
+    document.querySelectorAll('input[type="checkbox"], select').forEach((input) => {
+      input.addEventListener('change', updateEstimate);
+    });
+
+    function updateEstimate() {
+      const matrix = pricingMatrix[selectedProjectType];
+      const pages = Number(pagesRange.value);
+      const timeline = document.getElementById('timeline').value;
+      const logoStatus = document.getElementById('logo-status').value;
+      const urlStatus = document.getElementById('url-status').value;
+
+      let total = matrix.base;
+      const breakdownItems = [{ label: matrix.label, cost: matrix.base }];
+
+      if (pages > matrix.includedPages) {
+        const extraPages = pages - matrix.includedPages;
+        const extraCost = extraPages * matrix.perPage;
+        total += extraCost;
+        breakdownItems.push({ label: `Additional pages (${extraPages})`, cost: extraCost });
+      }
+
+      if (backendRequirement === 'yes') {
+        total += backendCost;
+        breakdownItems.push({ label: 'Backend & integrations', cost: backendCost });
+      }
+
+      Object.entries(featurePricing).forEach(([id, details]) => {
+        const checkbox = document.getElementById(id);
+        if (checkbox.checked) {
+          total += details.cost;
+          breakdownItems.push({ label: details.label, cost: details.cost });
+        }
+      });
+
+      if (logoStatus === 'no') {
+        total += logoRefreshCost;
+        breakdownItems.push({ label: 'Rapid brand refresh', cost: logoRefreshCost });
+      }
+
+      if (urlStatus === 'buy') {
+        total += domainSetupCost;
+        breakdownItems.push({ label: 'Domain & hosting setup', cost: domainSetupCost });
+      }
+
+      const timelineDetails = timelinePricing[timeline];
+      if (timelineDetails.multiplier > 1) {
+        const preTimelineTotal = total;
+        total *= timelineDetails.multiplier;
+        breakdownItems.push({ label: `${timelineDetails.label} delivery uplift`, cost: total - preTimelineTotal });
+      }
+
+      estimateTotal.textContent = formatCurrency(total);
+      renderBreakdown(breakdownItems);
+      return Math.round(total);
+    }
+
+    function renderBreakdown(items) {
+      estimateBreakdown.innerHTML = '';
+      if (!items.length) {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.className = 'form-note';
+        emptyMessage.textContent = 'Adjust inputs to see a detailed breakdown.';
+        estimateBreakdown.appendChild(emptyMessage);
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      items.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'estimate-row';
+        row.innerHTML = `<span>${item.label}</span><span>${formatCurrency(item.cost)}</span>`;
+        fragment.appendChild(row);
+      });
+      estimateBreakdown.appendChild(fragment);
+    }
+
+    function toggleToast(toastElement, show) {
+      if (!toastElement) return;
+      if (show) {
+        toastElement.classList.remove('hidden');
+        requestAnimationFrame(() => toastElement.classList.add('show'));
+        setTimeout(() => toggleToast(toastElement, false), 5200);
+      } else {
+        toastElement.classList.remove('show');
+        setTimeout(() => {
+          toastElement.classList.add('hidden');
+        }, 220);
+      }
+    }
+
+    function showStep(step) {
+      const totalSteps = stepPanels.length;
+      currentStep = Math.max(1, Math.min(step, totalSteps));
+      stepPanels.forEach((panel, index) => {
+        panel.classList.toggle('active', index === currentStep - 1);
+      });
+      stepDots.forEach((dot, index) => {
+        dot.classList.toggle('active', index <= currentStep - 1);
+      });
+      stepLabels.forEach((label, index) => {
+        label.classList.toggle('active', index === currentStep - 1);
+      });
+
+      const atStart = currentStep === 1;
+      const atEnd = currentStep === totalSteps;
+      prevStepButton.disabled = atStart;
+      prevStepButton.classList.toggle('is-disabled', atStart);
+      nextStepButton.classList.toggle('hidden', atEnd);
+      submitButton.classList.toggle('hidden', !atEnd);
+    }
+
+    function resetFormState() {
+      form.reset();
+      selectedProjectType = 'marketing';
+      backendRequirement = 'no';
+      const defaultProjectButton = projectTypeButtons.find((btn) => btn.dataset.projectType === selectedProjectType);
+      const defaultBackendButton = backendButtons.find((btn) => btn.dataset.backend === backendRequirement);
+      highlightSelection(projectTypeButtons, defaultProjectButton);
+      highlightSelection(backendButtons, defaultBackendButton);
+      pagesRange.value = '3';
+      pagesOutput.textContent = '3 pages';
+      showStep(1);
+      updateEstimate();
+    }
+
+    function openModal() {
+      resetFormState();
+      quoteModal.classList.remove('hidden');
+      requestAnimationFrame(() => quoteModal.classList.add('active'));
+      body.classList.add('modal-open');
+      quoteModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeModal() {
+      quoteModal.classList.remove('active');
+      body.classList.remove('modal-open');
+      quoteModal.setAttribute('aria-hidden', 'true');
+      setTimeout(() => {
+        if (!quoteModal.classList.contains('active')) {
+          quoteModal.classList.add('hidden');
+        }
+      }, 220);
+    }
+
+    openQuoteButtons.forEach((button) => {
+      button.addEventListener('click', openModal);
+    });
+
+    closeModalButtons.forEach((button) => {
+      button.addEventListener('click', closeModal);
+    });
+
+    quoteModal.addEventListener('click', (event) => {
+      if (event.target === quoteModal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && quoteModal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    nextStepButton.addEventListener('click', () => {
+      showStep(currentStep + 1);
+      updateEstimate();
+    });
+
+    prevStepButton.addEventListener('click', () => {
+      if (currentStep > 1) {
+        showStep(currentStep - 1);
+      }
+    });
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      submitButton.disabled = true;
+      submitButton.classList.add('is-disabled');
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const projectName = document.getElementById('project-name').value.trim();
+      const projectDescription = document.getElementById('project-description').value.trim();
+      const projectUrl = document.getElementById('project-url').value.trim();
+      const urlStatus = document.getElementById('url-status').value;
+      const logoStatus = document.getElementById('logo-status').value;
+      const timeline = document.getElementById('timeline').value;
+      const pages = Number(pagesRange.value);
+      const designTone = document.getElementById('design-tone').value;
+      const interactionLevel = document.getElementById('interaction-level').value;
+
+      const finalEstimate = updateEstimate();
+      const now = new Date();
+
+      const data = {
+        name,
+        email,
+        phone,
+        projectName,
+        projectDescription,
+        projectType: pricingMatrix[selectedProjectType].label,
+        projectTypeKey: selectedProjectType,
+        pages,
+        backend: backendRequirement,
+        timeline,
+        timelineLabel: timelinePricing[timeline].label,
+        urlStatus,
+        projectUrl: projectUrl || 'N/A',
+        logoStatus,
+        designTone,
+        interactionLevel,
+        finalEstimate,
+        timestamp: now.toISOString(),
+        humanTimestamp: now.toLocaleString(),
+        userId: crypto.randomUUID(),
+        'feature-ecommerce': document.getElementById('feature-ecommerce').checked ? 'on' : 'off',
+        'feature-admin': document.getElementById('feature-admin').checked ? 'on' : 'off',
+        'feature-support': document.getElementById('feature-support').checked ? 'on' : 'off',
+        'feature-automation': document.getElementById('feature-automation').checked ? 'on' : 'off',
+      };
+
+      try {
+        await addDoc(collection(db, 'quotes'), data);
+        toggleToast(errorToast, false);
+        toggleToast(successToast, true);
+        closeModal();
+        resetFormState();
+      } catch (error) {
+        console.error('Error saving quote:', error);
+        toggleToast(successToast, false);
+        toggleToast(errorToast, true);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.classList.remove('is-disabled');
+      }
+    }
+
+    form.addEventListener('submit', handleSubmit);
+
+    resetFormState();
+
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+
+    const adminCode = 'admin';
+    let typedKeys = '';
+    const adminUrl = '/admin';
+
+    document.addEventListener('keydown', (event) => {
+      const key = event.key.toLowerCase();
+      if (key.length === 1 && key >= 'a' && key <= 'z') {
+        typedKeys += key;
+      } else {
+        typedKeys = '';
+      }
+
+      if (typedKeys.length > adminCode.length) {
+        typedKeys = typedKeys.substring(typedKeys.length - adminCode.length);
+      }
+
+      if (typedKeys === adminCode) {
+        window.location.href = adminUrl;
+        typedKeys = '';
+      }
+    });
+  </script>
 </body>
 </html>
