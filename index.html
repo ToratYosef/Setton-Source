@@ -28,34 +28,33 @@
       position: fixed;
       inset: 0;
       background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-      opacity: 0.05;
+      opacity: 0.02;
       mix-blend-mode: screen;
     }
     .glass-card {
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       background: linear-gradient(135deg, rgba(15,23,42,0.78), rgba(15,23,42,0.55));
       border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 25px 60px rgba(2,8,23,0.55);
+      box-shadow: 0 20px 35px rgba(2,8,23,0.4);
       position: relative;
       overflow: hidden;
     }
     .glass-surface {
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      background: rgba(15,23,42,0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(15,23,42,0.58);
       border: 1px solid rgba(255,255,255,0.05);
     }
     .glass-veil {
       position: absolute;
       inset: -80% -60% -40% -60%;
-      background: radial-gradient(circle at 20% 30%, rgba(0,210,255,0.35), rgba(0,210,255,0)),
-                  radial-gradient(circle at 80% 20%, rgba(120,57,255,0.35), rgba(120,57,255,0)),
-                  radial-gradient(circle at 50% 80%, rgba(56,189,248,0.25), rgba(56,189,248,0));
-      opacity: 0.5;
+      background: radial-gradient(circle at 20% 30%, rgba(0,210,255,0.28), rgba(0,210,255,0)),
+                  radial-gradient(circle at 80% 20%, rgba(120,57,255,0.25), rgba(120,57,255,0)),
+                  radial-gradient(circle at 50% 80%, rgba(56,189,248,0.18), rgba(56,189,248,0));
+      opacity: 0.45;
       pointer-events: none;
-      filter: blur(90px);
-      transform: translateZ(0);
+      filter: blur(60px);
     }
     .focus-ring:focus-visible {
       outline: 2px solid rgba(0,210,255,0.45);
@@ -65,30 +64,24 @@
       position: absolute;
       inset: -30% -20% auto -20%;
       height: 60vh;
-      background: radial-gradient(circle, rgba(0,210,255,0.45) 0%, rgba(0,210,255,0) 65%);
-      filter: blur(80px);
-      opacity: 0.6;
-      animation: pulse 12s ease-in-out infinite;
+      background: radial-gradient(circle, rgba(0,210,255,0.35) 0%, rgba(0,210,255,0) 65%);
+      filter: blur(60px);
+      opacity: 0.45;
     }
     .aurora-second {
       position: absolute;
       inset: auto -15% -30% 40%;
       height: 55vh;
-      background: radial-gradient(circle, rgba(120,57,255,0.4) 0%, rgba(120,57,255,0) 70%);
-      filter: blur(85px);
-      opacity: 0.7;
-      animation: pulse 16s ease-in-out infinite reverse;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.65; }
-      50% { transform: scale(1.08); opacity: 0.85; }
+      background: radial-gradient(circle, rgba(120,57,255,0.3) 0%, rgba(120,57,255,0) 70%);
+      filter: blur(60px);
+      opacity: 0.45;
     }
     .layout-cluster {
-      backdrop-filter: blur(42px);
-      -webkit-backdrop-filter: blur(42px);
-      background: linear-gradient(140deg, rgba(15,23,42,0.72), rgba(15,23,42,0.52));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: linear-gradient(140deg, rgba(15,23,42,0.68), rgba(15,23,42,0.48));
       border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 35px 80px rgba(1,5,20,0.55);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 22px 45px rgba(1,5,20,0.4);
     }
     .iframe-shell {
       position: relative;
@@ -289,8 +282,8 @@
     <section class="px-0 sm:px-4 lg:px-10">
       <div class="relative w-full overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/5 to-emerald-500/10"></div>
-        <div class="absolute -top-32 -right-32 w-72 h-72 rounded-full bg-cyan-400/20 blur-[120px]"></div>
-        <div class="absolute -bottom-32 -left-32 w-72 h-72 rounded-full bg-purple-500/25 blur-[140px]"></div>
+        <div class="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-cyan-400/20 blur-[80px]"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-purple-500/20 blur-[90px]"></div>
         <div class="glass-card rounded-none sm:rounded-[38px] p-6 sm:p-8 lg:p-12 shadow-2xl w-full">
           <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
             <h2 class="text-2xl md:text-3xl font-semibold text-slate-50">Project Blueprint</h2>
@@ -445,7 +438,26 @@
               <textarea id="project-description" rows="5" class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="Tell us about the product, target audience, features, and success metrics."></textarea>
             </label>
 
-            <button type="submit" id="submit-button" class="w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-400 to-emerald-400 text-slate-900 font-semibold py-4 text-lg shadow-[0_25px_45px_rgba(0,210,255,0.25)] transition hover:brightness-110">
+            <section aria-live="polite" class="space-y-4 rounded-3xl glass-surface border border-white/5 p-6">
+              <div class="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Projected investment</p>
+                  <p class="text-3xl font-semibold text-slate-50" id="estimate-total">$5,200</p>
+                </div>
+                <span class="px-4 py-2 rounded-full glass-surface text-xs text-cyan-200/90 uppercase tracking-[0.3em]">Live</span>
+              </div>
+              <div id="estimate-pill" class="rounded-2xl glass-surface p-4 text-sm text-slate-300/90">
+                This includes design, development, QA, launch support, and the selected feature stack.
+              </div>
+              <div class="space-y-3" id="estimate-breakdown"></div>
+              <ul class="space-y-2 text-xs text-slate-400/90">
+                <li class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-cyan-300"></i> Real humans reviewing every request.</li>
+                <li class="flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-300"></i> Securely stored in Firebase and synced to our admin command center.</li>
+                <li class="flex items-center gap-2"><i data-lucide="clock-4" class="w-4 h-4 text-purple-300"></i> Follow-up call slots delivered instantly.</li>
+              </ul>
+            </section>
+
+            <button type="submit" id="submit-button" class="w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-400 to-emerald-400 text-slate-900 font-semibold py-4 text-lg shadow-[0_18px_35px_rgba(0,210,255,0.22)] transition hover:brightness-110">
               <i data-lucide="send" class="w-5 h-5"></i>
               Submit Quote Request
             </button>
@@ -454,40 +466,19 @@
       </div>
     </section>
 
-    <section class="max-w-6xl mx-auto px-6">
-      <div class="grid lg:grid-cols-[1.05fr_0.95fr] gap-10">
-        <div class="glass-card rounded-3xl p-8 lg:sticky lg:top-8">
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Projected investment</p>
-              <h3 class="text-4xl font-semibold text-slate-50" id="estimate-total">$5,200</h3>
-            </div>
-            <span class="px-4 py-2 rounded-full glass-surface text-xs text-cyan-200/90 uppercase tracking-[0.3em]">Live</span>
-          </div>
-          <div id="estimate-pill" class="rounded-2xl glass-surface p-5 text-sm space-y-2">
-            <p class="text-slate-300">This includes design, development, QA, launch support, and the selected feature stack.</p>
-          </div>
-          <div class="space-y-4" id="estimate-breakdown"></div>
-          <div class="pt-6 mt-6 border-t border-white/10 space-y-3 text-sm text-slate-300">
-            <p class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-cyan-300"></i> Real humans reviewing every request.</p>
-            <p class="flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-300"></i> Securely stored in Firebase and synced to our admin command center.</p>
-            <p class="flex items-center gap-2"><i data-lucide="clock-4" class="w-4 h-4 text-purple-300"></i> Follow-up call slots delivered instantly.</p>
-          </div>
-        </div>
-
-        <div class="glass-card rounded-3xl p-8 space-y-4">
-          <h3 class="text-xl font-semibold text-slate-100">Why teams choose Setton Source</h3>
-          <p class="text-sm text-slate-400">Founders, schools, and nonprofits lean on our fusion of cinematic design and dependable engineering to ship launches that convert.</p>
-          <ul class="space-y-3 text-sm text-slate-300">
-            <li class="flex gap-3"><i data-lucide="diamond" class="w-4 h-4 text-cyan-300 mt-1"></i> Glassmorphism visuals with meticulous motion design.</li>
-            <li class="flex gap-3"><i data-lucide="git-branch" class="w-4 h-4 text-purple-300 mt-1"></i> Full-stack builds powered by Next.js, Firebase, and automation.</li>
-            <li class="flex gap-3"><i data-lucide="gauge" class="w-4 h-4 text-emerald-300 mt-1"></i> Launch analytics, CRO experiments, and growth retainers baked in.</li>
-          </ul>
-          <a href="admin/index.html" class="inline-flex items-center gap-2 text-sm text-cyan-300 hover:text-cyan-200 transition">
-            Access admin dashboard
-            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-          </a>
-        </div>
+    <section class="max-w-5xl mx-auto px-6">
+      <div class="rounded-3xl border border-white/10 bg-slate-950/40 p-8 space-y-5">
+        <h3 class="text-xl font-semibold text-slate-100">Why teams choose Setton Source</h3>
+        <p class="text-sm text-slate-400">Founders, schools, and nonprofits lean on our fusion of cinematic design and dependable engineering to ship launches that convert.</p>
+        <ul class="space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><i data-lucide="diamond" class="w-4 h-4 text-cyan-300 mt-1"></i> Glassmorphism visuals with meticulous motion design.</li>
+          <li class="flex gap-3"><i data-lucide="git-branch" class="w-4 h-4 text-purple-300 mt-1"></i> Full-stack builds powered by Next.js, Firebase, and automation.</li>
+          <li class="flex gap-3"><i data-lucide="gauge" class="w-4 h-4 text-emerald-300 mt-1"></i> Launch analytics, CRO experiments, and growth retainers baked in.</li>
+        </ul>
+        <a href="admin/index.html" class="inline-flex items-center gap-2 text-sm text-cyan-300 hover:text-cyan-200 transition">
+          Access admin dashboard
+          <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+        </a>
       </div>
     </section>
 
