@@ -37,12 +37,25 @@
       background: linear-gradient(135deg, rgba(15,23,42,0.78), rgba(15,23,42,0.55));
       border: 1px solid rgba(255,255,255,0.08);
       box-shadow: 0 25px 60px rgba(2,8,23,0.55);
+      position: relative;
+      overflow: hidden;
     }
     .glass-surface {
       backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(30px);
       background: rgba(15,23,42,0.65);
       border: 1px solid rgba(255,255,255,0.05);
+    }
+    .glass-veil {
+      position: absolute;
+      inset: -80% -60% -40% -60%;
+      background: radial-gradient(circle at 20% 30%, rgba(0,210,255,0.35), rgba(0,210,255,0)),
+                  radial-gradient(circle at 80% 20%, rgba(120,57,255,0.35), rgba(120,57,255,0)),
+                  radial-gradient(circle at 50% 80%, rgba(56,189,248,0.25), rgba(56,189,248,0));
+      opacity: 0.5;
+      pointer-events: none;
+      filter: blur(90px);
+      transform: translateZ(0);
     }
     .focus-ring:focus-visible {
       outline: 2px solid rgba(0,210,255,0.45);
@@ -70,6 +83,81 @@
       0%, 100% { transform: scale(1); opacity: 0.65; }
       50% { transform: scale(1.08); opacity: 0.85; }
     }
+    .layout-cluster {
+      backdrop-filter: blur(42px);
+      -webkit-backdrop-filter: blur(42px);
+      background: linear-gradient(140deg, rgba(15,23,42,0.72), rgba(15,23,42,0.52));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 35px 80px rgba(1,5,20,0.55);
+    }
+    .iframe-shell {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(145deg, rgba(15,23,42,0.95), rgba(15,23,42,0.4));
+      box-shadow: 0 25px 60px rgba(2,8,23,0.6);
+    }
+    .iframe-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.35), transparent 60%),
+                  radial-gradient(circle at bottom right, rgba(168,85,247,0.25), transparent 70%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .iframe-ratio {
+      position: relative;
+      width: 100%;
+      padding-top: 62%;
+    }
+    .iframe-ratio iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      border-radius: 24px;
+      background: #020617;
+    }
+    .gradient-divider {
+      width: 120px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(34,211,238,0), rgba(34,211,238,0.65), rgba(168,85,247,0));
+      margin: 0 auto;
+    }
+    @media (max-width: 1024px) {
+      header .flex {
+        flex-direction: column;
+        text-align: center;
+      }
+      header .flex > div:last-child {
+        max-width: 100%;
+      }
+      header .flex .flex-wrap {
+        justify-content: center;
+      }
+    }
+    @media (max-width: 768px) {
+      body {
+        background: radial-gradient(circle at top, rgba(14,165,233,0.35), transparent 55%),
+                    radial-gradient(circle at bottom, rgba(147,51,234,0.28), transparent 60%),
+                    #030712;
+      }
+      .glass-card {
+        border-radius: 26px;
+      }
+      .layout-cluster {
+        border-radius: 26px;
+      }
+      .iframe-shell {
+        border-radius: 24px;
+      }
+      .iframe-ratio {
+        padding-top: 72%;
+      }
+    }
   </style>
 </head>
 <body class="relative">
@@ -78,6 +166,7 @@
   <div class="aurora-second"></div>
 
   <header class="relative z-10">
+    <div class="glass-veil"></div>
     <div class="max-w-6xl mx-auto px-6 pt-12 pb-8">
       <div class="flex flex-wrap lg:flex-nowrap items-center gap-10">
         <div class="flex-1 space-y-6">
@@ -89,6 +178,9 @@
             Get an instant estimate that makes your vision impossible to ignore.
           </h1>
           <p class="text-lg md:text-xl text-slate-300/90 max-w-2xl">
+            Services that fuse design aesthetics with resilient engineering. Every engagement is tuned to measurable outcomes—speed, conversion, retention, and brand lift.
+          </p>
+          <p class="text-base md:text-lg text-slate-300/80 max-w-2xl">
             Answer a few high-impact questions and watch a live quote adapt to your scope. When you submit, your roadmap lands directly in our real-time dashboard for a rapid follow-up.
           </p>
           <div class="flex flex-wrap gap-4 text-sm text-slate-300/80">
@@ -142,10 +234,64 @@
     </div>
   </header>
 
-  <main class="relative z-10 pb-24">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="grid lg:grid-cols-[1.05fr_0.95fr] gap-10">
-        <section class="glass-card rounded-3xl p-8 lg:p-10 shadow-2xl">
+  <main class="relative z-10 pb-24 space-y-16">
+    <section class="px-6 sm:px-8 lg:px-16">
+      <div class="max-w-6xl mx-auto text-center space-y-6">
+        <span class="inline-flex items-center justify-center gap-2 px-6 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.35em] text-cyan-200/80">
+          <i data-lucide="beaker" class="w-4 h-4"></i>
+          Strategic capabilities
+        </span>
+        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Services that scale from launch to lifecycle</h2>
+        <p class="text-base md:text-lg text-slate-300/90 max-w-3xl mx-auto">
+          Every engagement is tuned to measurable outcomes—speed, conversion, retention, and brand lift.
+        </p>
+        <div class="gradient-divider"></div>
+      </div>
+      <div class="max-w-6xl mx-auto mt-10 grid gap-6 lg:gap-8 md:grid-cols-2 xl:grid-cols-3">
+        <article class="layout-cluster rounded-3xl p-8 space-y-5">
+          <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl glass-surface text-xs uppercase tracking-[0.3em] text-cyan-200/80">
+            <i data-lucide="rocket" class="w-4 h-4"></i>
+            Launch Kits
+          </div>
+          <h3 class="text-2xl font-semibold text-slate-50">Flagship marketing sites</h3>
+          <p class="text-sm md:text-base text-slate-300/90">Narrative-driven pages with immersive visuals, motion, and optimized funnels for growth.</p>
+          <ul class="space-y-3 text-sm text-slate-300/80">
+            <li class="flex gap-3"><i data-lucide="sparkles" class="w-4 h-4 text-cyan-300 mt-1"></i> Glassmorphism hero systems &amp; interactive component libraries.</li>
+            <li class="flex gap-3"><i data-lucide="palette" class="w-4 h-4 text-purple-300 mt-1"></i> Identity-aligned visuals, content design, and analytics instrumentation.</li>
+          </ul>
+        </article>
+        <article class="layout-cluster rounded-3xl p-8 space-y-5">
+          <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl glass-surface text-xs uppercase tracking-[0.3em] text-emerald-200/80">
+            <i data-lucide="grid" class="w-4 h-4"></i>
+            Product
+          </div>
+          <h3 class="text-2xl font-semibold text-slate-50">SaaS &amp; portal experiences</h3>
+          <p class="text-sm md:text-base text-slate-300/90">Secure dashboards, internal tools, and membership platforms engineered for scale.</p>
+          <ul class="space-y-3 text-sm text-slate-300/80">
+            <li class="flex gap-3"><i data-lucide="shield" class="w-4 h-4 text-emerald-300 mt-1"></i> Authentication, role-based access, and data visualization.</li>
+            <li class="flex gap-3"><i data-lucide="cloud" class="w-4 h-4 text-sky-300 mt-1"></i> Cloud functions, Firestore, and serverless APIs to connect operations.</li>
+          </ul>
+        </article>
+        <article class="layout-cluster rounded-3xl p-8 space-y-5 md:col-span-2 xl:col-span-1">
+          <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl glass-surface text-xs uppercase tracking-[0.3em] text-amber-200/80">
+            <i data-lucide="activity" class="w-4 h-4"></i>
+            Optimization
+          </div>
+          <h3 class="text-2xl font-semibold text-slate-50">Growth &amp; lifecycle</h3>
+          <p class="text-sm md:text-base text-slate-300/90">Ongoing experiments, performance tuning, and CRO to maintain momentum.</p>
+          <ul class="space-y-3 text-sm text-slate-300/80">
+            <li class="flex gap-3"><i data-lucide="zap" class="w-4 h-4 text-amber-300 mt-1"></i> Sub-second loading, accessibility, and SEO enhancements.</li>
+            <li class="flex gap-3"><i data-lucide="bot" class="w-4 h-4 text-cyan-300 mt-1"></i> Automations, CRM integrations, and lifecycle campaigns.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+    <section class="px-0 sm:px-4 lg:px-10">
+      <div class="relative w-full overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/5 to-emerald-500/10"></div>
+        <div class="absolute -top-32 -right-32 w-72 h-72 rounded-full bg-cyan-400/20 blur-[120px]"></div>
+        <div class="absolute -bottom-32 -left-32 w-72 h-72 rounded-full bg-purple-500/25 blur-[140px]"></div>
+        <div class="glass-card rounded-none sm:rounded-[38px] p-6 sm:p-8 lg:p-12 shadow-2xl w-full">
           <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
             <h2 class="text-2xl md:text-3xl font-semibold text-slate-50">Project Blueprint</h2>
             <span class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-slate-400">
@@ -304,44 +450,179 @@
               Submit Quote Request
             </button>
           </form>
-        </section>
+        </div>
+      </div>
+    </section>
 
-        <aside class="space-y-6">
-          <div class="glass-card rounded-3xl p-8 lg:sticky lg:top-8">
-            <div class="flex items-center justify-between mb-6">
-              <div>
-                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Projected investment</p>
-                <h3 class="text-4xl font-semibold text-slate-50" id="estimate-total">$5,200</h3>
-              </div>
-              <span class="px-4 py-2 rounded-full glass-surface text-xs text-cyan-200/90 uppercase tracking-[0.3em]">Live</span>
+    <section class="max-w-6xl mx-auto px-6">
+      <div class="grid lg:grid-cols-[1.05fr_0.95fr] gap-10">
+        <div class="glass-card rounded-3xl p-8 lg:sticky lg:top-8">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Projected investment</p>
+              <h3 class="text-4xl font-semibold text-slate-50" id="estimate-total">$5,200</h3>
             </div>
-            <div id="estimate-pill" class="rounded-2xl glass-surface p-5 text-sm space-y-2">
-              <p class="text-slate-300">This includes design, development, QA, launch support, and the selected feature stack.</p>
-            </div>
-            <div class="space-y-4" id="estimate-breakdown"></div>
-            <div class="pt-6 mt-6 border-t border-white/10 space-y-3 text-sm text-slate-300">
-              <p class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-cyan-300"></i> Real humans reviewing every request.</p>
-              <p class="flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-300"></i> Securely stored in Firebase and synced to our admin command center.</p>
-              <p class="flex items-center gap-2"><i data-lucide="clock-4" class="w-4 h-4 text-purple-300"></i> Follow-up call slots delivered instantly.</p>
+            <span class="px-4 py-2 rounded-full glass-surface text-xs text-cyan-200/90 uppercase tracking-[0.3em]">Live</span>
+          </div>
+          <div id="estimate-pill" class="rounded-2xl glass-surface p-5 text-sm space-y-2">
+            <p class="text-slate-300">This includes design, development, QA, launch support, and the selected feature stack.</p>
+          </div>
+          <div class="space-y-4" id="estimate-breakdown"></div>
+          <div class="pt-6 mt-6 border-t border-white/10 space-y-3 text-sm text-slate-300">
+            <p class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-cyan-300"></i> Real humans reviewing every request.</p>
+            <p class="flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-300"></i> Securely stored in Firebase and synced to our admin command center.</p>
+            <p class="flex items-center gap-2"><i data-lucide="clock-4" class="w-4 h-4 text-purple-300"></i> Follow-up call slots delivered instantly.</p>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 space-y-4">
+          <h3 class="text-xl font-semibold text-slate-100">Why teams choose Setton Source</h3>
+          <p class="text-sm text-slate-400">Founders, schools, and nonprofits lean on our fusion of cinematic design and dependable engineering to ship launches that convert.</p>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex gap-3"><i data-lucide="diamond" class="w-4 h-4 text-cyan-300 mt-1"></i> Glassmorphism visuals with meticulous motion design.</li>
+            <li class="flex gap-3"><i data-lucide="git-branch" class="w-4 h-4 text-purple-300 mt-1"></i> Full-stack builds powered by Next.js, Firebase, and automation.</li>
+            <li class="flex gap-3"><i data-lucide="gauge" class="w-4 h-4 text-emerald-300 mt-1"></i> Launch analytics, CRO experiments, and growth retainers baked in.</li>
+          </ul>
+          <a href="admin/index.html" class="inline-flex items-center gap-2 text-sm text-cyan-300 hover:text-cyan-200 transition">
+            Access admin dashboard
+            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="px-6 sm:px-10">
+      <div class="max-w-6xl mx-auto text-center space-y-6">
+        <span class="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.35em] text-cyan-200/80">
+          <i data-lucide="coins" class="w-4 h-4"></i>
+          Transparent pricing
+        </span>
+        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Transparent pricing calibrated slightly below the industry average.</h2>
+        <div class="text-base md:text-lg text-slate-300/90 max-w-3xl mx-auto space-y-3">
+          <p>Strategic builds usually begin at $850 for a conversion-ready single page—most agencies sit around $1,000+.</p>
+          <p>Scale with add-ons and integrations as you need them.</p>
+        </div>
+      </div>
+      <div class="max-w-6xl mx-auto mt-12 grid gap-6 lg:grid-cols-3">
+        <article class="layout-cluster rounded-3xl p-8 space-y-6 text-left">
+          <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-semibold text-slate-50">Launch Starter</h3>
+            <span class="glass-surface px-4 py-2 rounded-2xl text-xs uppercase tracking-[0.3em] text-cyan-200/80">$850</span>
+          </div>
+          <p class="text-sm md:text-base text-slate-300/90">Perfect for single-page launches, early-stage startups, and campaign landers.</p>
+          <ul class="space-y-3 text-sm text-slate-300/80">
+            <li class="flex gap-3"><i data-lucide="sparkles" class="w-4 h-4 text-cyan-300 mt-1"></i> Glass-inspired hero, responsive layout, and type systems.</li>
+            <li class="flex gap-3"><i data-lucide="search" class="w-4 h-4 text-purple-300 mt-1"></i> SEO-ready build with analytics baseline.</li>
+            <li class="flex gap-3"><i data-lucide="refresh-cw" class="w-4 h-4 text-emerald-300 mt-1"></i> 1 round of revisions + launch support.</li>
+          </ul>
+        </article>
+        <article class="layout-cluster rounded-3xl p-8 space-y-6 text-left border border-cyan-400/30 shadow-[0_35px_80px_rgba(8,47,73,0.35)]">
+          <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-semibold text-slate-50">Growth Suite</h3>
+            <span class="glass-surface px-4 py-2 rounded-2xl text-xs uppercase tracking-[0.3em] text-purple-200/80">$1.6K–$3.4K</span>
+          </div>
+          <p class="text-sm md:text-base text-slate-300/90">Multi-page builds with CMS, e-commerce flows, or gated experiences.</p>
+          <ul class="space-y-3 text-sm text-slate-300/80">
+            <li class="flex gap-3"><i data-lucide="layout-grid" class="w-4 h-4 text-cyan-300 mt-1"></i> 3–7 custom pages, modular sections, and animation systems.</li>
+            <li class="flex gap-3"><i data-lucide="server-cog" class="w-4 h-4 text-emerald-300 mt-1"></i> Backend integrations, membership portals, or store setup.</li>
+            <li class="flex gap-3"><i data-lucide="line-chart" class="w-4 h-4 text-purple-300 mt-1"></i> 2 months of analytics &amp; CRO insights.</li>
+          </ul>
+        </article>
+        <article class="layout-cluster rounded-3xl p-8 space-y-6 text-left">
+          <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-semibold text-slate-50">Scale Partnerships</h3>
+            <span class="glass-surface px-4 py-2 rounded-2xl text-xs uppercase tracking-[0.3em] text-emerald-200/80">Custom</span>
+          </div>
+          <p class="text-sm md:text-base text-slate-300/90">Retainers for active product teams needing continuous iteration &amp; feature shipping.</p>
+          <ul class="space-y-3 text-sm text-slate-300/80">
+            <li class="flex gap-3"><i data-lucide="goal" class="w-4 h-4 text-emerald-300 mt-1"></i> Quarterly roadmaps &amp; experiment pipelines.</li>
+            <li class="flex gap-3"><i data-lucide="book-open-check" class="w-4 h-4 text-cyan-300 mt-1"></i> Design systems, design/dev sync, and product analytics.</li>
+            <li class="flex gap-3"><i data-lucide="messages-square" class="w-4 h-4 text-purple-300 mt-1"></i> Priority response &amp; dedicated communication hub.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="px-6 sm:px-10">
+      <div class="max-w-6xl mx-auto text-center space-y-6">
+        <span class="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.35em] text-cyan-200/80">
+          <i data-lucide="monitor-smartphone" class="w-4 h-4"></i>
+          Selected builds
+        </span>
+        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Selected builds with immersive glass interfaces.</h2>
+        <p class="text-base md:text-lg text-slate-300/90 max-w-3xl mx-auto">Dive into a few recent experiences. Each project pairs tactile UI with measurable outcomes.</p>
+      </div>
+      <div class="max-w-6xl mx-auto mt-12 grid gap-10 lg:grid-cols-2">
+        <article class="space-y-4">
+          <div class="iframe-shell">
+            <div class="iframe-ratio">
+              <iframe src="https://secondhandcell.com" loading="lazy" title="Second Hand Cell" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
             </div>
           </div>
-
-          <div class="glass-card rounded-3xl p-8 space-y-4">
-            <h3 class="text-xl font-semibold text-slate-100">Why teams choose Setton Source</h3>
-            <p class="text-sm text-slate-400">Founders, schools, and nonprofits lean on our fusion of cinematic design and dependable engineering to ship launches that convert.</p>
-            <ul class="space-y-3 text-sm text-slate-300">
-              <li class="flex gap-3"><i data-lucide="diamond" class="w-4 h-4 text-cyan-300 mt-1"></i> Glassmorphism visuals with meticulous motion design.</li>
-              <li class="flex gap-3"><i data-lucide="git-branch" class="w-4 h-4 text-purple-300 mt-1"></i> Full-stack builds powered by Next.js, Firebase, and automation.</li>
-              <li class="flex gap-3"><i data-lucide="gauge" class="w-4 h-4 text-emerald-300 mt-1"></i> Launch analytics, CRO experiments, and growth retainers baked in.</li>
-            </ul>
-            <a href="admin/index.html" class="inline-flex items-center gap-2 text-sm text-cyan-300 hover:text-cyan-200 transition">
-              Access admin dashboard
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="text-left">
+              <p class="text-sm uppercase tracking-[0.3em] text-cyan-200/80">Second Hand Cell</p>
+              <h3 class="text-xl font-semibold text-slate-50">Mobile E-commerce Platform</h3>
+            </div>
+            <a href="https://secondhandcell.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-surface text-sm text-cyan-200 hover:text-cyan-100 transition">
+              Visit Site
               <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
             </a>
           </div>
-        </aside>
+        </article>
+        <article class="space-y-4">
+          <div class="iframe-shell">
+            <div class="iframe-ratio">
+              <iframe src="https://ydeseniors.com" loading="lazy" title="YDE Seniors" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="text-left">
+              <p class="text-sm uppercase tracking-[0.3em] text-cyan-200/80">YDE Seniors</p>
+              <h3 class="text-xl font-semibold text-slate-50">Educational / School Portal</h3>
+            </div>
+            <a href="https://ydeseniors.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-surface text-sm text-cyan-200 hover:text-cyan-100 transition">
+              Visit Site
+              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </article>
+        <article class="space-y-4">
+          <div class="iframe-shell">
+            <div class="iframe-ratio">
+              <iframe src="https://binyanshalem.org" loading="lazy" title="Binyan Shalem" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="text-left">
+              <p class="text-sm uppercase tracking-[0.3em] text-cyan-200/80">Binyan Shalem</p>
+              <h3 class="text-xl font-semibold text-slate-50">Non-profit / Organizational Site</h3>
+            </div>
+            <a href="https://binyanshalem.org" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-surface text-sm text-cyan-200 hover:text-cyan-100 transition">
+              Visit Site
+              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </article>
+        <article class="space-y-4">
+          <div class="iframe-shell">
+            <div class="iframe-ratio">
+              <iframe src="https://toratyosefraffle.com" loading="lazy" title="Torat Yosef Raffle" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="text-left">
+              <p class="text-sm uppercase tracking-[0.3em] text-cyan-200/80">Torat Yosef Raffle</p>
+              <h3 class="text-xl font-semibold text-slate-50">Fundraising / Raffle Site</h3>
+            </div>
+            <a href="https://toratyosefraffle.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-surface text-sm text-cyan-200 hover:text-cyan-100 transition">
+              Visit Site
+              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </article>
       </div>
-    </div>
+    </section>
   </main>
 
   <footer class="relative z-10 border-t border-white/5">
