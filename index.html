@@ -18,6 +18,12 @@
       --slate-950: #020617;
       --slate-900: #030b1f;
     }
+    /* --- CRITICAL RESET FOR STICKY FOOTER --- */
+    html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
     body {
       font-family: "Manrope", system-ui, sans-serif;
       background:
@@ -26,9 +32,22 @@
         radial-gradient(circle at 12% 78%, rgba(249, 199, 79, 0.12), transparent 65%),
         linear-gradient(135deg, #020617, #050215 45%, #08091f 85%);
       color: #f8fafc;
-      min-height: 100vh;
+      
+      /* --- STICKY FOOTER FIX: 1/ Body as Flex Column container --- */
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh; /* Stretches body to full viewport height */
+      margin: 0; /* Ensures no default body margin causes vertical scrolling */
+      padding: 0; /* Ensures no default body padding causes vertical scrolling */
+      /* --- END STICKY FOOTER FIX --- */
+
       position: relative;
       overflow-x: hidden;
+    }
+    main {
+      /* --- STICKY FOOTER FIX: 2/ Main content grows to fill space --- */
+      flex-grow: 1; 
+      /* --- END STICKY FOOTER FIX --- */
     }
     a { color: inherit; }
     .noise-overlay {
@@ -203,7 +222,8 @@
     }
     .modal-panel {
       width: 100%;
-      max-width: min(1000px, 100%);
+      /* Adjusted max-width for a smaller, better fit */
+      max-width: min(800px, 95vw); 
       transform: translateY(32px);
       transition: transform 0.3s ease;
     }
@@ -303,6 +323,15 @@
     <div class="max-w-6xl mx-auto px-6 pt-16 pb-12">
       <div class="grid gap-12 lg:grid-cols-[1.1fr,0.9fr] items-center">
         <div class="space-y-8">
+          <div class="flex items-center space-x-3 text-2xl font-bold text-slate-50">
+            <!-- Setton Source Logo Placeholder (3D Box) -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cyan-400">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+            </svg>
+            <span>Setton Source</span>
+          </div>
           <span class="tagline inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-xs tracking-[0.35em] text-cyan-100/80">
             <i data-lucide="scan-search" class="w-4 h-4"></i>
             Instant project intelligence
@@ -482,7 +511,8 @@
         <article class="space-y-4">
           <div class="iframe-shell">
             <div class="iframe-ratio">
-              <iframe src="https://secondhandcell.com" loading="lazy" title="Second Hand Cell" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+              <!-- Added scrolling="no" -->
+              <iframe src="https://secondhandcell.com" loading="lazy" title="Second Hand Cell" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no"></iframe>
             </div>
           </div>
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -499,7 +529,8 @@
         <article class="space-y-4">
           <div class="iframe-shell">
             <div class="iframe-ratio">
-              <iframe src="https://ydeseniors.com" loading="lazy" title="YDE Seniors" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+              <!-- Added scrolling="no" -->
+              <iframe src="https://ydeseniors.com" loading="lazy" title="YDE Seniors" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no"></iframe>
             </div>
           </div>
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -516,7 +547,8 @@
         <article class="space-y-4">
           <div class="iframe-shell">
             <div class="iframe-ratio">
-              <iframe src="https://binyan-shalem.com" loading="lazy" title="Binyan Shalem" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+              <!-- Added scrolling="no" -->
+              <iframe src="https://binyan-shalem.com" loading="lazy" title="Binyan Shalem" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no"></iframe>
             </div>
           </div>
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -533,7 +565,8 @@
         <article class="space-y-4">
           <div class="iframe-shell">
             <div class="iframe-ratio">
-              <iframe src="https://toratyosefsummerraffle.com" loading="lazy" title="Torat Yosef Raffle" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+              <!-- Added scrolling="no" -->
+              <iframe src="https://toratyosefsummerraffle.com" loading="lazy" title="Torat Yosef Raffle" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no"></iframe>
             </div>
           </div>
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -554,7 +587,15 @@
   <footer class="relative z-10 border-t border-white/5">
     <div class="max-w-6xl mx-auto px-6 py-12 grid gap-8 md:grid-cols-[1.2fr,0.8fr]">
       <div class="space-y-4">
-        <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Setton Source</p>
+        <!-- Replaced simple text with logo/name block -->
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-cyan-400">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+            </svg>
+            <p class="text-lg font-bold text-slate-50">Setton Source</p>
+        </div>
         <h3 class="text-2xl font-semibold text-slate-50">Crafting resilient digital experiences with heart, clarity, and measurable lift.</h3>
         <div class="flex flex-wrap gap-3 text-sm text-slate-400">
           <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface">
@@ -587,6 +628,15 @@
     <div class="modal-panel glass-card rounded-[36px] p-6 sm:p-8 lg:p-10">
       <div class="flex items-start justify-between gap-6 flex-wrap">
         <div>
+          <!-- Added Logo and Name to Modal Header -->
+          <div class="flex items-center space-x-3 mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cyan-400">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+            </svg>
+            <p class="font-bold text-xl text-slate-50">Setton Source</p>
+          </div>
           <p class="text-xs uppercase tracking-[0.3em] text-cyan-200/80">Instant quote flow</p>
           <h2 class="text-2xl font-semibold text-slate-50 mt-2">Map the build in three guided steps.</h2>
         </div>
@@ -850,6 +900,9 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // --- Firebase Setup ---
+    // NOTE: In a real environment, __firebase_config and related variables are provided by the canvas environment.
+    // For standalone testing, this mock config is used.
     const firebaseConfig = {
       apiKey: "AIzaSyCcUMZmKwdOcUj4KszvTkPKlo-HmiVCXZU",
       authDomain: "setton-source-68177.firebaseapp.com",
@@ -863,11 +916,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // --- Pricing Logic ---
     const pricingMatrix = {
-      landing: { label: "Launch Page", base: 850, includedPages: 1, perPage: 280 },
-      marketing: { label: "Marketing Site", base: 1600, includedPages: 3, perPage: 320 },
-      ecommerce: { label: "E-commerce", base: 2400, includedPages: 4, perPage: 420 },
-      webapp: { label: "Web App / Portal", base: 3200, includedPages: 4, perPage: 520 },
+      landing: { label: "Launch Page", base: 850, includedPages: 1, perPage: 150 },
+      marketing: { label: "Marketing Site", base: 1600, includedPages: 3, perPage: 200 },
+      ecommerce: { label: "E-commerce", base: 2500, includedPages: 4, perPage: 450 },
+      webapp: { label: "Web App / Portal", base: 3200, includedPages: 4, perPage: 500 },
     };
 
     const timelinePricing = {
@@ -878,14 +932,16 @@
 
     const backendCost = 950;
     const featurePricing = {
-      "feature-ecommerce": { label: "Payments & commerce", cost: 680 },
-      "feature-admin": { label: "Admin / CMS", cost: 520 },
+      "feature-ecommerce": { label: "Payments & commerce", cost: 600 },
+      "feature-admin": { label: "Admin / CMS", cost: 500 },
       "feature-support": { label: "Live support suite", cost: 280 },
-      "feature-automation": { label: "Automation & CRM", cost: 420 },
+      "feature-automation": { label: "Automation & CRM", cost: 500 },
     };
-    const logoRefreshCost = 180;
-    const domainSetupCost = 140;
+    const logoRefreshCost = 50;
+    const domainSetupCost = 50;
 
+
+    // --- DOM Elements ---
     const projectTypeButtons = Array.from(document.querySelectorAll('.project-type-option'));
     const backendButtons = Array.from(document.querySelectorAll('.backend-option'));
     const pagesRange = document.getElementById('pages');
@@ -910,6 +966,7 @@
     let backendRequirement = 'no';
     let currentStep = 1;
 
+    // --- Utility Functions ---
     const formatCurrency = (value) => new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -925,6 +982,7 @@
       });
     }
 
+    // --- Event Listeners for Quote Calculation ---
     projectTypeButtons.forEach((button) => {
       button.addEventListener('click', () => {
         selectedProjectType = button.dataset.projectType;
@@ -950,6 +1008,7 @@
       input.addEventListener('change', updateEstimate);
     });
 
+    // --- Main Estimate Logic ---
     function updateEstimate() {
       const matrix = pricingMatrix[selectedProjectType];
       const pages = Number(pagesRange.value);
@@ -980,16 +1039,19 @@
         }
       });
 
+      // Logo Refresh Cost
       if (logoStatus === 'no') {
         total += logoRefreshCost;
         breakdownItems.push({ label: 'Rapid brand refresh', cost: logoRefreshCost });
       }
 
+      // Domain Setup Cost
       if (urlStatus === 'buy') {
         total += domainSetupCost;
         breakdownItems.push({ label: 'Domain & hosting setup', cost: domainSetupCost });
       }
 
+      // Timeline Multiplier
       const timelineDetails = timelinePricing[timeline];
       if (timelineDetails.multiplier > 1) {
         const preTimelineTotal = total;
@@ -1012,6 +1074,7 @@
       });
     }
 
+    // --- Modal/Toast UI Functions ---
     function toggleToast(toastElement, show) {
       toastElement.classList.toggle('hidden', !show);
       toastElement.classList.toggle('opacity-0', !show);
@@ -1075,6 +1138,7 @@
       }, 220);
     }
 
+    // --- Modal Event Handlers ---
     openQuoteButtons.forEach((button) => {
       button.addEventListener('click', openModal);
     });
@@ -1106,6 +1170,7 @@
       }
     });
 
+    // --- Form Submission (Firestore) ---
     async function handleSubmit(event) {
       event.preventDefault();
       submitButton.disabled = true;
@@ -1155,6 +1220,7 @@
       };
 
       try {
+        // Use a generic 'quotes' collection for this example
         await addDoc(collection(db, 'quotes'), data);
         toggleToast(errorToast, false);
         toggleToast(successToast, true);
@@ -1177,6 +1243,38 @@
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
     }
+
+    // --- Secret Admin Code Logic ---
+    const adminCode = 'admin';
+    let typedKeys = '';
+    const adminUrl = '/admin';
+
+    document.addEventListener('keydown', (event) => {
+        // Get the key, forcing lowercase for case-insensitivity
+        const key = event.key.toLowerCase();
+
+        // Check if the key is a single letter (a-z)
+        if (key.length === 1 && key >= 'a' && key <= 'z') {
+            typedKeys += key;
+        } else {
+            // Reset sequence if a non-letter key (like Space, Enter, Shift, etc.) is pressed
+            typedKeys = '';
+        }
+
+        // Keep only the last 5 characters to check against 'admin'
+        if (typedKeys.length > adminCode.length) {
+            typedKeys = typedKeys.substring(typedKeys.length - adminCode.length);
+        }
+
+        if (typedKeys === adminCode) {
+            console.log(`Admin code '${adminCode}' entered. Redirecting to ${adminUrl}`);
+            // Redirect to /admin
+            window.location.href = adminUrl;
+            // Reset the key sequence after success
+            typedKeys = '';
+        }
+    });
+
   </script>
 </body>
 </html>
