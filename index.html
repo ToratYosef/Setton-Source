@@ -3,868 +3,1708 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Setton Source | Instant Quote</title>
+  <title>Setton Source | Digital Experience Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
       color-scheme: dark;
-      --accent-cyan: #47e8ff;
-      --accent-magenta: #ff72d4;
-      --accent-amber: #f9c74f;
-      --slate-950: #020617;
-      --slate-900: #030b1f;
+      --bg-primary: #05060f;
+      --bg-secondary: #101323;
+      --bg-highlight: rgba(35, 44, 85, 0.55);
+      --bg-glass: rgba(16, 19, 35, 0.72);
+      --accent-cyan: #56f4ff;
+      --accent-lilac: #a164ff;
+      --accent-lime: #9cff6c;
+      --text-main: #f5f7ff;
+      --text-muted: rgba(208, 214, 239, 0.82);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --shadow-glass: 0 30px 60px rgba(5, 10, 35, 0.65);
+      --radius-lg: 32px;
+      --radius-md: 22px;
+      --radius-sm: 16px;
     }
-    /* --- CRITICAL RESET FOR STICKY FOOTER --- */
-    html {
-      height: 100%;
-      margin: 0;
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
       padding: 0;
+      margin: 0;
+      min-height: 100%;
     }
+
     body {
-      font-family: "Manrope", system-ui, sans-serif;
+      font-family: "Outfit", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 8% 12%, rgba(71, 232, 255, 0.16), transparent 55%),
-        radial-gradient(circle at 85% 20%, rgba(255, 114, 212, 0.18), transparent 60%),
-        radial-gradient(circle at 12% 78%, rgba(249, 199, 79, 0.12), transparent 65%),
-        linear-gradient(135deg, #020617, #050215 45%, #08091f 85%);
-      color: #f8fafc;
-      
-      /* --- STICKY FOOTER FIX: 1/ Body as Flex Column container --- */
+        radial-gradient(circle at 12% 18%, rgba(86, 244, 255, 0.25), transparent 55%),
+        radial-gradient(circle at 80% 22%, rgba(161, 100, 255, 0.28), transparent 60%),
+        radial-gradient(circle at 24% 78%, rgba(156, 255, 108, 0.2), transparent 65%),
+        linear-gradient(160deg, #02030a, #0c0f2b 55%, #05060f 90%);
+      color: var(--text-main);
       display: flex;
       flex-direction: column;
-      min-height: 100vh; /* Stretches body to full viewport height */
-      margin: 0; /* Ensures no default body margin causes vertical scrolling */
-      padding: 0; /* Ensures no default body padding causes vertical scrolling */
-      /* --- END STICKY FOOTER FIX --- */
-
+      min-height: 100vh;
       position: relative;
       overflow-x: hidden;
     }
+
     main {
-      /* --- STICKY FOOTER FIX: 2/ Main content grows to fill space --- */
-      flex-grow: 1; 
-      /* --- END STICKY FOOTER FIX --- */
+      flex: 1;
+      width: 100%;
     }
-    a { color: inherit; }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
     .noise-overlay {
-      pointer-events: none;
       position: fixed;
       inset: 0;
+      pointer-events: none;
       background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-      opacity: 0.05;
+      opacity: 0.04;
       mix-blend-mode: screen;
+      z-index: 1;
     }
-    .glass-card {
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.52));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 28px 60px rgba(2, 6, 23, 0.55);
-      position: relative;
-      overflow: hidden;
-    }
-    .glass-surface {
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      background: rgba(15, 23, 42, 0.58);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .glass-veil {
-      position: absolute;
-      inset: -80% -50% -40% -60%;
-      background:
-        radial-gradient(circle at 20% 30%, rgba(71, 232, 255, 0.35), rgba(71, 232, 255, 0)),
-        radial-gradient(circle at 70% 20%, rgba(255, 114, 212, 0.28), rgba(255, 114, 212, 0)),
-        radial-gradient(circle at 60% 85%, rgba(249, 199, 79, 0.25), rgba(249, 199, 79, 0));
-      opacity: 0.45;
+
+    .aurora, .aurora-secondary {
+      position: fixed;
       pointer-events: none;
-      filter: blur(70px);
-    }
-    .aurora, .aurora-second {
-      position: absolute;
       border-radius: 999px;
-      filter: blur(90px);
-      opacity: 0.45;
-      pointer-events: none;
+      filter: blur(160px);
+      opacity: 0.55;
+      z-index: 0;
     }
+
     .aurora {
-      inset: -25% auto auto -25%;
+      top: -18%;
+      left: -20%;
       width: 60vw;
-      height: 60vh;
-      background: radial-gradient(circle, rgba(71, 232, 255, 0.4) 0%, rgba(71, 232, 255, 0) 70%);
-    }
-    .aurora-second {
-      inset: auto -20% -30% 40%;
-      width: 45vw;
       height: 55vh;
-      background: radial-gradient(circle, rgba(255, 114, 212, 0.35) 0%, rgba(255, 114, 212, 0) 75%);
+      background: radial-gradient(circle, rgba(86, 244, 255, 0.55) 0%, rgba(86, 244, 255, 0) 70%);
     }
-    .layout-cluster {
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      background: linear-gradient(145deg, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.48));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 22px 45px rgba(1, 5, 20, 0.4);
+
+    .aurora-secondary {
+      bottom: -22%;
+      right: -10%;
+      width: 45vw;
+      height: 50vh;
+      background: radial-gradient(circle, rgba(161, 100, 255, 0.45) 0%, rgba(161, 100, 255, 0) 80%);
     }
-    .iframe-shell {
+
+    .page-shell {
       position: relative;
-      border-radius: 28px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.4));
-      box-shadow: 0 25px 60px rgba(2, 8, 23, 0.6);
+      z-index: 2;
+      width: min(1200px, 92vw);
+      margin: 0 auto;
+      padding: 40px 0 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 120px;
     }
-    .iframe-shell::before {
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: rgba(16, 19, 35, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px rgba(8, 15, 45, 0.38);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand svg {
+      width: 32px;
+      height: 32px;
+      color: var(--accent-cyan);
+    }
+
+    nav {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 999px;
+      transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+      border: 1px solid transparent;
+    }
+
+    nav a:hover {
+      color: var(--text-main);
+      background: rgba(86, 244, 255, 0.08);
+      border-color: rgba(86, 244, 255, 0.25);
+    }
+
+    .glass-panel {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: clamp(28px, 4vw, 48px);
+      box-shadow: var(--shadow-glass);
+      backdrop-filter: blur(24px);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 50px;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(86, 244, 255, 0.12);
+      border: 1px solid rgba(86, 244, 255, 0.24);
+      color: var(--accent-cyan);
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.6rem, 5vw, 4.3rem);
+      font-weight: 600;
+      line-height: 1.05;
+      margin: 18px 0 22px;
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .button-primary,
+    .button-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 26px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-lilac));
+      color: #031019;
+      box-shadow: 0 18px 36px rgba(86, 244, 255, 0.25);
+    }
+
+    .button-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 44px rgba(161, 100, 255, 0.35);
+    }
+
+    .button-secondary {
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(16, 19, 35, 0.45);
+      color: var(--text-muted);
+    }
+
+    .button-secondary:hover {
+      color: var(--text-main);
+      border-color: rgba(86, 244, 255, 0.35);
+      background: rgba(16, 19, 35, 0.7);
+    }
+
+    .hero-media {
+      position: relative;
+      padding: 28px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(16, 24, 46, 0.95), rgba(16, 19, 35, 0.65));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow-glass);
+    }
+
+    .hero-media::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top left, rgba(71, 232, 255, 0.35), transparent 60%),
-                  radial-gradient(circle at bottom right, rgba(255, 114, 212, 0.25), transparent 70%);
+      background: radial-gradient(circle at 20% 30%, rgba(86, 244, 255, 0.35), transparent 60%),
+                  radial-gradient(circle at 80% 70%, rgba(161, 100, 255, 0.3), transparent 70%);
       opacity: 0.7;
+    }
+
+    .hero-media img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 35px 60px rgba(5, 12, 35, 0.4);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .metric-card {
+      padding: 24px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(16, 19, 35, 0.7), rgba(16, 19, 35, 0.45));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 22px 45px rgba(5, 10, 35, 0.38);
+    }
+
+    .metric-card span {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(86, 244, 255, 0.65);
+      margin-bottom: 8px;
+    }
+
+    .metric-card strong {
+      font-size: 2rem;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .metric-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .section-heading {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(2.1rem, 3.8vw, 3rem);
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .section-heading p {
+      color: var(--text-muted);
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    .services-grid {
+      display: grid;
+      gap: 28px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .service-card {
+      background: linear-gradient(160deg, rgba(17, 24, 42, 0.85), rgba(15, 20, 33, 0.55));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 50px rgba(4, 10, 32, 0.38);
+    }
+
+    .service-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(86, 244, 255, 0.12), transparent 60%);
+      opacity: 0.8;
       pointer-events: none;
     }
-    .iframe-ratio {
-      position: relative;
-      width: 100%;
-      padding-top: 62%;
+
+    .service-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(86, 244, 255, 0.18);
+      border: 1px solid rgba(86, 244, 255, 0.3);
+      color: var(--accent-cyan);
+      margin-bottom: 18px;
     }
-    .iframe-ratio iframe {
+
+    .service-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .service-card p {
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .service-card ul {
+      padding-left: 20px;
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .case-studies {
+      display: grid;
+      gap: 30px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .case-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      background: rgba(16, 19, 35, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow-glass);
+      backdrop-filter: blur(20px);
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .case-card picture,
+    .case-card img {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      border: 0;
-      border-radius: 24px;
-      background: #020617;
+      object-fit: cover;
+      opacity: 0.78;
     }
-    .tagline {
-      letter-spacing: 0.35em;
+
+    .case-card .case-content {
+      position: relative;
+      padding: 30px;
+      background: linear-gradient(180deg, transparent 0%, rgba(5, 6, 15, 0.9) 75%);
+    }
+
+    .case-card span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(5, 6, 15, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(86, 244, 255, 0.85);
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
       text-transform: uppercase;
+      margin-bottom: 16px;
     }
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.85rem 1.6rem;
-      border-radius: 9999px;
-      font-weight: 600;
-      background: linear-gradient(120deg, rgba(71, 232, 255, 0.92), rgba(255, 114, 212, 0.92));
-      color: #020617;
-      box-shadow: 0 18px 35px rgba(71, 232, 255, 0.25);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+    .case-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: var(--text-main);
     }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 22px 45px rgba(255, 114, 212, 0.32);
+
+    .case-card p {
+      color: var(--text-muted);
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.85rem 1.4rem;
-      border-radius: 9999px;
-      font-weight: 600;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      color: rgba(203, 213, 225, 0.9);
-      transition: border-color 0.25s ease, color 0.25s ease;
+
+    .testimonial-section {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
-    .btn-secondary:hover {
-      color: #fff;
-      border-color: rgba(71, 232, 255, 0.55);
+
+    .testimonial-card {
+      padding: 32px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(160deg, rgba(16, 19, 35, 0.85), rgba(16, 19, 35, 0.5));
+      box-shadow: 0 24px 50px rgba(3, 8, 25, 0.4);
+      position: relative;
+      overflow: hidden;
     }
-    .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.2rem;
-      border-radius: 9999px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      color: rgba(203, 213, 225, 0.85);
-      font-weight: 600;
-      transition: border-color 0.25s ease, color 0.25s ease;
+
+    .testimonial-card::before {
+      content: "“";
+      position: absolute;
+      top: 24px;
+      left: 30px;
+      font-size: 4rem;
+      font-weight: 700;
+      color: rgba(86, 244, 255, 0.25);
     }
-    .btn-ghost:hover {
-      color: #f8fafc;
-      border-color: rgba(71, 232, 255, 0.55);
+
+    .testimonial-card p {
+      margin: 24px 0 18px 0;
+      color: var(--text-main);
+      line-height: 1.6;
+      font-size: 1.05rem;
     }
-    .focus-ring:focus-visible {
-      outline: 2px solid rgba(71, 232, 255, 0.6);
-      outline-offset: 2px;
+
+    .testimonial-card footer {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
     }
-    .gradient-divider {
-      width: 140px;
-      height: 2px;
-      background: linear-gradient(90deg, rgba(71, 232, 255, 0), rgba(71, 232, 255, 0.8), rgba(255, 114, 212, 0));
-      margin: 0 auto;
+
+    .hidden {
+      display: none !important;
     }
+
+    .is-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
     .modal {
       position: fixed;
       inset: 0;
+      background: rgba(5, 6, 15, 0.82);
+      backdrop-filter: blur(20px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.5rem;
-      background: rgba(2, 6, 23, 0.82);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
+      padding: 32px 24px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.28s ease;
-      z-index: 60;
+      transition: opacity 0.3s ease;
+      z-index: 80;
     }
+
     .modal.active {
       opacity: 1;
       pointer-events: auto;
     }
+
     .modal-panel {
-      width: 100%;
-      /* Adjusted max-width for a smaller, better fit */
-      max-width: min(800px, 95vw); 
-      transform: translateY(32px);
+      width: min(1040px, 95vw);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 32px;
+      box-shadow: var(--shadow-glass);
+      padding: clamp(28px, 4vw, 48px);
+      transform: translateY(24px);
       transition: transform 0.3s ease;
+      max-height: calc(100vh - 80px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
     }
+
     .modal.active .modal-panel {
       transform: translateY(0);
     }
+
     body.modal-open {
       overflow: hidden;
     }
-    [data-step-panel] {
-      display: none;
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
     }
-    [data-step-panel].active {
-      display: block;
+
+    .modal-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
+
+    .modal-brand svg {
+      width: 28px;
+      height: 28px;
+      color: var(--accent-cyan);
+    }
+
+    .modal-eyebrow {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(86, 244, 255, 0.7);
+      margin-bottom: 10px;
+    }
+
+    .modal-headline {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 600;
+      line-height: 1.2;
+      margin: 0;
+      max-width: 32rem;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(16, 19, 35, 0.6);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .icon-button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(86, 244, 255, 0.55);
+      background: rgba(16, 19, 35, 0.85);
+    }
+
+    .icon-button i {
+      width: 20px;
+      height: 20px;
+    }
+
     .stepper {
       display: flex;
-      gap: 1rem;
       align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: rgba(16, 19, 35, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
+
+    .stepper > div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 110px;
+    }
+
     .step-dot {
       width: 38px;
       height: 38px;
-      border-radius: 999px;
-      display: flex;
+      border-radius: 50%;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: rgba(71, 232, 255, 0.12);
-      border: 1px solid rgba(148, 163, 184, 0.25);
       font-weight: 600;
-      transition: all 0.25s ease;
+      color: var(--text-muted);
+      background: rgba(16, 19, 35, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     }
+
     .step-dot.active {
-      background: linear-gradient(135deg, rgba(71, 232, 255, 0.85), rgba(255, 114, 212, 0.85));
-      color: #020617;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-lilac));
       border-color: transparent;
-      box-shadow: 0 0 25px rgba(71, 232, 255, 0.35);
+      color: #02030a;
     }
+
     .step-line {
       flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(71, 232, 255, 0.05), rgba(71, 232, 255, 0.6));
-      opacity: 0.6;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(86, 244, 255, 0.4), rgba(161, 100, 255, 0.4));
+      opacity: 0.5;
     }
+
+    .step-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color 0.2s ease;
+    }
+
+    .step-label.active {
+      color: var(--accent-cyan);
+    }
+
     .modal-grid {
       display: grid;
-      gap: 2rem;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+      grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.8fr);
+      gap: 32px;
+      align-items: flex-start;
     }
+
+    .modal-content {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      overflow-y: auto;
+      max-height: calc(70vh - 80px);
+      padding-right: 6px;
+    }
+
+    .modal-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+      background: rgba(86, 244, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .step-panel {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .step-panel.active {
+      display: flex;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .field-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(86, 244, 255, 0.7);
+    }
+
+    .option-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .quote-option {
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(16, 19, 35, 0.55);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .quote-option:hover {
+      border-color: rgba(86, 244, 255, 0.45);
+      color: var(--text-main);
+    }
+
+    .quote-option .option-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(86, 244, 255, 0.16);
+      color: var(--accent-cyan);
+    }
+
+    .quote-option h3 {
+      font-size: 1.05rem;
+      margin: 0;
+      color: var(--text-main);
+    }
+
+    .quote-option p {
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .quote-option.is-active {
+      border-color: rgba(86, 244, 255, 0.65);
+      background: rgba(86, 244, 255, 0.12);
+      color: var(--text-main);
+      box-shadow: 0 14px 32px rgba(86, 244, 255, 0.22);
+    }
+
+    .pill-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+    }
+
+    .pill-option {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 12px 16px;
+      background: rgba(16, 19, 35, 0.55);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .pill-option:hover {
+      border-color: rgba(86, 244, 255, 0.45);
+      color: var(--text-main);
+    }
+
+    .pill-option.is-active {
+      border-color: rgba(86, 244, 255, 0.65);
+      background: rgba(86, 244, 255, 0.12);
+      color: var(--text-main);
+      box-shadow: 0 12px 30px rgba(86, 244, 255, 0.22);
+    }
+
+    .range-field {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .range-output {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .checkbox-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .checkbox-card {
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(16, 19, 35, 0.5);
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .checkbox-card:hover {
+      border-color: rgba(161, 100, 255, 0.45);
+    }
+
+    .checkbox-card input {
+      margin-top: 4px;
+    }
+
+    .checkbox-card span {
+      display: block;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .checkbox-card p {
+      margin: 4px 0 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .input-field,
+    .select-field,
+    .textarea-field {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(16, 19, 35, 0.55);
+      color: var(--text-main);
+      padding: 14px 18px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .input-field::placeholder,
+    .textarea-field::placeholder {
+      color: rgba(208, 214, 239, 0.55);
+    }
+
+    .select-field {
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23f5f7ff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polyline points="6 9 12 15 18 9"/></svg>');
+      background-repeat: no-repeat;
+      background-position: calc(100% - 18px) 50%;
+      background-size: 16px;
+      padding-right: 44px;
+    }
+
+    .input-field:focus,
+    .select-field:focus,
+    .textarea-field:focus {
+      outline: none;
+      border-color: rgba(86, 244, 255, 0.55);
+      box-shadow: 0 0 0 3px rgba(86, 244, 255, 0.15);
+      background: rgba(16, 19, 35, 0.85);
+    }
+
+    .textarea-field {
+      resize: vertical;
+      min-height: 140px;
+    }
+
+    .dual-field-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .quote-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 12px;
+    }
+
+    .quote-footer-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .button-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(16, 19, 35, 0.4);
+      color: var(--text-muted);
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    }
+
+    .button-ghost:hover {
+      border-color: rgba(86, 244, 255, 0.45);
+      color: var(--text-main);
+      background: rgba(16, 19, 35, 0.7);
+    }
+
+    .button-ghost.is-disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .quote-footer-actions .button-primary,
+    .quote-footer-actions .button-secondary {
+      width: 100%;
+    }
+
     .estimate-summary {
-      position: sticky;
-      top: 1.5rem;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(16, 19, 35, 0.55);
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
-    @media (max-width: 1024px) {
-      header .flex {
-        flex-direction: column;
-        text-align: center;
+
+    .estimate-summary header span {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(86, 244, 255, 0.65);
+    }
+
+    .estimate-summary header h3 {
+      margin: 12px 0 6px;
+      font-size: 2.2rem;
+    }
+
+    .estimate-summary header p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .estimate-breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .estimate-breakdown::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .estimate-breakdown::-webkit-scrollbar-thumb {
+      background: rgba(161, 100, 255, 0.24);
+      border-radius: 4px;
+    }
+
+    .estimate-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: rgba(16, 19, 35, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .estimate-row span:last-child {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .estimate-note {
+      display: flex;
+      gap: 14px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(86, 244, 255, 0.08);
+      border: 1px solid rgba(86, 244, 255, 0.2);
+      color: var(--text-main);
+      align-items: flex-start;
+    }
+
+    .estimate-note .note-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(86, 244, 255, 0.16);
+      color: var(--accent-cyan);
+    }
+
+    .toast {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      z-index: 90;
+      width: min(320px, 90vw);
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(16, 19, 35, 0.85);
+      box-shadow: 0 24px 48px rgba(5, 10, 35, 0.55);
+      padding: 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+    }
+
+    .toast.success .toast-icon {
+      background: rgba(76, 209, 149, 0.18);
+      border-color: rgba(76, 209, 149, 0.4);
+      color: #4cd195;
+    }
+
+    .toast.error .toast-icon {
+      background: rgba(255, 107, 129, 0.18);
+      border-color: rgba(255, 107, 129, 0.4);
+      color: #ff6b81;
+    }
+
+    .toast strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--text-main);
+    }
+
+    .toast p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .form-note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    @media (min-width: 640px) {
+      .quote-footer {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
       }
-      header .flex > div:last-child {
-        max-width: 100%;
+
+      .quote-footer-actions {
+        flex-direction: row;
       }
-      header .flex .flex-wrap {
-        justify-content: center;
+
+      .quote-footer-actions .button-primary,
+      .quote-footer-actions .button-secondary {
+        width: auto;
       }
     }
-    @media (max-width: 900px) {
+
+    @media (max-width: 1100px) {
       .modal-grid {
         grid-template-columns: 1fr;
       }
-      .estimate-summary {
-        position: static;
+
+      .modal-content {
+        max-height: none;
       }
     }
-    @media (max-width: 768px) {
-      body {
-        background:
-          radial-gradient(circle at top, rgba(71, 232, 255, 0.28), transparent 55%),
-          radial-gradient(circle at bottom, rgba(255, 114, 212, 0.24), transparent 60%),
-          #030617;
+
+    @media (max-width: 720px) {
+      .modal-panel {
+        padding: 28px 20px;
       }
-      .glass-card {
-        border-radius: 26px;
+
+      .stepper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+        padding: 18px;
       }
-      .modal {
-        padding: 1rem;
+
+      .stepper > div {
+        min-width: 0;
+      }
+
+      .step-line {
+        width: 100%;
+      }
+
+      .toast {
+        right: 16px;
+        left: 16px;
+        width: auto;
+      }
+    }
+
+    .cta {
+      text-align: center;
+      padding: clamp(32px, 4vw, 48px);
+      background: linear-gradient(140deg, rgba(86, 244, 255, 0.15), rgba(161, 100, 255, 0.18));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-glass);
+    }
+
+    .cta h2 {
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      margin-bottom: 18px;
+    }
+
+    .cta p {
+      color: var(--text-muted);
+      max-width: 540px;
+      margin: 0 auto 28px auto;
+      line-height: 1.6;
+    }
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 48px 0 56px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-grid {
+      display: grid;
+      gap: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      width: min(1200px, 92vw);
+      margin: 0 auto;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .footer-brand p {
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      color: var(--text-muted);
+    }
+
+    .footer-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: rgba(16, 19, 35, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .footer-links a:hover {
+      background: rgba(86, 244, 255, 0.12);
+      color: var(--text-main);
+    }
+
+    .footer-meta {
+      color: rgba(208, 214, 239, 0.55);
+      font-size: 0.85rem;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav {
+        justify-content: flex-start;
+      }
+
+      .page-shell {
+        gap: 96px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        gap: 36px;
+      }
+
+      .page-shell {
+        padding: 32px 0 72px;
+      }
+
+      .button-primary,
+      .button-secondary {
+        width: 100%;
+      }
+
+      .footer-links {
+        gap: 16px;
       }
     }
   </style>
 </head>
-<body class="relative">
+<body id="top">
   <div class="noise-overlay"></div>
   <div class="aurora"></div>
-  <div class="aurora-second"></div>
+  <div class="aurora-secondary"></div>
 
-  <header class="relative z-10 overflow-hidden">
-    <div class="glass-veil"></div>
-    <div class="max-w-6xl mx-auto px-6 pt-16 pb-12">
-      <div class="grid gap-12 lg:grid-cols-[1.1fr,0.9fr] items-center">
-        <div class="space-y-8">
-          <div class="flex items-center space-x-3 text-2xl font-bold text-slate-50">
-            <!-- Setton Source Logo Placeholder (3D Box) -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cyan-400">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-            </svg>
-            <span>Setton Source</span>
-          </div>
-          <span class="tagline inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-xs tracking-[0.35em] text-cyan-100/80">
-            <i data-lucide="scan-search" class="w-4 h-4"></i>
-            Instant project intelligence
-          </span>
-          <h1 class="font-[700] text-4xl md:text-5xl lg:text-6xl leading-tight text-slate-50">
-            Build unforgettable digital experiences with precision-crafted delivery.
-          </h1>
-          <p class="text-lg md:text-xl text-slate-300/90 max-w-2xl">
-            From conversion-obsessed marketing sites to resilient product platforms, Setton Source blends engineering rigor with cinematic design. Answer a few guided prompts to generate a launch-ready roadmap.
-          </p>
-          <div class="flex flex-wrap gap-4">
-            <button type="button" class="btn-primary focus-ring" data-open-quote>
-              Get instant quote
-              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-            </button>
-            <a href="#work" class="btn-secondary">
-              See recent builds
-              <i data-lucide="sparkle" class="w-4 h-4"></i>
-            </a>
-          </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-slate-300/85">
-            <div class="glass-surface rounded-2xl p-4">
-              <p class="text-xs uppercase tracking-[0.3em] text-cyan-100/60">Avg response</p>
-              <p class="text-lg font-semibold text-slate-50">&lt; 12 hrs</p>
-            </div>
-            <div class="glass-surface rounded-2xl p-4">
-              <p class="text-xs uppercase tracking-[0.3em] text-cyan-100/60">Launch window</p>
-              <p class="text-lg font-semibold text-slate-50">4 – 6 wks</p>
-            </div>
-            <div class="glass-surface rounded-2xl p-4">
-              <p class="text-xs uppercase tracking-[0.3em] text-cyan-100/60">Retention lift</p>
-              <p class="text-lg font-semibold text-slate-50">+28%</p>
-            </div>
-            <div class="glass-surface rounded-2xl p-4">
-              <p class="text-xs uppercase tracking-[0.3em] text-cyan-100/60">Launch partners</p>
-              <p class="text-lg font-semibold text-slate-50">42 startups</p>
-            </div>
-          </div>
-        </div>
-        <div class="glass-card rounded-3xl p-8 space-y-6 text-slate-200">
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.28em] text-cyan-200/80">
-            <i data-lucide="radar" class="w-4 h-4"></i>
-            Why teams choose us
-          </div>
-          <h2 class="text-2xl font-semibold text-slate-50">Obsessed with results, not deliverables.</h2>
-          <ul class="space-y-4 text-sm text-slate-300/80">
-            <li class="flex gap-3">
-              <span class="w-11 h-11 rounded-2xl glass-surface flex items-center justify-center">
-                <i data-lucide="sparkles" class="w-5 h-5 text-cyan-300"></i>
-              </span>
-              Cinematic hero systems, dynamic art direction, and motion-driven storytelling tuned to your brand voice.
-            </li>
-            <li class="flex gap-3">
-              <span class="w-11 h-11 rounded-2xl glass-surface flex items-center justify-center">
-                <i data-lucide="cpu" class="w-5 h-5 text-purple-300"></i>
-              </span>
-              Firebase, Next.js, automations, and analytics baked in from day zero for measurable outcomes.
-            </li>
-            <li class="flex gap-3">
-              <span class="w-11 h-11 rounded-2xl glass-surface flex items-center justify-center">
-                <i data-lucide="bot" class="w-5 h-5 text-emerald-300"></i>
-              </span>
-              Conversion-first flows, CRO sprints, and lifecycle strategy to keep momentum after launch.
-            </li>
-          </ul>
-          <div class="glass-surface rounded-2xl p-4 text-sm text-slate-300/80">
-            <p class="uppercase tracking-[0.3em] text-xs text-cyan-100/60 mb-2">Quick note</p>
-            <p>Share your wishlist via the quote flow and we’ll send a curated scope with pricing, timeline, and opportunities to delight.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+  <div class="page-shell">
+    <header>
+      <a href="#top" class="brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l9 5-9 5-9-5 9-5z" />
+          <path d="M21 8v6l-9 5-9-5V8" />
+          <path d="M12 13V8" />
+        </svg>
+        <span>Setton Source</span>
+      </a>
+      <nav>
+        <a href="#services">Services</a>
+        <a href="#case-studies">Work</a>
+        <a href="#testimonials">Testimonials</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
 
-  <main class="relative z-10 pb-24 space-y-20">
-    <section class="px-6 sm:px-8 lg:px-16">
-      <div class="max-w-6xl mx-auto text-center space-y-6">
-        <span class="inline-flex items-center justify-center gap-2 px-6 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.35em] text-cyan-200/80">
-          <i data-lucide="beaker" class="w-4 h-4"></i>
-          Strategic capabilities
-        </span>
-        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Services that scale from launch to lifecycle.</h2>
-        <p class="text-base md:text-lg text-slate-300/90 max-w-3xl mx-auto">
-          Every engagement is tuned to measurable outcomes—speed, conversion, retention, and brand lift.
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="hero-eyebrow">Design. Build. Launch.</span>
+        <h1>Glassmorphism-first digital experiences engineered to convert.</h1>
+        <p>
+          We pair cinematic interfaces with bulletproof product strategy. From lightning-fast marketing launches to complex platform overhauls, we ship outcomes that feel otherworldly—and perform down to the decimal.
         </p>
-        <div class="gradient-divider"></div>
+        <div class="hero-actions">
+          <button type="button" class="button-primary" data-open-quote>Start instant quote</button>
+          <a href="#contact" class="button-secondary">Book a discovery call</a>
+          <a href="#case-studies" class="button-secondary">Browse launch stories</a>
+        </div>
       </div>
-      <div class="max-w-6xl mx-auto mt-12 grid gap-6 lg:gap-8 md:grid-cols-2 xl:grid-cols-3">
-        <article class="layout-cluster rounded-3xl p-8 space-y-5 glass-card">
-          <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl glass-surface text-xs uppercase tracking-[0.3em] text-cyan-200/80">
-            <i data-lucide="rocket" class="w-4 h-4"></i>
-            Launch Kits
-          </div>
-          <h3 class="text-2xl font-semibold text-slate-50">Flagship marketing sites</h3>
-          <p class="text-sm md:text-base text-slate-300/90">Narrative-driven pages with immersive visuals, motion, and optimized funnels for growth.</p>
-          <ul class="space-y-3 text-sm text-slate-300/80">
-            <li class="flex gap-3"><i data-lucide="sparkles" class="w-4 h-4 text-cyan-300 mt-1"></i> Glassmorphism hero systems &amp; interactive component libraries.</li>
-            <li class="flex gap-3"><i data-lucide="palette" class="w-4 h-4 text-purple-300 mt-1"></i> Identity-aligned visuals, content design, and analytics instrumentation.</li>
+      <div class="hero-media">
+        <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1080&q=80" alt="Laptop showcasing futuristic interface" />
+      </div>
+    </section>
+
+    <section class="glass-panel">
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span>Average launch time</span>
+          <strong>4–6 weeks</strong>
+          <p>Streamlined discovery, weekly sprints, and obsessively tracked deliverables keep momentum high.</p>
+        </div>
+        <div class="metric-card">
+          <span>Performance lift</span>
+          <strong>+31%</strong>
+          <p>Clients see conversion and retention spikes thanks to tight CRO loops and analytics baked in.</p>
+        </div>
+        <div class="metric-card">
+          <span>Platforms shipped</span>
+          <strong>42+</strong>
+          <p>Scaling startups and modern enterprises trust Setton Source with launches and revamps.</p>
+        </div>
+        <div class="metric-card">
+          <span>Support rating</span>
+          <strong>9.8/10</strong>
+          <p>Ongoing success sprints ensure learnings turn into fresh experiments after launch.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="section-heading">
+        <span class="hero-eyebrow">Capabilities</span>
+        <h2>Everything you need to craft luminous products and stories.</h2>
+        <p>Multidisciplinary teams blend product strategy, motion artistry, and high-grade engineering to deliver experiences that feel like the future, while remaining fast, maintainable, and measurable.</p>
+      </div>
+      <div class="services-grid">
+        <article class="service-card">
+          <div class="service-icon">🚀</div>
+          <h3>Signature Launch Systems</h3>
+          <p>Modular, animation-rich marketing systems that scale with your GTM, ready for CMS integration from day one.</p>
+          <ul>
+            <li>Hero storytelling with parallax, video, and dynamic art direction.</li>
+            <li>Component libraries with automated theming and A/B-ready layouts.</li>
+            <li>SEO, analytics, and conversion tracking wired in at launch.</li>
           </ul>
         </article>
-        <article class="layout-cluster rounded-3xl p-8 space-y-5 glass-card">
-          <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl glass-surface text-xs uppercase tracking-[0.3em] text-emerald-200/80">
-            <i data-lucide="grid" class="w-4 h-4"></i>
-            Product
-          </div>
-          <h3 class="text-2xl font-semibold text-slate-50">SaaS &amp; portal experiences</h3>
-          <p class="text-sm md:text-base text-slate-300/90">Secure dashboards, internal tools, and membership platforms engineered for scale.</p>
-          <ul class="space-y-3 text-sm text-slate-300/80">
-            <li class="flex gap-3"><i data-lucide="shield" class="w-4 h-4 text-emerald-300 mt-1"></i> Authentication, role-based access, and data visualization.</li>
-            <li class="flex gap-3"><i data-lucide="cloud" class="w-4 h-4 text-sky-300 mt-1"></i> Cloud functions, Firestore, and serverless APIs to connect operations.</li>
+        <article class="service-card">
+          <div class="service-icon">🧠</div>
+          <h3>Product Platform Experience</h3>
+          <p>Design systems, onboarding flows, and retention loops that keep customers returning—and referring friends.</p>
+          <ul>
+            <li>UX research, customer mapping, and data-backed experimentation.</li>
+            <li>Glass dashboards, realtime states, and delightful micro-interactions.</li>
+            <li>Progressive enhancements for mobile, desktop, and in-product portals.</li>
           </ul>
         </article>
-        <article class="layout-cluster rounded-3xl p-8 space-y-5 glass-card md:col-span-2 xl:col-span-1">
-          <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl glass-surface text-xs uppercase tracking-[0.3em] text-amber-200/80">
-            <i data-lucide="activity" class="w-4 h-4"></i>
-            Optimization
-          </div>
-          <h3 class="text-2xl font-semibold text-slate-50">Growth &amp; lifecycle</h3>
-          <p class="text-sm md:text-base text-slate-300/90">Ongoing experiments, performance tuning, and CRO to maintain momentum.</p>
-          <ul class="space-y-3 text-sm text-slate-300/80">
-            <li class="flex gap-3"><i data-lucide="zap" class="w-4 h-4 text-amber-300 mt-1"></i> Sub-second loading, accessibility, and SEO enhancements.</li>
-            <li class="flex gap-3"><i data-lucide="bot" class="w-4 h-4 text-cyan-300 mt-1"></i> Automations, CRM integrations, and lifecycle campaigns.</li>
+        <article class="service-card">
+          <div class="service-icon">🤝</div>
+          <h3>Lifecycle & Growth Ops</h3>
+          <p>From CRM journeys to product-led onboarding, we architect life-cycle programs that convert curiosity into advocacy.</p>
+          <ul>
+            <li>Automations and triggered messaging via HubSpot, Customer.io, and Braze.</li>
+            <li>Experimentation pods for pricing, packaging, and paywall funnels.</li>
+            <li>Revenue analytics dashboards tailored to your leadership KPIs.</li>
           </ul>
         </article>
       </div>
     </section>
 
-    <section class="px-6 sm:px-8 lg:px-16">
-      <div class="max-w-6xl mx-auto glass-card rounded-[38px] p-10 lg:p-14 space-y-10">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div class="space-y-3">
-            <span class="tagline inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-xs tracking-[0.3em] text-cyan-200/80">
-              <i data-lucide="workflow" class="w-4 h-4"></i>
-              Guided quoting
-            </span>
-            <h2 class="text-3xl font-semibold text-slate-50">Three steps to a living quote.</h2>
-            <p class="text-base text-slate-300/85 max-w-2xl">Open the hero button to explore functionality, design, and delivery preferences. The modal keeps a running total so you can experiment before sending us context.</p>
-          </div>
-          <button type="button" class="btn-primary focus-ring" data-open-quote>Start the flow</button>
-        </div>
-        <div class="grid gap-6 lg:grid-cols-3 text-sm text-slate-300/85">
-          <div class="glass-surface rounded-3xl p-6 space-y-3">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl glass-card">
-              <i data-lucide="sliders-horizontal" class="w-5 h-5 text-cyan-300"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-slate-50">Step 1 · Functionality</h3>
-            <p>Choose your experience type, scope, and back-end needs. Add optional features and see the estimate respond instantly.</p>
-          </div>
-          <div class="glass-surface rounded-3xl p-6 space-y-3">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl glass-card">
-              <i data-lucide="paintbrush" class="w-5 h-5 text-purple-300"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-slate-50">Step 2 · Design DNA</h3>
-            <p>Share the vibe you’re chasing, brand asset readiness, and domain status so we can plan creative direction out of the gate.</p>
-          </div>
-          <div class="glass-surface rounded-3xl p-6 space-y-3">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl glass-card">
-              <i data-lucide="messages-square" class="w-5 h-5 text-emerald-300"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-slate-50">Step 3 · Contact &amp; context</h3>
-            <p>Tell us who to collaborate with and drop comments, inspirations, or KPIs. We respond with a tailored scope in under 12 hours.</p>
-          </div>
-        </div>
+    <section id="case-studies">
+      <div class="section-heading">
+        <span class="hero-eyebrow">Launch Stories</span>
+        <h2>Projects that shimmer without sacrificing performance.</h2>
+        <p>We partner with founders, marketing teams, and product leads to fuse visual drama with pragmatic systems. Explore a few of our recent transformations.</p>
       </div>
-    </section>
-
-    <section id="work" class="px-6 sm:px-10">
-      <div class="max-w-6xl mx-auto text-center space-y-6">
-        <span class="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full glass-surface text-xs uppercase tracking-[0.35em] text-cyan-200/80">
-          <i data-lucide="monitor-smartphone" class="w-4 h-4"></i>
-          Selected builds
-        </span>
-        <h2 class="text-3xl md:text-4xl font-semibold text-slate-50">Immersive interfaces that turn visitors into fans.</h2>
-        <p class="text-base md:text-lg text-slate-300/90 max-w-3xl mx-auto">Dive into a few recent experiences. Each project pairs tactile UI with measurable outcomes.</p>
-      </div>
-      <div class="max-w-6xl mx-auto mt-12 grid gap-10 lg:grid-cols-2">
-        <article class="space-y-4">
-          <div class="iframe-shell">
-            <div class="iframe-ratio">
-              <!-- Added scrolling="no" -->
-              <iframe src="https://secondhandcell.com" loading="lazy" title="Second Hand Cell" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no"></iframe>
-            </div>
-          </div>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div class="text-left">
-              <p class="text-sm uppercase tracking-[0.3em] text-cyan-200/80">Second Hand Cell</p>
-              <h3 class="text-xl font-semibold text-slate-50">Mobile E-commerce Platform</h3>
-            </div>
-            <a href="https://secondhandcell.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-surface text-sm text-cyan-200 hover:text-cyan-100 transition">
-              Visit Site
-              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-            </a>
+      <div class="case-studies">
+        <article class="case-card">
+          <picture>
+            <img src="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1200&q=80" alt="Abstract holographic interface" />
+          </picture>
+          <div class="case-content">
+            <span>Fintech SaaS</span>
+            <h3>Meridian — From legacy dashboards to a glass-fluid analytics OS.</h3>
+            <p>Reimagined their investor analytics tool with modular glass surfaces, resulting in a 38% increase in enterprise demos.</p>
           </div>
         </article>
-        <article class="space-y-4">
-          <div class="iframe-shell">
-            <div class="iframe-ratio">
-              <!-- Added scrolling="no" -->
-              <iframe src="https://ydeseniors.com" loading="lazy" title="YDE Seniors" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no"></iframe>
-            </div>
-          </div>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div class="text-left">
-              <p class="text-sm uppercase tracking-[0.3em] text-cyan-200/80">YDE Seniors</p>
-              <h3 class="text-xl font-semibold text-slate-50">Educational / School Portal</h3>
-            </div>
-            <a href="https://ydeseniors.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-surface text-sm text-cyan-200 hover:text-cyan-100 transition">
-              Visit Site
-              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-            </a>
+        <article class="case-card">
+          <picture>
+            <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80" alt="Modern architectural lobby" />
+          </picture>
+          <div class="case-content">
+            <span>Luxury Hospitality</span>
+            <h3>Lumina Resorts — A cinematic booking journey.</h3>
+            <p>Crafted an immersive booking experience with realtime itinerary previews, bumping direct reservations by 29%.</p>
           </div>
         </article>
-        <article class="space-y-4">
-          <div class="iframe-shell">
-            <div class="iframe-ratio">
-              <!-- Added scrolling="no" -->
-              <iframe src="https://binyan-shalem.com" loading="lazy" title="Binyan Shalem" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no"></iframe>
-            </div>
-          </div>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div class="text-left">
-              <p class="text-sm uppercase tracking-[0.3em] text-cyan-200/80">Binyan Shalem</p>
-              <h3 class="text-xl font-semibold text-slate-50">Non-profit / Organizational Site</h3>
-            </div>
-            <a href="https://binyan-shalem.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-surface text-sm text-cyan-200 hover:text-cyan-100 transition">
-              Visit Site
-              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-            </a>
-          </div>
-        </article>
-        <article class="space-y-4">
-          <div class="iframe-shell">
-            <div class="iframe-ratio">
-              <!-- Added scrolling="no" -->
-              <iframe src="https://toratyosefsummerraffle.com" loading="lazy" title="Torat Yosef Raffle" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no"></iframe>
-            </div>
-          </div>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div class="text-left">
-              <p class="text-sm uppercase tracking-[0.3em] text-cyan-200/80">Torat Yosef Raffle</p>
-              <h3 class="text-xl font-semibold text-slate-50">Fundraising / Raffle Site</h3>
-            </div>
-            <a href="https://toratyosefsummerraffle.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-surface text-sm text-cyan-200 hover:text-cyan-100 transition">
-              Visit Site
-              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-            </a>
+        <article class="case-card">
+          <picture>
+            <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80" alt="Developers collaborating in futuristic workspace" />
+          </picture>
+          <div class="case-content">
+            <span>Developer Tools</span>
+            <h3>OpsForge — Narrative-driven product education.</h3>
+            <p>Built a living knowledge base with animated diagrams and AI-powered onboarding, shrinking time-to-value by half.</p>
           </div>
         </article>
       </div>
     </section>
-  </main>
 
-  <footer class="relative z-10 border-t border-white/5">
-    <div class="max-w-6xl mx-auto px-6 py-12 grid gap-8 md:grid-cols-[1.2fr,0.8fr]">
-      <div class="space-y-4">
-        <!-- Replaced simple text with logo/name block -->
-        <div class="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-cyan-400">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-            </svg>
-            <p class="text-lg font-bold text-slate-50">Setton Source</p>
-        </div>
-        <h3 class="text-2xl font-semibold text-slate-50">Crafting resilient digital experiences with heart, clarity, and measurable lift.</h3>
-        <div class="flex flex-wrap gap-3 text-sm text-slate-400">
-          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface">
-            <i data-lucide="map-pin" class="w-4 h-4"></i>
-            NYC · Remote friendly
-          </span>
-          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface">
-            <i data-lucide="clock" class="w-4 h-4"></i>
-            Replies in under 12 hours
-          </span>
-        </div>
+    <section id="testimonials">
+      <div class="section-heading">
+        <span class="hero-eyebrow">Client Notes</span>
+        <h2>Teams love how we blend drama with dependability.</h2>
+        <p>Transparent collaboration, weekly insight reviews, and a calm, confident hand across design, engineering, and growth.</p>
       </div>
-      <div class="space-y-4 text-sm text-slate-400">
-        <div>
-          <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Contact</p>
-          <a href="mailto:hello@settonsource.com" class="block text-lg text-slate-100 hover:text-cyan-200 transition">hello@settonsource.com</a>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <a href="#" class="glass-surface rounded-2xl px-4 py-3 flex items-center gap-2 hover:text-cyan-200 transition"><i data-lucide="instagram" class="w-4 h-4"></i> Instagram</a>
-          <a href="#" class="glass-surface rounded-2xl px-4 py-3 flex items-center gap-2 hover:text-cyan-200 transition"><i data-lucide="linkedin" class="w-4 h-4"></i> LinkedIn</a>
-          <a href="#" class="glass-surface rounded-2xl px-4 py-3 flex items-center gap-2 hover:text-cyan-200 transition"><i data-lucide="dribbble" class="w-4 h-4"></i> Dribbble</a>
-          <a href="#" class="glass-surface rounded-2xl px-4 py-3 flex items-center gap-2 hover:text-cyan-200 transition"><i data-lucide="youtube" class="w-4 h-4"></i> YouTube</a>
-        </div>
-        <p class="text-xs text-slate-500">© 2025 Setton Source. All rights reserved.</p>
+      <div class="testimonial-section">
+        <article class="testimonial-card">
+          <p>“Setton Source orchestrated a full relaunch without a single missed milestone. Their taste level is unreal, but what sold our board was how tightly they measured impact. We saw lift day one.”</p>
+          <footer>
+            <strong>Jamie Albright</strong>
+            <span>CMO, Meridian Analytics</span>
+          </footer>
+        </article>
+        <article class="testimonial-card">
+          <p>“They understand how to make digital feel tactile. Every touchpoint is glassy, responsive, and anchored by data. Our NPS jumped 12 points in the first month post-launch.”</p>
+          <footer>
+            <strong>Chloe Reyes</strong>
+            <span>Founder, Lumina Hospitality Group</span>
+          </footer>
+        </article>
+        <article class="testimonial-card">
+          <p>“Working with Setton Source felt like unlocking a secret level. Their team just quietly over-delivers—from strategy sprints to refined handoff documentation. Support has been impeccable.”</p>
+          <footer>
+            <strong>Isaac Park</strong>
+            <span>Product Lead, OpsForge</span>
+          </footer>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact" class="cta">
+      <h2>Ready for a glass-smooth launch?</h2>
+      <p>Share your goals and we’ll assemble a bespoke roadmap with timeline, investment, and the experiments we’d run from week one. Expect a reply in under twelve hours.</p>
+      <div class="hero-actions" style="justify-content: center;">
+        <button type="button" class="button-primary" data-open-quote>Start instant quote</button>
+        <a href="mailto:hello@settonsource.com" class="button-secondary">hello@settonsource.com</a>
+        <a href="https://cal.com" class="button-secondary" target="_blank" rel="noopener">Schedule a session</a>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#top" class="brand" style="width: fit-content;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l9 5-9 5-9-5 9-5z" />
+            <path d="M21 8v6l-9 5-9-5V8" />
+            <path d="M12 13V8" />
+          </svg>
+          <span>Setton Source</span>
+        </a>
+        <p>We design and engineer luminous digital platforms with translucency, motion, and measurable outcomes baked in from day one.</p>
+        <div class="footer-meta">© 2025 Setton Source. Built with clarity, curiosity, and caffeine.</div>
+      </div>
+      <div class="footer-links">
+        <strong>Studio</strong>
+        <a href="#services">Capabilities</a>
+        <a href="#case-studies">Launch stories</a>
+        <a href="#testimonials">Client love</a>
+      </div>
+      <div class="footer-links">
+        <strong>Connect</strong>
+        <a href="mailto:hello@settonsource.com">Email</a>
+        <a href="https://www.linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.instagram.com" target="_blank" rel="noopener">Instagram</a>
+      </div>
+      <div class="footer-links">
+        <strong>Resources</strong>
+        <a href="#">Case studies library</a>
+        <a href="#">Press kit</a>
+        <a href="#">Support portal</a>
       </div>
     </div>
   </footer>
 
-  <div id="quote-modal" class="modal hidden">
-    <div class="modal-panel glass-card rounded-[36px] p-6 sm:p-8 lg:p-10">
-      <div class="flex items-start justify-between gap-6 flex-wrap">
+  <div id="quote-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="quote-modal-title">
+    <div class="modal-panel">
+      <div class="modal-header">
         <div>
-          <!-- Added Logo and Name to Modal Header -->
-          <div class="flex items-center space-x-3 mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cyan-400">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
+          <div class="modal-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3l9 5-9 5-9-5 9-5z" />
+              <path d="M21 8v6l-9 5-9-5V8" />
+              <path d="M12 13V8" />
             </svg>
-            <p class="font-bold text-xl text-slate-50">Setton Source</p>
+            <span>Setton Source</span>
           </div>
-          <p class="text-xs uppercase tracking-[0.3em] text-cyan-200/80">Instant quote flow</p>
-          <h2 class="text-2xl font-semibold text-slate-50 mt-2">Map the build in three guided steps.</h2>
+          <span class="modal-eyebrow">Instant quote flow</span>
+          <h2 id="quote-modal-title" class="modal-headline">Map the build in three guided steps.</h2>
         </div>
-        <button type="button" class="glass-surface rounded-full p-2 focus-ring" data-close-modal>
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button type="button" class="icon-button" data-close-modal aria-label="Close instant quote">
+          <i data-lucide="x"></i>
         </button>
       </div>
-      <div class="stepper mt-6">
-        <div class="text-center">
+      <div class="stepper">
+        <div>
           <div class="step-dot active" data-step-dot="1">1</div>
-          <p class="text-xs mt-2 text-slate-400" data-step-label="1">Functionality</p>
+          <span class="step-label active" data-step-label="1">Functionality</span>
         </div>
         <span class="step-line"></span>
-        <div class="text-center">
+        <div>
           <div class="step-dot" data-step-dot="2">2</div>
-          <p class="text-xs mt-2 text-slate-400" data-step-label="2">Design DNA</p>
+          <span class="step-label" data-step-label="2">Design DNA</span>
         </div>
         <span class="step-line"></span>
-        <div class="text-center">
+        <div>
           <div class="step-dot" data-step-dot="3">3</div>
-          <p class="text-xs mt-2 text-slate-400" data-step-label="3">Contact &amp; Context</p>
+          <span class="step-label" data-step-label="3">Contact &amp; Context</span>
         </div>
       </div>
-      <form id="quote-form" class="mt-10">
+      <form id="quote-form" novalidate>
         <div class="modal-grid">
-          <div class="space-y-10">
-            <div data-step-panel="1" class="space-y-8 active">
-              <div class="space-y-4">
-                <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Project Type</span>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button type="button" data-project-type="landing" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
-                    <i data-lucide="sparkles" class="w-5 h-5 text-cyan-300 mb-3"></i>
-                    <p class="font-semibold text-slate-100">Launch Page</p>
-                    <p class="text-xs text-slate-400">Single page or microsite momentum.</p>
+          <div class="modal-content">
+            <div class="step-panel active" data-step-panel="1">
+              <div class="field-group">
+                <span class="field-eyebrow">Project type</span>
+                <div class="option-grid">
+                  <button type="button" class="quote-option project-type-option" data-project-type="landing" aria-pressed="false">
+                    <span class="option-icon"><i data-lucide="sparkles"></i></span>
+                    <h3>Launch Page</h3>
+                    <p>Single page or microsite momentum.</p>
                   </button>
-                  <button type="button" data-project-type="marketing" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
-                    <i data-lucide="layers" class="w-5 h-5 text-purple-300 mb-3"></i>
-                    <p class="font-semibold text-slate-100">Marketing Site</p>
-                    <p class="text-xs text-slate-400">Multi-page presence &amp; storytelling.</p>
+                  <button type="button" class="quote-option project-type-option" data-project-type="marketing" aria-pressed="false">
+                    <span class="option-icon"><i data-lucide="layers"></i></span>
+                    <h3>Marketing Site</h3>
+                    <p>Multi-page presence &amp; storytelling.</p>
                   </button>
-                  <button type="button" data-project-type="ecommerce" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
-                    <i data-lucide="shopping-bag" class="w-5 h-5 text-emerald-300 mb-3"></i>
-                    <p class="font-semibold text-slate-100">E-commerce</p>
-                    <p class="text-xs text-slate-400">Storefronts, subscriptions, funnels.</p>
+                  <button type="button" class="quote-option project-type-option" data-project-type="ecommerce" aria-pressed="false">
+                    <span class="option-icon"><i data-lucide="shopping-bag"></i></span>
+                    <h3>E-commerce</h3>
+                    <p>Storefronts, subscriptions, funnels.</p>
                   </button>
-                  <button type="button" data-project-type="webapp" class="project-type-option glass-surface rounded-2xl px-4 py-4 text-left border border-transparent hover:border-cyan-400/60 transition focus-ring">
-                    <i data-lucide="blocks" class="w-5 h-5 text-amber-300 mb-3"></i>
-                    <p class="font-semibold text-slate-100">Web App / Portal</p>
-                    <p class="text-xs text-slate-400">Dashboards, portals, internal tools.</p>
+                  <button type="button" class="quote-option project-type-option" data-project-type="webapp" aria-pressed="false">
+                    <span class="option-icon"><i data-lucide="blocks"></i></span>
+                    <h3>Web App / Portal</h3>
+                    <p>Dashboards, portals, internal tools.</p>
                   </button>
                 </div>
               </div>
-              <div class="grid gap-5 sm:grid-cols-2">
-                <label class="space-y-2 block text-sm">
-                  <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Core Pages</span>
-                  <input type="range" id="pages" min="1" max="12" step="1" value="3" class="w-full">
-                  <div class="flex justify-between text-xs text-slate-400">
-                    <span>1</span><span id="pages-output" class="text-cyan-300 text-sm font-semibold">3 pages</span><span>12</span>
+              <div class="dual-field-grid">
+                <label class="range-field">
+                  <span class="field-eyebrow">Core pages</span>
+                  <input type="range" id="pages" min="1" max="12" step="1" value="3" aria-describedby="pages-output">
+                  <div class="range-output">
+                    <span>1</span>
+                    <span id="pages-output">3 pages</span>
+                    <span>12</span>
                   </div>
                 </label>
-                <label class="space-y-2 block text-sm">
-                  <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Backend &amp; Integrations</span>
-                  <div class="grid grid-cols-2 gap-2 text-xs">
-                    <button type="button" data-backend="no" class="backend-option glass-surface rounded-xl px-3 py-3 border border-transparent hover:border-cyan-400/60 transition focus-ring">No</button>
-                    <button type="button" data-backend="yes" class="backend-option glass-surface rounded-xl px-3 py-3 border border-transparent hover:border-cyan-400/60 transition focus-ring">Yes</button>
+                <div class="field-group">
+                  <span class="field-eyebrow">Backend &amp; integrations</span>
+                  <div class="pill-group" role="group" aria-label="Backend requirements">
+                    <button type="button" class="pill-option backend-option" data-backend="no" aria-pressed="false">No</button>
+                    <button type="button" class="pill-option backend-option" data-backend="yes" aria-pressed="false">Yes</button>
                   </div>
-                  <p class="text-xs text-slate-500">APIs, auth, dashboards, automations.</p>
-                </label>
+                  <p class="form-note">APIs, auth, dashboards, automations.</p>
+                </div>
               </div>
-              <fieldset class="space-y-3">
-                <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Key Features</span>
-                <div class="grid sm:grid-cols-2 gap-3 text-sm">
-                  <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
-                    <input type="checkbox" id="feature-ecommerce" class="mt-1 accent-cyan-400" />
+              <div class="field-group">
+                <span class="field-eyebrow">Feature boosters</span>
+                <div class="checkbox-grid">
+                  <label class="checkbox-card" for="feature-ecommerce">
+                    <input type="checkbox" id="feature-ecommerce" />
                     <div>
-                      <p class="font-semibold text-slate-100">Payments / Storefront</p>
-                      <p class="text-xs text-slate-400">Shop, donations, booking flow.</p>
+                      <span>Payments &amp; commerce</span>
+                      <p>Subscriptions, checkout flows, or gated offers.</p>
                     </div>
                   </label>
-                  <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
-                    <input type="checkbox" id="feature-admin" class="mt-1 accent-purple-400" />
+                  <label class="checkbox-card" for="feature-admin">
+                    <input type="checkbox" id="feature-admin" />
                     <div>
-                      <p class="font-semibold text-slate-100">Admin / CMS</p>
-                      <p class="text-xs text-slate-400">Manageable content, data tools.</p>
+                      <span>Admin / CMS</span>
+                      <p>Manageable content, data tools, and insights.</p>
                     </div>
                   </label>
-                  <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
-                    <input type="checkbox" id="feature-support" class="mt-1 accent-emerald-400" />
+                  <label class="checkbox-card" for="feature-support">
+                    <input type="checkbox" id="feature-support" />
                     <div>
-                      <p class="font-semibold text-slate-100">Live Support</p>
-                      <p class="text-xs text-slate-400">Chat, support desk, knowledge base.</p>
+                      <span>Live support suite</span>
+                      <p>Chat, help centers, and customer success flows.</p>
                     </div>
                   </label>
-                  <label class="glass-surface rounded-2xl p-4 flex items-start gap-3 cursor-pointer transition hover:border-cyan-400/50 border border-transparent">
-                    <input type="checkbox" id="feature-automation" class="mt-1 accent-amber-300" />
+                  <label class="checkbox-card" for="feature-automation">
+                    <input type="checkbox" id="feature-automation" />
                     <div>
-                      <p class="font-semibold text-slate-100">Automation</p>
-                      <p class="text-xs text-slate-400">Workflows, CRM, analytics boosts.</p>
+                      <span>Automation &amp; CRM</span>
+                      <p>Lifecycle journeys, CRM sync, and analytics boosts.</p>
                     </div>
                   </label>
                 </div>
-              </fieldset>
+              </div>
             </div>
 
-            <div data-step-panel="2" class="space-y-6">
-              <div class="space-y-3">
-                <span class="uppercase tracking-[0.3em] text-xs text-slate-400">Visual Direction</span>
-                <label class="glass-surface rounded-2xl p-4 flex items-center justify-between gap-4 text-sm border border-transparent hover:border-cyan-400/50 transition">
-                  <div>
-                    <p class="font-semibold text-slate-100">Design tone</p>
-                    <p class="text-xs text-slate-400">Helps align art direction and typography.</p>
-                  </div>
-                  <select id="design-tone" class="glass-surface rounded-xl px-3 py-2 focus-ring">
+            <div class="step-panel" data-step-panel="2">
+              <div class="dual-field-grid">
+                <label class="field-group">
+                  <span class="field-eyebrow">Design tone</span>
+                  <select id="design-tone" class="select-field">
                     <option value="sleek">Sleek &amp; minimal</option>
                     <option value="vibrant">Vibrant &amp; playful</option>
                     <option value="editorial">Editorial &amp; premium</option>
                     <option value="experimental">Experimental &amp; bold</option>
                   </select>
+                  <p class="form-note">Helps align art direction and typography.</p>
                 </label>
-                <label class="glass-surface rounded-2xl p-4 flex items-center justify-between gap-4 text-sm border border-transparent hover:border-cyan-400/50 transition">
-                  <div>
-                    <p class="font-semibold text-slate-100">Interaction level</p>
-                    <p class="text-xs text-slate-400">Choose how much motion &amp; polish you want.</p>
-                  </div>
-                  <select id="interaction-level" class="glass-surface rounded-xl px-3 py-2 focus-ring">
+                <label class="field-group">
+                  <span class="field-eyebrow">Interaction level</span>
+                  <select id="interaction-level" class="select-field">
                     <option value="balanced">Balanced</option>
                     <option value="minimal">Minimal motion</option>
                     <option value="immersive">High-immersion</option>
                   </select>
+                  <p class="form-note">Choose how much motion &amp; polish you want.</p>
                 </label>
               </div>
-              <div class="space-y-4">
-                <span class="uppercase tracking-[0.3em] text-xs text-slate-400 block">Brand &amp; Assets</span>
-                <label class="glass-surface rounded-2xl p-4 flex items-center justify-between text-sm cursor-pointer border border-transparent hover:border-cyan-400/50 transition">
-                  <div>
-                    <p class="font-semibold text-slate-100">Logo ready to use?</p>
-                    <p class="text-xs text-slate-400">If not, we include a rapid brand refresh (+$180).</p>
-                  </div>
-                  <select id="logo-status" class="glass-surface rounded-xl px-3 py-2 focus-ring">
+              <div class="dual-field-grid">
+                <label class="field-group">
+                  <span class="field-eyebrow">Logo ready to use?</span>
+                  <select id="logo-status" class="select-field">
                     <option value="yes">Yes, ready</option>
                     <option value="no">Need help</option>
                   </select>
+                  <p class="form-note">We can include a rapid refresh if you need one.</p>
                 </label>
-                <label class="glass-surface rounded-2xl p-4 flex items-center justify-between text-sm cursor-pointer border border-transparent hover:border-cyan-400/50 transition">
-                  <div>
-                    <p class="font-semibold text-slate-100">Do you already own a URL?</p>
-                    <p class="text-xs text-slate-400">If not, we secure domains + hosting setup.</p>
-                  </div>
-                  <select id="url-status" class="glass-surface rounded-xl px-3 py-2 focus-ring">
+                <label class="field-group">
+                  <span class="field-eyebrow">Do you already own a URL?</span>
+                  <select id="url-status" class="select-field">
                     <option value="live">I have one</option>
                     <option value="buy">Need to purchase</option>
                   </select>
-                </label>
-                <label class="glass-surface rounded-2xl p-4 flex flex-col gap-3 text-sm border border-transparent hover:border-cyan-400/50 transition">
-                  <p class="font-semibold text-slate-100">Link to current site or inspiration (optional)</p>
-                  <input type="url" id="project-url" placeholder="https://" class="glass-surface rounded-xl px-3 py-2 focus-ring placeholder:text-slate-500" />
+                  <p class="form-note">We’ll secure domains and hosting if you don’t.</p>
                 </label>
               </div>
+              <label class="field-group">
+                <span class="field-eyebrow">Link to current site or inspiration (optional)</span>
+                <input type="url" id="project-url" class="input-field" placeholder="https://" />
+              </label>
             </div>
 
-            <div data-step-panel="3" class="space-y-6">
-              <div class="grid md:grid-cols-2 gap-6">
-                <label class="space-y-2 text-sm">
-                  <span class="uppercase tracking-[0.3em] text-slate-400">Your Name</span>
-                  <input type="text" id="name" name="name" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="Jordan Founder" />
+            <div class="step-panel" data-step-panel="3">
+              <div class="dual-field-grid">
+                <label class="field-group">
+                  <span class="field-eyebrow">Your name</span>
+                  <input type="text" id="name" name="name" class="input-field" placeholder="Jordan Founder" required />
                 </label>
-                <label class="space-y-2 text-sm">
-                  <span class="uppercase tracking-[0.3em] text-slate-400">Email</span>
-                  <input type="email" id="email" name="email" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="you@brand.com" />
+                <label class="field-group">
+                  <span class="field-eyebrow">Email</span>
+                  <input type="email" id="email" name="email" class="input-field" placeholder="you@brand.com" required />
                 </label>
-                <label class="space-y-2 text-sm">
-                  <span class="uppercase tracking-[0.3em] text-slate-400">Phone</span>
-                  <input type="tel" id="phone" name="phone" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="(555) 123-4567" />
+                <label class="field-group">
+                  <span class="field-eyebrow">Phone</span>
+                  <input type="tel" id="phone" name="phone" class="input-field" placeholder="(555) 123-4567" required />
                 </label>
-                <label class="space-y-2 text-sm">
-                  <span class="uppercase tracking-[0.3em] text-slate-400">Company / Brand</span>
-                  <input type="text" id="project-name" name="project-name" required class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="NovaLabs" />
+                <label class="field-group">
+                  <span class="field-eyebrow">Company / Brand</span>
+                  <input type="text" id="project-name" name="project-name" class="input-field" placeholder="NovaLabs" required />
                 </label>
               </div>
-              <label class="space-y-2 text-sm block">
-                <span class="uppercase tracking-[0.3em] text-slate-400">Timeline</span>
-                <select id="timeline" class="glass-surface rounded-2xl px-4 py-3 focus-ring">
+              <label class="field-group">
+                <span class="field-eyebrow">Timeline</span>
+                <select id="timeline" class="select-field">
                   <option value="standard">Standard (6–8 weeks)</option>
                   <option value="accelerated">Accelerated (4–6 weeks)</option>
                   <option value="rapid">Rapid sprint (2–4 weeks)</option>
                 </select>
               </label>
-              <label class="space-y-2 text-sm block">
-                <span class="uppercase tracking-[0.3em] text-slate-400">Project goals &amp; comments</span>
-                <textarea id="project-description" rows="4" class="focus-ring w-full px-4 py-3 rounded-2xl glass-surface placeholder:text-slate-500" placeholder="Share the story, KPI, or inspiration we should know about..."></textarea>
+              <label class="field-group">
+                <span class="field-eyebrow">Project goals &amp; comments</span>
+                <textarea id="project-description" class="textarea-field" rows="4" placeholder="Share the story, KPI, or inspiration we should know about..."></textarea>
               </label>
             </div>
 
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4">
-              <button type="button" id="prev-step" class="btn-ghost focus-ring">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                Previous
+            <div class="quote-footer">
+              <button type="button" id="prev-step" class="button-ghost is-disabled">
+                <i data-lucide="arrow-left"></i>
+                <span>Previous</span>
               </button>
-              <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <button type="button" id="next-step" class="btn-primary focus-ring justify-center">
-                  Next step
-                  <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              <div class="quote-footer-actions">
+                <button type="button" id="next-step" class="button-primary">
+                  <span>Next step</span>
+                  <i data-lucide="arrow-right"></i>
                 </button>
-                <button type="submit" id="submit-button" class="btn-primary focus-ring justify-center hidden">
-                  Submit quote
-                  <i data-lucide="send" class="w-4 h-4"></i>
+                <button type="submit" id="submit-button" class="button-primary hidden">
+                  <span>Submit quote</span>
+                  <i data-lucide="send"></i>
                 </button>
               </div>
             </div>
           </div>
 
-          <aside class="estimate-summary glass-surface rounded-3xl p-6 space-y-6 text-sm text-slate-300/85">
-            <div>
-              <p class="uppercase tracking-[0.3em] text-xs text-cyan-200/70">Live estimate</p>
-              <h3 class="text-3xl font-semibold text-slate-50 mt-3" id="estimate-total">$0</h3>
-              <p class="text-xs text-slate-400">Totals update as you adjust the scope.</p>
-            </div>
-            <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1" id="estimate-breakdown"></div>
-            <div class="glass-card rounded-2xl p-4 space-y-3">
-              <div class="flex items-center gap-3">
-                <span class="w-10 h-10 rounded-xl bg-cyan-400/20 flex items-center justify-center">
-                  <i data-lucide="sparkles" class="w-5 h-5 text-cyan-200"></i>
-                </span>
-                <div>
-                  <p class="font-semibold text-slate-100">Need something extra?</p>
-                  <p class="text-xs text-slate-400">Add notes in Step 3—we’ll include it in the follow-up scope.</p>
-                </div>
-              </div>
+          <aside class="estimate-summary">
+            <header>
+              <span>Live estimate</span>
+              <h3 id="estimate-total">$0</h3>
+              <p>Totals update as you adjust the scope.</p>
+            </header>
+            <div class="estimate-breakdown" id="estimate-breakdown"></div>
+            <div class="estimate-note">
+              <span class="note-icon"><i data-lucide="sparkles"></i></span>
+              <div class="form-note">Need something extra? Add notes in Step 3—we’ll include it in the follow-up scope.</div>
             </div>
           </aside>
         </div>
@@ -872,27 +1712,19 @@
     </div>
   </div>
 
-  <div id="success-toast" class="fixed bottom-8 right-6 max-w-sm glass-card rounded-2xl p-5 shadow-2xl border border-emerald-400/40 text-emerald-200 hidden">
-    <div class="flex items-start gap-3">
-      <span class="w-10 h-10 rounded-xl bg-emerald-400/20 flex items-center justify-center">
-        <i data-lucide="check" class="w-5 h-5"></i>
-      </span>
-      <div>
-        <p class="font-semibold text-slate-50">Quote captured!</p>
-        <p class="text-sm text-emerald-100/90">We just synced your request to our admin dashboard. Expect a personal reply shortly.</p>
-      </div>
+  <div id="success-toast" class="toast success hidden" role="status" aria-live="polite">
+    <div class="toast-icon"><i data-lucide="check"></i></div>
+    <div>
+      <strong>Quote captured!</strong>
+      <p>We just synced your request to our admin dashboard. Expect a personal reply shortly.</p>
     </div>
   </div>
 
-  <div id="error-toast" class="fixed bottom-8 right-6 max-w-sm glass-card rounded-2xl p-5 shadow-2xl border border-red-400/40 text-red-200 hidden">
-    <div class="flex items-start gap-3">
-      <span class="w-10 h-10 rounded-xl bg-red-400/20 flex items-center justify-center">
-        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
-      </span>
-      <div>
-        <p class="font-semibold text-slate-50">Something went wrong</p>
-        <p class="text-sm text-red-100/90">Please try again or email hello@settonsource.com so we can assist manually.</p>
-      </div>
+  <div id="error-toast" class="toast error hidden" role="status" aria-live="assertive">
+    <div class="toast-icon"><i data-lucide="alert-triangle"></i></div>
+    <div>
+      <strong>Something went wrong</strong>
+      <p>Please try again or email hello@settonsource.com so we can assist manually.</p>
     </div>
   </div>
 
@@ -900,9 +1732,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- Firebase Setup ---
-    // NOTE: In a real environment, __firebase_config and related variables are provided by the canvas environment.
-    // For standalone testing, this mock config is used.
     const firebaseConfig = {
       apiKey: "AIzaSyCcUMZmKwdOcUj4KszvTkPKlo-HmiVCXZU",
       authDomain: "setton-source-68177.firebaseapp.com",
@@ -916,7 +1745,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- Pricing Logic ---
     const pricingMatrix = {
       landing: { label: "Launch Page", base: 850, includedPages: 1, perPage: 150 },
       marketing: { label: "Marketing Site", base: 1600, includedPages: 3, perPage: 200 },
@@ -940,8 +1768,6 @@
     const logoRefreshCost = 50;
     const domainSetupCost = 50;
 
-
-    // --- DOM Elements ---
     const projectTypeButtons = Array.from(document.querySelectorAll('.project-type-option'));
     const backendButtons = Array.from(document.querySelectorAll('.backend-option'));
     const pagesRange = document.getElementById('pages');
@@ -966,7 +1792,6 @@
     let backendRequirement = 'no';
     let currentStep = 1;
 
-    // --- Utility Functions ---
     const formatCurrency = (value) => new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -976,13 +1801,11 @@
     function highlightSelection(collection, activeButton) {
       collection.forEach((button) => {
         const isActive = button === activeButton;
-        button.classList.toggle('border-cyan-400/80', isActive);
-        button.classList.toggle('bg-cyan-400/10', isActive);
-        button.classList.toggle('shadow-[0_0_25px_rgba(71,232,255,0.35)]', isActive);
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
       });
     }
 
-    // --- Event Listeners for Quote Calculation ---
     projectTypeButtons.forEach((button) => {
       button.addEventListener('click', () => {
         selectedProjectType = button.dataset.projectType;
@@ -1008,7 +1831,6 @@
       input.addEventListener('change', updateEstimate);
     });
 
-    // --- Main Estimate Logic ---
     function updateEstimate() {
       const matrix = pricingMatrix[selectedProjectType];
       const pages = Number(pagesRange.value);
@@ -1039,19 +1861,16 @@
         }
       });
 
-      // Logo Refresh Cost
       if (logoStatus === 'no') {
         total += logoRefreshCost;
         breakdownItems.push({ label: 'Rapid brand refresh', cost: logoRefreshCost });
       }
 
-      // Domain Setup Cost
       if (urlStatus === 'buy') {
         total += domainSetupCost;
         breakdownItems.push({ label: 'Domain & hosting setup', cost: domainSetupCost });
       }
 
-      // Timeline Multiplier
       const timelineDetails = timelinePricing[timeline];
       if (timelineDetails.multiplier > 1) {
         const preTimelineTotal = total;
@@ -1066,20 +1885,35 @@
 
     function renderBreakdown(items) {
       estimateBreakdown.innerHTML = '';
+      if (!items.length) {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.className = 'form-note';
+        emptyMessage.textContent = 'Adjust inputs to see a detailed breakdown.';
+        estimateBreakdown.appendChild(emptyMessage);
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
       items.forEach((item) => {
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between px-4 py-3 rounded-2xl glass-surface text-sm text-slate-200';
-        row.innerHTML = `<span>${item.label}</span><span class="font-semibold text-cyan-300">${formatCurrency(item.cost)}</span>`;
-        estimateBreakdown.appendChild(row);
+        row.className = 'estimate-row';
+        row.innerHTML = `<span>${item.label}</span><span>${formatCurrency(item.cost)}</span>`;
+        fragment.appendChild(row);
       });
+      estimateBreakdown.appendChild(fragment);
     }
 
-    // --- Modal/Toast UI Functions ---
     function toggleToast(toastElement, show) {
-      toastElement.classList.toggle('hidden', !show);
-      toastElement.classList.toggle('opacity-0', !show);
+      if (!toastElement) return;
       if (show) {
+        toastElement.classList.remove('hidden');
+        requestAnimationFrame(() => toastElement.classList.add('show'));
         setTimeout(() => toggleToast(toastElement, false), 5200);
+      } else {
+        toastElement.classList.remove('show');
+        setTimeout(() => {
+          toastElement.classList.add('hidden');
+        }, 220);
       }
     }
 
@@ -1093,14 +1927,13 @@
         dot.classList.toggle('active', index <= currentStep - 1);
       });
       stepLabels.forEach((label, index) => {
-        label.classList.toggle('text-cyan-200', index === currentStep - 1);
-        label.classList.toggle('text-slate-400', index !== currentStep - 1);
+        label.classList.toggle('active', index === currentStep - 1);
       });
 
       const atStart = currentStep === 1;
-      const atEnd = currentStep === stepPanels.length;
+      const atEnd = currentStep === totalSteps;
       prevStepButton.disabled = atStart;
-      prevStepButton.classList.toggle('opacity-40', atStart);
+      prevStepButton.classList.toggle('is-disabled', atStart);
       nextStepButton.classList.toggle('hidden', atEnd);
       submitButton.classList.toggle('hidden', !atEnd);
     }
@@ -1115,8 +1948,8 @@
       highlightSelection(backendButtons, defaultBackendButton);
       pagesRange.value = '3';
       pagesOutput.textContent = '3 pages';
-      updateEstimate();
       showStep(1);
+      updateEstimate();
     }
 
     function openModal() {
@@ -1138,7 +1971,6 @@
       }, 220);
     }
 
-    // --- Modal Event Handlers ---
     openQuoteButtons.forEach((button) => {
       button.addEventListener('click', openModal);
     });
@@ -1170,11 +2002,10 @@
       }
     });
 
-    // --- Form Submission (Firestore) ---
     async function handleSubmit(event) {
       event.preventDefault();
       submitButton.disabled = true;
-      submitButton.classList.add('opacity-60');
+      submitButton.classList.add('is-disabled');
 
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
@@ -1220,7 +2051,6 @@
       };
 
       try {
-        // Use a generic 'quotes' collection for this example
         await addDoc(collection(db, 'quotes'), data);
         toggleToast(errorToast, false);
         toggleToast(successToast, true);
@@ -1232,7 +2062,7 @@
         toggleToast(errorToast, true);
       } finally {
         submitButton.disabled = false;
-        submitButton.classList.remove('opacity-60');
+        submitButton.classList.remove('is-disabled');
       }
     }
 
@@ -1240,41 +2070,31 @@
 
     resetFormState();
 
-    if (typeof lucide !== 'undefined') {
-      lucide.createIcons();
+    if (window.lucide) {
+      window.lucide.createIcons();
     }
 
-    // --- Secret Admin Code Logic ---
     const adminCode = 'admin';
     let typedKeys = '';
     const adminUrl = '/admin';
 
     document.addEventListener('keydown', (event) => {
-        // Get the key, forcing lowercase for case-insensitivity
-        const key = event.key.toLowerCase();
+      const key = event.key.toLowerCase();
+      if (key.length === 1 && key >= 'a' && key <= 'z') {
+        typedKeys += key;
+      } else {
+        typedKeys = '';
+      }
 
-        // Check if the key is a single letter (a-z)
-        if (key.length === 1 && key >= 'a' && key <= 'z') {
-            typedKeys += key;
-        } else {
-            // Reset sequence if a non-letter key (like Space, Enter, Shift, etc.) is pressed
-            typedKeys = '';
-        }
+      if (typedKeys.length > adminCode.length) {
+        typedKeys = typedKeys.substring(typedKeys.length - adminCode.length);
+      }
 
-        // Keep only the last 5 characters to check against 'admin'
-        if (typedKeys.length > adminCode.length) {
-            typedKeys = typedKeys.substring(typedKeys.length - adminCode.length);
-        }
-
-        if (typedKeys === adminCode) {
-            console.log(`Admin code '${adminCode}' entered. Redirecting to ${adminUrl}`);
-            // Redirect to /admin
-            window.location.href = adminUrl;
-            // Reset the key sequence after success
-            typedKeys = '';
-        }
+      if (typedKeys === adminCode) {
+        window.location.href = adminUrl;
+        typedKeys = '';
+      }
     });
-
   </script>
 </body>
 </html>
