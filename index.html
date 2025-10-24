@@ -528,7 +528,8 @@
       padding: clamp(28px, 4vw, 48px);
       transform: translateY(24px);
       transition: transform 0.3s ease;
-      max-height: calc(100vh - 80px);
+      height: min(860px, calc(100vh - 64px));
+      max-height: calc(100vh - 48px);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -668,22 +669,34 @@
       grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.8fr);
       gap: 32px;
       align-items: flex-start;
+      flex: 1;
+      min-height: 0;
     }
 
     .modal-content {
       display: flex;
       flex-direction: column;
-      gap: 28px;
-      overflow-y: auto;
-      max-height: calc(70vh - 80px);
-      padding-right: 6px;
+      gap: 24px;
+      min-height: 0;
     }
 
-    .modal-content::-webkit-scrollbar {
+    .step-panels {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 6px;
+      padding-bottom: 24px;
+      scroll-behavior: smooth;
+    }
+
+    .step-panels::-webkit-scrollbar {
       width: 6px;
     }
 
-    .modal-content::-webkit-scrollbar-thumb {
+    .step-panels::-webkit-scrollbar-thumb {
       background: rgba(86, 244, 255, 0.2);
       border-radius: 4px;
     }
@@ -900,7 +913,15 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      padding-top: 12px;
+      margin-top: auto;
+      padding: 18px;
+      padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(180deg, rgba(16, 19, 35, 0.24) 0%, rgba(16, 19, 35, 0.78) 45%, rgba(16, 19, 35, 0.92) 100%);
+      box-shadow: 0 -18px 38px rgba(5, 10, 35, 0.45);
+      backdrop-filter: blur(22px);
+      flex-shrink: 0;
     }
 
     .quote-footer-actions {
@@ -1111,16 +1132,46 @@
     @media (max-width: 1100px) {
       .modal-grid {
         grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) auto;
+        gap: 24px;
       }
 
-      .modal-content {
-        max-height: none;
+      .estimate-summary {
+        max-height: 280px;
+        overflow-y: auto;
+      }
+
+      .estimate-summary::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .estimate-summary::-webkit-scrollbar-thumb {
+        background: rgba(161, 100, 255, 0.24);
+        border-radius: 4px;
       }
     }
 
     @media (max-width: 720px) {
+      .modal {
+        padding: calc(16px + env(safe-area-inset-top, 0px)) 14px 0;
+        align-items: flex-end;
+      }
+
       .modal-panel {
-        padding: 28px 20px;
+        padding: 28px 20px 24px;
+        width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 28px 28px 0 0;
+        gap: 28px;
+      }
+
+      .modal-grid {
+        gap: 20px;
+      }
+
+      .step-panels {
+        padding-right: 0;
       }
 
       .stepper {
@@ -1142,6 +1193,13 @@
         right: 16px;
         left: 16px;
         width: auto;
+      }
+
+      .quote-footer {
+        padding: 16px;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        border-radius: 20px;
+        box-shadow: 0 -12px 28px rgba(5, 10, 35, 0.4);
       }
     }
 
@@ -1518,163 +1576,165 @@
       <form id="quote-form" novalidate>
         <div class="modal-grid">
           <div class="modal-content">
-            <div class="step-panel active" data-step-panel="1">
-              <div class="field-group">
-                <span class="field-eyebrow">Project type</span>
-                <div class="option-grid">
-                  <button type="button" class="quote-option project-type-option" data-project-type="landing" aria-pressed="false">
-                    <span class="option-icon"><i data-lucide="sparkles"></i></span>
-                    <h3>Launch Page</h3>
-                    <p>Single page or microsite momentum.</p>
-                  </button>
-                  <button type="button" class="quote-option project-type-option" data-project-type="marketing" aria-pressed="false">
-                    <span class="option-icon"><i data-lucide="layers"></i></span>
-                    <h3>Marketing Site</h3>
-                    <p>Multi-page presence &amp; storytelling.</p>
-                  </button>
-                  <button type="button" class="quote-option project-type-option" data-project-type="ecommerce" aria-pressed="false">
-                    <span class="option-icon"><i data-lucide="shopping-bag"></i></span>
-                    <h3>E-commerce</h3>
-                    <p>Storefronts, subscriptions, funnels.</p>
-                  </button>
-                  <button type="button" class="quote-option project-type-option" data-project-type="webapp" aria-pressed="false">
-                    <span class="option-icon"><i data-lucide="blocks"></i></span>
-                    <h3>Web App / Portal</h3>
-                    <p>Dashboards, portals, internal tools.</p>
-                  </button>
-                </div>
-              </div>
-              <div class="dual-field-grid">
-                <label class="range-field">
-                  <span class="field-eyebrow">Core pages</span>
-                  <input type="range" id="pages" min="1" max="12" step="1" value="3" aria-describedby="pages-output">
-                  <div class="range-output">
-                    <span>1</span>
-                    <span id="pages-output">3 pages</span>
-                    <span>12</span>
-                  </div>
-                </label>
+            <div class="step-panels">
+              <div class="step-panel active" data-step-panel="1">
                 <div class="field-group">
-                  <span class="field-eyebrow">Backend &amp; integrations</span>
-                  <div class="pill-group" role="group" aria-label="Backend requirements">
-                    <button type="button" class="pill-option backend-option" data-backend="no" aria-pressed="false">No</button>
-                    <button type="button" class="pill-option backend-option" data-backend="yes" aria-pressed="false">Yes</button>
+                  <span class="field-eyebrow">Project type</span>
+                  <div class="option-grid">
+                    <button type="button" class="quote-option project-type-option" data-project-type="landing" aria-pressed="false">
+                      <span class="option-icon"><i data-lucide="sparkles"></i></span>
+                      <h3>Launch Page</h3>
+                      <p>Single page or microsite momentum.</p>
+                    </button>
+                    <button type="button" class="quote-option project-type-option" data-project-type="marketing" aria-pressed="false">
+                      <span class="option-icon"><i data-lucide="layers"></i></span>
+                      <h3>Marketing Site</h3>
+                      <p>Multi-page presence &amp; storytelling.</p>
+                    </button>
+                    <button type="button" class="quote-option project-type-option" data-project-type="ecommerce" aria-pressed="false">
+                      <span class="option-icon"><i data-lucide="shopping-bag"></i></span>
+                      <h3>E-commerce</h3>
+                      <p>Storefronts, subscriptions, funnels.</p>
+                    </button>
+                    <button type="button" class="quote-option project-type-option" data-project-type="webapp" aria-pressed="false">
+                      <span class="option-icon"><i data-lucide="blocks"></i></span>
+                      <h3>Web App / Portal</h3>
+                      <p>Dashboards, portals, internal tools.</p>
+                    </button>
                   </div>
-                  <p class="form-note">APIs, auth, dashboards, automations.</p>
+                </div>
+                <div class="dual-field-grid">
+                  <label class="range-field">
+                    <span class="field-eyebrow">Core pages</span>
+                    <input type="range" id="pages" min="1" max="12" step="1" value="3" aria-describedby="pages-output">
+                    <div class="range-output">
+                      <span>1</span>
+                      <span id="pages-output">3 pages</span>
+                      <span>12</span>
+                    </div>
+                  </label>
+                  <div class="field-group">
+                    <span class="field-eyebrow">Backend &amp; integrations</span>
+                    <div class="pill-group" role="group" aria-label="Backend requirements">
+                      <button type="button" class="pill-option backend-option" data-backend="no" aria-pressed="false">No</button>
+                      <button type="button" class="pill-option backend-option" data-backend="yes" aria-pressed="false">Yes</button>
+                    </div>
+                    <p class="form-note">APIs, auth, dashboards, automations.</p>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <span class="field-eyebrow">Feature boosters</span>
+                  <div class="checkbox-grid">
+                    <label class="checkbox-card" for="feature-ecommerce">
+                      <input type="checkbox" id="feature-ecommerce" />
+                      <div>
+                        <span>Payments &amp; commerce</span>
+                        <p>Subscriptions, checkout flows, or gated offers.</p>
+                      </div>
+                    </label>
+                    <label class="checkbox-card" for="feature-admin">
+                      <input type="checkbox" id="feature-admin" />
+                      <div>
+                        <span>Admin / CMS</span>
+                        <p>Manageable content, data tools, and insights.</p>
+                      </div>
+                    </label>
+                    <label class="checkbox-card" for="feature-support">
+                      <input type="checkbox" id="feature-support" />
+                      <div>
+                        <span>Live support suite</span>
+                        <p>Chat, help centers, and customer success flows.</p>
+                      </div>
+                    </label>
+                    <label class="checkbox-card" for="feature-automation">
+                      <input type="checkbox" id="feature-automation" />
+                      <div>
+                        <span>Automation &amp; CRM</span>
+                        <p>Lifecycle journeys, CRM sync, and analytics boosts.</p>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               </div>
-              <div class="field-group">
-                <span class="field-eyebrow">Feature boosters</span>
-                <div class="checkbox-grid">
-                  <label class="checkbox-card" for="feature-ecommerce">
-                    <input type="checkbox" id="feature-ecommerce" />
-                    <div>
-                      <span>Payments &amp; commerce</span>
-                      <p>Subscriptions, checkout flows, or gated offers.</p>
-                    </div>
+
+              <div class="step-panel" data-step-panel="2">
+                <div class="dual-field-grid">
+                  <label class="field-group">
+                    <span class="field-eyebrow">Design tone</span>
+                    <select id="design-tone" class="select-field">
+                      <option value="sleek">Sleek &amp; minimal</option>
+                      <option value="vibrant">Vibrant &amp; playful</option>
+                      <option value="editorial">Editorial &amp; premium</option>
+                      <option value="experimental">Experimental &amp; bold</option>
+                    </select>
+                    <p class="form-note">Helps align art direction and typography.</p>
                   </label>
-                  <label class="checkbox-card" for="feature-admin">
-                    <input type="checkbox" id="feature-admin" />
-                    <div>
-                      <span>Admin / CMS</span>
-                      <p>Manageable content, data tools, and insights.</p>
-                    </div>
-                  </label>
-                  <label class="checkbox-card" for="feature-support">
-                    <input type="checkbox" id="feature-support" />
-                    <div>
-                      <span>Live support suite</span>
-                      <p>Chat, help centers, and customer success flows.</p>
-                    </div>
-                  </label>
-                  <label class="checkbox-card" for="feature-automation">
-                    <input type="checkbox" id="feature-automation" />
-                    <div>
-                      <span>Automation &amp; CRM</span>
-                      <p>Lifecycle journeys, CRM sync, and analytics boosts.</p>
-                    </div>
+                  <label class="field-group">
+                    <span class="field-eyebrow">Interaction level</span>
+                    <select id="interaction-level" class="select-field">
+                      <option value="balanced">Balanced</option>
+                      <option value="minimal">Minimal motion</option>
+                      <option value="immersive">High-immersion</option>
+                    </select>
+                    <p class="form-note">Choose how much motion &amp; polish you want.</p>
                   </label>
                 </div>
+                <div class="dual-field-grid">
+                  <label class="field-group">
+                    <span class="field-eyebrow">Logo ready to use?</span>
+                    <select id="logo-status" class="select-field">
+                      <option value="yes">Yes, ready</option>
+                      <option value="no">Need help</option>
+                    </select>
+                    <p class="form-note">We can include a rapid refresh if you need one.</p>
+                  </label>
+                  <label class="field-group">
+                    <span class="field-eyebrow">Do you already own a URL?</span>
+                    <select id="url-status" class="select-field">
+                      <option value="live">I have one</option>
+                      <option value="buy">Need to purchase</option>
+                    </select>
+                    <p class="form-note">We’ll secure domains and hosting if you don’t.</p>
+                  </label>
+                </div>
+                <label class="field-group">
+                  <span class="field-eyebrow">Link to current site or inspiration (optional)</span>
+                  <input type="url" id="project-url" class="input-field" placeholder="https://" />
+                </label>
               </div>
-            </div>
 
-            <div class="step-panel" data-step-panel="2">
-              <div class="dual-field-grid">
+              <div class="step-panel" data-step-panel="3">
+                <div class="dual-field-grid">
+                  <label class="field-group">
+                    <span class="field-eyebrow">Your name</span>
+                    <input type="text" id="name" name="name" class="input-field" placeholder="Jordan Founder" required />
+                  </label>
+                  <label class="field-group">
+                    <span class="field-eyebrow">Email</span>
+                    <input type="email" id="email" name="email" class="input-field" placeholder="you@brand.com" required />
+                  </label>
+                  <label class="field-group">
+                    <span class="field-eyebrow">Phone</span>
+                    <input type="tel" id="phone" name="phone" class="input-field" placeholder="(555) 123-4567" required />
+                  </label>
+                  <label class="field-group">
+                    <span class="field-eyebrow">Company / Brand</span>
+                    <input type="text" id="project-name" name="project-name" class="input-field" placeholder="NovaLabs" required />
+                  </label>
+                </div>
                 <label class="field-group">
-                  <span class="field-eyebrow">Design tone</span>
-                  <select id="design-tone" class="select-field">
-                    <option value="sleek">Sleek &amp; minimal</option>
-                    <option value="vibrant">Vibrant &amp; playful</option>
-                    <option value="editorial">Editorial &amp; premium</option>
-                    <option value="experimental">Experimental &amp; bold</option>
+                  <span class="field-eyebrow">Timeline</span>
+                  <select id="timeline" class="select-field">
+                    <option value="standard">Standard (6–8 weeks)</option>
+                    <option value="accelerated">Accelerated (4–6 weeks)</option>
+                    <option value="rapid">Rapid sprint (2–4 weeks)</option>
                   </select>
-                  <p class="form-note">Helps align art direction and typography.</p>
                 </label>
                 <label class="field-group">
-                  <span class="field-eyebrow">Interaction level</span>
-                  <select id="interaction-level" class="select-field">
-                    <option value="balanced">Balanced</option>
-                    <option value="minimal">Minimal motion</option>
-                    <option value="immersive">High-immersion</option>
-                  </select>
-                  <p class="form-note">Choose how much motion &amp; polish you want.</p>
+                  <span class="field-eyebrow">Project goals &amp; comments</span>
+                  <textarea id="project-description" class="textarea-field" rows="4" placeholder="Share the story, KPI, or inspiration we should know about..."></textarea>
                 </label>
               </div>
-              <div class="dual-field-grid">
-                <label class="field-group">
-                  <span class="field-eyebrow">Logo ready to use?</span>
-                  <select id="logo-status" class="select-field">
-                    <option value="yes">Yes, ready</option>
-                    <option value="no">Need help</option>
-                  </select>
-                  <p class="form-note">We can include a rapid refresh if you need one.</p>
-                </label>
-                <label class="field-group">
-                  <span class="field-eyebrow">Do you already own a URL?</span>
-                  <select id="url-status" class="select-field">
-                    <option value="live">I have one</option>
-                    <option value="buy">Need to purchase</option>
-                  </select>
-                  <p class="form-note">We’ll secure domains and hosting if you don’t.</p>
-                </label>
-              </div>
-              <label class="field-group">
-                <span class="field-eyebrow">Link to current site or inspiration (optional)</span>
-                <input type="url" id="project-url" class="input-field" placeholder="https://" />
-              </label>
-            </div>
-
-            <div class="step-panel" data-step-panel="3">
-              <div class="dual-field-grid">
-                <label class="field-group">
-                  <span class="field-eyebrow">Your name</span>
-                  <input type="text" id="name" name="name" class="input-field" placeholder="Jordan Founder" required />
-                </label>
-                <label class="field-group">
-                  <span class="field-eyebrow">Email</span>
-                  <input type="email" id="email" name="email" class="input-field" placeholder="you@brand.com" required />
-                </label>
-                <label class="field-group">
-                  <span class="field-eyebrow">Phone</span>
-                  <input type="tel" id="phone" name="phone" class="input-field" placeholder="(555) 123-4567" required />
-                </label>
-                <label class="field-group">
-                  <span class="field-eyebrow">Company / Brand</span>
-                  <input type="text" id="project-name" name="project-name" class="input-field" placeholder="NovaLabs" required />
-                </label>
-              </div>
-              <label class="field-group">
-                <span class="field-eyebrow">Timeline</span>
-                <select id="timeline" class="select-field">
-                  <option value="standard">Standard (6–8 weeks)</option>
-                  <option value="accelerated">Accelerated (4–6 weeks)</option>
-                  <option value="rapid">Rapid sprint (2–4 weeks)</option>
-                </select>
-              </label>
-              <label class="field-group">
-                <span class="field-eyebrow">Project goals &amp; comments</span>
-                <textarea id="project-description" class="textarea-field" rows="4" placeholder="Share the story, KPI, or inspiration we should know about..."></textarea>
-              </label>
             </div>
 
             <div class="quote-footer">
@@ -1782,6 +1842,7 @@
     const quoteModal = document.getElementById('quote-modal');
     const closeModalButtons = Array.from(document.querySelectorAll('[data-close-modal]'));
     const stepPanels = Array.from(document.querySelectorAll('[data-step-panel]'));
+    const stepPanelsContainer = document.querySelector('.step-panels');
     const stepDots = Array.from(document.querySelectorAll('[data-step-dot]'));
     const stepLabels = Array.from(document.querySelectorAll('[data-step-label]'));
     const prevStepButton = document.getElementById('prev-step');
@@ -1930,6 +1991,10 @@
         label.classList.toggle('active', index === currentStep - 1);
       });
 
+      if (stepPanelsContainer) {
+        stepPanelsContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
       const atStart = currentStep === 1;
       const atEnd = currentStep === totalSteps;
       prevStepButton.disabled = atStart;
@@ -1958,6 +2023,9 @@
       requestAnimationFrame(() => quoteModal.classList.add('active'));
       body.classList.add('modal-open');
       quoteModal.setAttribute('aria-hidden', 'false');
+      if (stepPanelsContainer) {
+        stepPanelsContainer.scrollTop = 0;
+      }
     }
 
     function closeModal() {
