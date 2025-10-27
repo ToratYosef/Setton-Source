@@ -28,23 +28,9 @@
         }
         body {
             font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top right, rgba(0, 210, 255, 0.18), transparent 45%),
-                        radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.18), transparent 40%),
-                        var(--primary-color);
+            background-color: var(--primary-color);
             color: var(--text-color);
             scroll-behavior: smooth;
-            position: relative;
-            min-height: 100vh;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.08;
-            pointer-events: none;
-            z-index: -1;
         }
 
         /* Custom utility for smooth transitions */
@@ -52,133 +38,11 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        header {
-            background: linear-gradient(120deg, rgba(10, 15, 30, 0.45), rgba(12, 20, 38, 0.25));
-            backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
         /* Header backdrop effect */
         .header-scrolled {
-            background: linear-gradient(120deg, rgba(17, 25, 40, 0.85), rgba(32, 56, 80, 0.65));
-            backdrop-filter: blur(16px);
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .glass-panel {
-            background: linear-gradient(135deg, rgba(17, 25, 40, 0.75), rgba(11, 29, 48, 0.55));
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(18px);
-        }
-
-        .glass-card {
-            position: relative;
-            background: linear-gradient(135deg, rgba(17, 25, 40, 0.78), rgba(37, 99, 235, 0.08));
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(16px);
-            box-shadow: 0 25px 45px rgba(15, 23, 42, 0.55);
-        }
-
-        .glass-card::before {
-            content: "";
-            position: absolute;
-            top: -35%;
-            left: -25%;
-            width: 75%;
-            height: 75%;
-            background: radial-gradient(circle, rgba(0, 210, 255, 0.22), transparent 70%);
-            opacity: 0.65;
-            transition: transform 0.45s ease, opacity 0.45s ease;
-        }
-
-        .glass-card::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            border: 1px solid rgba(0, 210, 255, 0.12);
-            opacity: 0;
-            transition: opacity 0.35s ease;
-            pointer-events: none;
-        }
-
-        .glass-card:hover::after,
-        .glass-card:focus-visible::after {
-            opacity: 1;
-        }
-
-        .glass-card:hover::before,
-        .glass-card:focus-visible::before {
-            opacity: 0.85;
-            transform: translate(30px, 25px) scale(1.15);
-        }
-
-        .glass-button {
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(120deg, rgba(255, 255, 255, 0.85), rgba(0, 210, 255, 0.85));
-            color: var(--primary-color);
-            box-shadow: 0 20px 35px rgba(0, 210, 255, 0.35);
-        }
-
-        .glass-button::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(120deg, rgba(0, 210, 255, 0.3), rgba(255, 255, 255, 0));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .glass-button:hover::after,
-        .glass-button:focus-visible::after {
-            opacity: 1;
-        }
-
-        .hero-pill {
-            background: linear-gradient(120deg, rgba(255, 255, 255, 0.18), rgba(0, 210, 255, 0.2));
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(14px);
-            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.45);
-        }
-
-        .hero-metric {
-            background: linear-gradient(135deg, rgba(0, 210, 255, 0.16), rgba(59, 130, 246, 0.08));
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            border-radius: 1.25rem;
-            padding: 1.2rem;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
-            transition: transform 0.35s ease, box-shadow 0.35s ease;
-        }
-
-        .hero-metric:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 30px 60px rgba(0, 210, 255, 0.28);
-        }
-
-        .hero-gradient-ring {
-            position: absolute;
-            inset: auto;
-            width: 420px;
-            height: 420px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            background: radial-gradient(circle, rgba(0, 210, 255, 0.22), transparent 55%);
-            filter: blur(0.5px);
-            animation: float 12s ease-in-out infinite;
-            opacity: 0.65;
-            pointer-events: none;
-        }
-
-        .hero-gradient-ring:nth-of-type(1) { top: 6%; right: 12%; animation-delay: 0s; }
-        .hero-gradient-ring:nth-of-type(2) { bottom: 18%; left: 10%; animation-delay: 3s; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-18px) scale(1.05); }
+            background-color: rgba(26, 26, 46, 0.95); /* Slightly opaque dark navy */
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
         /* Hero text animation */
@@ -212,39 +76,11 @@
         }
 
         /* Quote Modal Styles: Digital Spawn Animation */
-
+        
         /* 1. Define the inner content box appearance transition */
         .modal-content-box {
             /* Aggressive cubic-bezier for a sharp pop-in effect */
-            transition: all 0.3s cubic-bezier(0.1, 0.9, 0.3, 1.2);
-            position: relative;
-            border-radius: 1.75rem;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(29, 78, 216, 0.18));
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 40px 80px rgba(6, 11, 30, 0.65);
-            overflow: hidden;
-        }
-
-        .modal-content-box::before {
-            content: "";
-            position: absolute;
-            inset: -120px -180px auto auto;
-            width: 320px;
-            height: 320px;
-            background: radial-gradient(circle, rgba(0, 210, 255, 0.35), transparent 60%);
-            opacity: 0.7;
-            filter: blur(4px);
-        }
-
-        .modal-content-box::after {
-            content: "";
-            position: absolute;
-            inset: auto auto -160px -120px;
-            width: 280px;
-            height: 280px;
-            background: radial-gradient(circle, rgba(236, 72, 153, 0.28), transparent 62%);
-            opacity: 0.8;
-            filter: blur(6px);
+            transition: all 0.3s cubic-bezier(0.1, 0.9, 0.3, 1.2); 
         }
 
         /* 2. Outer container controls backdrop fade and sets initial state for inner box */
@@ -284,83 +120,8 @@
             transition: all 0.2s ease-in;
         }
 
-        .modal-header {
-            background: linear-gradient(120deg, rgba(0, 210, 255, 0.2), rgba(17, 25, 40, 0));
-            border-radius: 1rem;
-            padding: 1rem 1.5rem;
-            margin: 0 -1.5rem 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        @media (min-width: 640px) {
-            .modal-header {
-                margin-left: -2.5rem;
-                margin-right: -2.5rem;
-                padding: 1.25rem 2.5rem;
-            }
-        }
-
-        .modal-highlight {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.9rem;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            font-size: 0.85rem;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            color: rgba(226, 232, 240, 0.88);
-        }
-
-        .modal-highlight svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, rgba(17, 25, 40, 0.75), rgba(37, 99, 235, 0.18)) !important;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(12px);
-            color: rgba(226, 232, 240, 0.85) !important;
-        }
-
-        #submission-status {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.75), rgba(0, 210, 255, 0.15));
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(14px);
-        }
-
-        .modal-content-box .input-text,
-        .modal-content-box textarea,
-        .modal-content-box select {
-            background: linear-gradient(135deg, rgba(17, 25, 40, 0.75), rgba(59, 130, 246, 0.1));
-            border-color: rgba(255, 255, 255, 0.12);
-            color: #f8fafc;
-        }
-
-        .modal-content-box .input-text::placeholder,
-        .modal-content-box textarea::placeholder {
-            color: rgba(226, 232, 240, 0.5);
-        }
-
 
         /* Custom radio button styling */
-        .custom-radio label {
-            background: linear-gradient(135deg, rgba(17, 25, 40, 0.7), rgba(37, 99, 235, 0.12));
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: rgba(241, 245, 249, 0.85);
-            backdrop-filter: blur(8px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .custom-radio label:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 18px 35px rgba(15, 23, 42, 0.35);
-        }
-
         .custom-radio input:checked + label {
             border-color: var(--accent-color);
             background-color: rgba(0, 210, 255, 0.1);
@@ -486,13 +247,12 @@
             /* Ensure the footer is sticky at the bottom of the form */
             position: sticky;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(17, 25, 40, 0.85), rgba(37, 99, 235, 0.15));
-            backdrop-filter: blur(14px);
+            background-color: var(--primary-color);
             z-index: 20; /* Keep buttons above scrolling content */
             margin-top: 0;
             padding-top: 1rem;
             padding-bottom: 0; /* Remove bottom padding here, keep it inside the button section */
-
+            
             /* Style adjustments for a clean sticky look */
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -531,8 +291,7 @@
                 border-radius: 0;
                 padding: 1rem; /* Uniform padding */
                 padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-                background: linear-gradient(135deg, rgba(8, 11, 25, 0.95), rgba(37, 99, 235, 0.2));
-                backdrop-filter: blur(18px);
+                background-color: var(--primary-color);
                 box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
                 border-top: 1px solid rgba(255, 255, 255, 0.15);
             }
@@ -542,82 +301,6 @@
                 display: none;
             }
 
-        }
-
-        @media (max-width: 1024px) {
-            header .container {
-                gap: 1rem;
-            }
-
-            #hero {
-                padding-top: 8rem;
-                padding-bottom: 6rem;
-            }
-
-            .hero-metric {
-                padding: 1rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            #hero {
-                min-height: auto;
-                padding-top: 7rem;
-                padding-bottom: 4rem;
-            }
-
-            #hero .glass-panel {
-                padding: 2.5rem 1.8rem;
-            }
-
-            #hero h1 {
-                font-size: clamp(2.8rem, 7vw, 3.8rem);
-            }
-
-            .hero-pill {
-                font-size: 0.9rem;
-                padding: 0.6rem 1rem;
-            }
-
-            .hero-metric {
-                transform: none !important;
-                box-shadow: 0 18px 38px rgba(15, 23, 42, 0.4);
-            }
-
-            .hero-gradient-ring {
-                display: none;
-            }
-
-            #work {
-                padding-left: 1.25rem;
-                padding-right: 1.25rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            header .container {
-                flex-direction: column;
-                justify-content: center;
-                text-align: center;
-            }
-
-            header nav {
-                margin-top: 0.75rem;
-            }
-
-            header button {
-                width: 100%;
-            }
-
-            .hero-metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            footer .container {
-                flex-direction: column;
-                text-align: center;
-                gap: 1rem;
-            }
         }
     </style>
 </head>
@@ -638,7 +321,7 @@
             <nav class="hidden md:flex space-x-8 font-medium">
                 <!-- REMOVED DEEP LINKS -->
             </nav>
-            <button id="open-quote-modal" class="py-2.5 px-6 glass-button text-sm md:text-base font-semibold rounded-full transition-default transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60">
+            <button id="open-quote-modal" class="py-2 px-6 bg-[var(--accent-color)] text-[var(--primary-color)] font-bold rounded-full shadow-lg hover:shadow-[0_0_15px_rgba(0,210,255,0.7)] transition-default transform hover:scale-105">
                 Get Instant Quote
             </button>
         </div>
@@ -651,95 +334,40 @@
             <div class="absolute inset-0 bg-gradient-to-br from-[var(--primary-color)] to-[#11111f] opacity-90"></div>
             <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-[var(--accent-color)] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
             <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-            <div class="hero-gradient-ring"></div>
-            <div class="hero-gradient-ring"></div>
 
-            <div class="z-10 text-center max-w-4xl space-y-8 glass-panel rounded-[2.5rem] px-8 sm:px-12 py-12 border border-white/10 mx-auto animated-hero">
-                <div class="flex flex-wrap justify-center gap-3 animated-hero">
-                    <span class="hero-pill inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white/90 uppercase tracking-[0.25em]">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i>
-                        Crafted for the future web
-                    </span>
-                    <span class="hero-pill inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white/90">
-                        <i data-lucide="smartphone" class="w-4 h-4"></i>
-                        Mobile-first perfection
-                    </span>
-                </div>
-
-                <p class="text-xl text-zinc-300/90 animated-hero">— Your Foundation for Digital Growth</p>
+            <div class="z-10 text-center max-w-4xl space-y-8">
+                <p class="text-xl text-zinc-400 animated-hero">— Your Foundation for Digital Growth</p>
                 <!-- Updated to SI-Web -->
-                <h1 class="text-5xl sm:text-7xl lg:text-9xl font-extrabold text-white leading-tight animated-hero">
+                <h1 class="6xl sm:text-7xl lg:text-9xl font-extrabold text-white leading-tight animated-hero">
                     SI-<span class="text-[var(--accent-color)] block md:inline-block">WEB</span>
                 </h1>
-
+                
                 <!-- Typing Indicator Text Area -->
-                <div class="h-10 text-2xl font-semibold text-zinc-200 mx-auto max-w-full overflow-hidden animated-hero">
-                    <span id="typewriter-text" class="border-r-2 border-zinc-300/70 pr-1"></span>
+                <div class="h-10 text-2xl font-semibold text-zinc-300 animated-hero mx-auto max-w-full overflow-hidden">
+                    <span id="typewriter-text" class="border-r-2 border-zinc-300 pr-1"></span>
                 </div>
 
-                <button id="hero-quote-button" class="mt-10 py-3.5 px-10 text-lg font-semibold rounded-full glass-button transition-default transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 animated-hero">
+                <button id="hero-quote-button" class="mt-8 py-3 px-10 text-lg bg-white text-[var(--primary-color)] font-extrabold rounded-lg shadow-xl hover:bg-[var(--accent-color)] hover:text-white transition-default transform hover:scale-105 animated-hero">
                     Launch Your Project — Get Instant Quote
                 </button>
-
-                <div class="grid hero-metrics-grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left mt-12 animated-hero">
-                    <div class="hero-metric">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2.5 rounded-full bg-white/10 text-[var(--accent-color)]">
-                                <i data-lucide="rocket" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm uppercase tracking-wider text-white/60">Launch Timeline</p>
-                                <p class="text-lg font-semibold text-white">2-3 Weeks Avg.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="hero-metric">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2.5 rounded-full bg-white/10 text-[var(--accent-color)]">
-                                <i data-lucide="layers" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm uppercase tracking-wider text-white/60">Design Systems</p>
-                                <p class="text-lg font-semibold text-white">Glass &amp; Gradient Ready</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="hero-metric">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2.5 rounded-full bg-white/10 text-[var(--accent-color)]">
-                                <i data-lucide="shield-check" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm uppercase tracking-wider text-white/60">Performance</p>
-                                <p class="text-lg font-semibold text-white">Core Web Vitals Obsessed</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
         <!-- My Work Section -->
         <section id="work" class="py-20 lg:py-32 px-6">
             <div class="container mx-auto">
-                <div class="flex justify-center mb-6">
-                    <span class="hero-pill inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm text-white/90 uppercase tracking-[0.4em]">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i>
-                        Featured build gallery
-                    </span>
-                </div>
                 <h2 class="text-4xl lg:text-5xl font-extrabold text-center mb-16 text-white">My Work</h2>
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 
                     <!-- Project 1: Second Hand Cell (IFRAME SNAPSHOT) -->
-                    <a href="https://secondhandcell.com" target="_blank" class="block group glass-card rounded-2xl overflow-hidden transition-default transform hover:-translate-y-3 hover:shadow-[0_45px_90px_rgba(0,210,255,0.25)]">
+                    <a href="https://secondhandcell.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
                         <div class="h-48 overflow-hidden relative">
                             <div class="iframe-container transition-default group-hover:scale-110">
                                 <iframe src="https://secondhandcell.com" class="iframe-snapshot" title="Second Hand Cell Preview"></iframe>
                                 <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
                             </div>
                         </div>
-                        <div class="p-6 relative z-10">
+                        <div class="p-6">
                             <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Second Hand Cell</h3>
                             <p class="text-zinc-400 text-sm mt-2">Mobile E-commerce Platform</p>
                             <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
@@ -749,14 +377,14 @@
                     </a>
 
                     <!-- Project 2: YDE Seniors (IFRAME SNAPSHOT) -->
-                    <a href="https://ydeseniors.com" target="_blank" class="block group glass-card rounded-2xl overflow-hidden transition-default transform hover:-translate-y-3 hover:shadow-[0_45px_90px_rgba(0,210,255,0.25)]">
+                    <a href="https://ydeseniors.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
                          <div class="h-48 overflow-hidden relative">
                             <div class="iframe-container transition-default group-hover:scale-110">
                                 <iframe src="https://ydeseniors.com" class="iframe-snapshot" title="YDE Seniors Preview"></iframe>
                                 <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
                             </div>
                         </div>
-                        <div class="p-6 relative z-10">
+                        <div class="p-6">
                             <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">YDE Seniors</h3>
                             <p class="text-zinc-400 text-sm mt-2">Educational / School Portal</p>
                             <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
@@ -766,14 +394,14 @@
                     </a>
 
                     <!-- Project 3: Binyan Shalem (IFRAME SNAPSHOT) -->
-                    <a href="https://binyan-shalem.com" target="_blank" class="block group glass-card rounded-2xl overflow-hidden transition-default transform hover:-translate-y-3 hover:shadow-[0_45px_90px_rgba(0,210,255,0.25)]">
+                    <a href="https://binyan-shalem.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
                         <div class="h-48 overflow-hidden relative">
                             <div class="iframe-container transition-default group-hover:scale-110">
                                 <iframe src="https://binyan-shalem.com" class="iframe-snapshot" title="Binyan Shalem Preview"></iframe>
                                 <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
                             </div>
                         </div>
-                        <div class="p-6 relative z-10">
+                        <div class="p-6">
                             <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Binyan Shalem</h3>
                             <p class="text-zinc-400 text-sm mt-2">Non-profit/Organizational Site</p>
                             <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
@@ -783,14 +411,14 @@
                     </a>
 
                     <!-- Project 4: Torat Yosef Raffle (IFRAME SNAPSHOT) -->
-                    <a href="https://toratyosefsummerraffle.com" target="_blank" class="block group glass-card rounded-2xl overflow-hidden transition-default transform hover:-translate-y-3 hover:shadow-[0_45px_90px_rgba(0,210,255,0.25)]">
+                    <a href="https://toratyosefsummerraffle.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
                         <div class="h-48 overflow-hidden relative">
                             <div class="iframe-container transition-default group-hover:scale-110">
                                 <iframe src="https://toratyosefsummerraffle.com" class="iframe-snapshot" title="Torat Yosef Raffle Preview"></iframe>
                                 <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
                             </div>
                         </div>
-                        <div class="p-6 relative z-10">
+                        <div class="p-6">
                             <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Torat Yosef Raffle</h3>
                             <p class="text-zinc-400 text-sm mt-2">Fundraising/Raffle Site</p>
                             <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
@@ -802,16 +430,13 @@
             </div>
         </section>        
         <!-- Contact Section -->
-        <section id="contact" class="py-20 lg:py-32 px-6 relative overflow-hidden text-center">
-            <div class="absolute inset-0 bg-gradient-to-br from-[#0b1120] via-[#111827] to-[#020617] opacity-95"></div>
-            <div class="absolute -top-32 right-10 w-72 h-72 bg-[var(--accent-color)]/25 blur-3xl rounded-full"></div>
-            <div class="absolute -bottom-24 left-8 w-64 h-64 bg-pink-600/20 blur-3xl rounded-full"></div>
-            <div class="container mx-auto max-w-3xl relative z-10 glass-panel rounded-[2.75rem] px-8 sm:px-16 py-14 border border-white/10">
+        <section id="contact" class="py-20 lg:py-32 px-6 bg-[#11111f] text-center">
+            <div class="container mx-auto max-w-3xl">
                 <h2 class="text-4xl lg:text-5xl font-extrabold mb-6 text-white">Ready to build something amazing?</h2>
-                <p class="text-xl text-zinc-300/90 mb-10">
+                <p class="text-xl text-zinc-400 mb-10">
                     Your next high-performing website is just a quote away.
                 </p>
-                <button id="footer-quote-button" class="py-3.5 px-10 text-lg font-semibold rounded-full glass-button transition-default transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60">
+                <button id="footer-quote-button" class="py-3 px-10 text-lg bg-[var(--accent-color)] text-[var(--primary-color)] font-extrabold rounded-lg shadow-xl hover:shadow-[0_0_20px_rgba(0,210,255,0.9)] transition-default transform hover:scale-105">
                     Start My Project Quote
                 </button>
             </div>
@@ -819,42 +444,30 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-12 text-center text-zinc-400 text-sm relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-70"></div>
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-[480px] bg-[var(--accent-color)]/15 blur-3xl rounded-full"></div>
-        <div class="container mx-auto relative z-10 flex flex-col md:flex-row justify-between md:items-center gap-6 md:gap-10 glass-panel rounded-3xl px-8 py-8 border border-white/10">
-            <span class="text-sm md:text-base text-zinc-300/90">&copy; 2025 SI-Web. Built with precision and passion.</span>
+    <footer class="py-8 text-center text-zinc-500 text-sm bg-black">
+        <div class="container mx-auto flex justify-center items-center space-x-6">
+            <span>&copy; 2025 SI-Web. Built with precision and passion.</span>
             <!-- ADMIN LINK -->
-            <a href="admin.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 text-zinc-300/80 hover:text-white hover:border-[var(--accent-color)]/60 transition-default">
-                <i data-lucide="lock" class="w-4 h-4"></i>
-                Admin
+            <a href="admin.html" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
+                <i data-lucide="lock" class="w-4 h-4 mr-1"></i> Admin
             </a>
         </div>
     </footer>
 
     <!-- Quote Generation Modal -->
-    <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-md z-50 flex justify-center items-start py-8 px-4 hidden modal-exit overflow-y-auto">
-        <div class="glass-panel modal-content-box max-w-xl w-full p-6 sm:p-10 my-auto transition-default">
-
-            <div class="flex flex-wrap items-center justify-between gap-3 modal-header">
-                <span class="modal-highlight">
-                    <i data-lucide="cpu" class="w-4 h-4"></i>
-                    Instant quote engine
-                </span>
-                <button id="close-quote-modal" type="button" class="text-zinc-300 hover:text-white transition-default flex items-center gap-2">
-                    Close
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
+    <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 flex justify-center items-start py-8 px-4 hidden modal-exit overflow-y-auto">
+        <div class="bg-[var(--primary-color)] rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-8 my-auto modal-content-box transition-default">
+            
             <!-- Progress Bar (NEW) -->
-            <div class="w-full bg-white/10 rounded-full h-2.5 mb-6 flex-shrink-0">
+            <div class="w-full bg-zinc-700 rounded-full h-2.5 mb-6 flex-shrink-0">
                 <div id="quote-progress-bar" class="bg-[var(--accent-color)] h-2.5 rounded-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
             </div>
-
-            <div class="flex justify-between items-center mb-6 flex-shrink-0">
+            
+            <div class="flex justify-between items-center mb-6 border-b border-zinc-700 pb-4 flex-shrink-0">
                 <h3 class="text-3xl font-bold text-white">Project Quote — Step <span id="current-step-display">1</span>/3</h3>
-                <p class="text-sm uppercase tracking-[0.35em] text-white/50">Stay chill — it's translucent</p>
+                <button id="close-quote-modal" class="text-zinc-400 hover:text-[var(--accent-color)] transition-default">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
             </div>
 
             <!-- Quote Form Steps -->
@@ -917,7 +530,7 @@
                             <label class="block text-lg font-semibold text-zinc-300">3. Will you require a backend/database?</label>
                             <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="backend-info"></i>
                         </div>
-                        <div id="backend-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg text-zinc-200">
+                        <div id="backend-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
                             The backend is the brain of your website. It's needed for features like user logins, storing product data, saving form entries, or handling any dynamic content (content that changes based on user actions or time).
                         </div>
                         <div class="grid grid-cols-2 gap-3 custom-radio">
@@ -939,7 +552,7 @@
                                     <label for="feature-ecommerce" class="ml-3 text-zinc-300">Store / Payment Gateway Integration</label>
                                     <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="ecommerce-info"></i>
                                 </div>
-                                <div id="ecommerce-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg text-zinc-200">
+                                <div id="ecommerce-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
                                     This covers setting up product listings, shopping carts, checkout logic, and connecting to services like PayPal or Stripe to securely accept payments.
                                 </div>
                             </div>
@@ -950,7 +563,7 @@
                                     <label for="feature-admin" class="ml-3 text-zinc-300">Custom Admin/CMS Page</label>
                                     <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="admin-info"></i>
                                 </div>
-                                <div id="admin-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg text-zinc-200">
+                                <div id="admin-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
                                     A Content Management System (CMS) or admin page lets you easily update text, change images, add blog posts, or modify products yourself without needing a developer for every little change.
                                 </div>
                             </div>
@@ -961,7 +574,7 @@
                                     <label for="feature-support" class="ml-3 text-zinc-300">Customer Support / Live Chat Integration</label>
                                     <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="support-info"></i>
                                 </div>
-                                <div id="support-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg text-zinc-200">
+                                <div id="support-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
                                     Integrating a tool like Tidio, Zendesk, or a similar service to allow visitors to instantly chat with your team or send support requests directly from the website.
                                 </div>
                             </div>
@@ -1056,8 +669,8 @@
 
                 <!-- Step Navigation and Quote Result -->
                 <div class="mt-8 pt-6 border-t border-zinc-700 quote-footer">
-                    <div id="navigation-buttons" class="flex flex-wrap justify-between items-center gap-4">
-                        <button type="button" id="prev-step" class="py-2.5 px-4 rounded-full border border-white/20 text-white/80 hover:text-white hover:border-white/50 transition-default backdrop-blur-sm hidden">
+                    <div id="navigation-buttons" class="flex justify-between items-center">
+                        <button type="button" id="prev-step" class="py-2 px-4 bg-zinc-600 text-white font-bold rounded-lg transition-default hover:bg-zinc-500 hidden">
                             <i data-lucide="arrow-left" class="w-4 h-4 inline mr-2"></i> Back
                         </button>
                         
@@ -1066,16 +679,16 @@
                             <p id="quote-result" class="text-4xl font-extrabold text-[var(--accent-color)] mt-1">$1,199</p>
                         </div>
 
-                        <button type="button" id="next-step" class="py-2.5 px-4 glass-button text-sm sm:text-base font-semibold rounded-full uppercase tracking-[0.35em] sm:tracking-[0.4em]">
+                        <button type="button" id="next-step" class="py-2 px-4 bg-[var(--accent-color)] text-[var(--primary-color)] font-bold rounded-lg transition-default hover:bg-cyan-400">
                             Continue <i data-lucide="arrow-right" class="w-4 h-4 inline ml-2"></i>
                         </button>
 
-                        <button type="submit" id="submit-quote" class="py-2.5 px-4 rounded-full bg-emerald-500/90 text-sm sm:text-base text-white font-semibold uppercase tracking-[0.35em] sm:tracking-[0.4em] shadow-lg shadow-emerald-500/25 transition-default hover:bg-emerald-400 hidden">
+                        <button type="submit" id="submit-quote" class="py-2 px-4 bg-green-500 text-[var(--primary-color)] font-bold rounded-lg transition-default hover:bg-green-400 hidden">
                             Submit Quote
                         </button>
                     </div>
 
-                    <div id="submission-status" class="hidden text-center mt-6 p-4 rounded-lg">
+                    <div id="submission-status" class="hidden text-center mt-6 p-4 rounded-lg bg-[#3a3a5e]">
                         <p id="status-message" class="text-xl font-bold text-white mb-2"></p>
                         <p id="final-price-display" class="text-4xl font-extrabold text-[var(--accent-color)] mb-4"></p>
                         <p id="disclaimer-text" class="text-sm text-zinc-400">
@@ -1256,7 +869,7 @@
         function alertUser(message, color) {
             statusDiv.classList.remove('hidden');
             // Remove all existing background colors
-            statusDiv.classList.remove('bg-green-600/50', 'bg-yellow-600/50', 'bg-red-600/50');
+            statusDiv.classList.remove('bg-green-600/50', 'bg-yellow-600/50', 'bg-red-600/50', 'bg-[#3a3a5e]'); 
             // Apply error background
             statusDiv.classList.add(color === 'red' ? 'bg-red-600/50' : 'bg-yellow-600/50');
             statusMessage.textContent = message;
