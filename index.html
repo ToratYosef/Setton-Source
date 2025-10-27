@@ -1,2601 +1,1289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Setton Source | Digital Experience Studio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg-primary: #05060f;
-      --bg-secondary: #101323;
-      --bg-highlight: rgba(35, 44, 85, 0.55);
-      --bg-glass: rgba(16, 19, 35, 0.72);
-      --accent-cyan: #56f4ff;
-      --accent-lilac: #a164ff;
-      --accent-lime: #9cff6c;
-      --text-main: #f5f7ff;
-      --text-muted: rgba(208, 214, 239, 0.82);
-      --border-glass: rgba(255, 255, 255, 0.12);
-      --shadow-glass: 0 30px 60px rgba(5, 10, 35, 0.65);
-      --radius-lg: 32px;
-      --radius-md: 22px;
-      --radius-sm: 16px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      padding: 0;
-      margin: 0;
-      min-height: 100%;
-    }
-
-    body {
-      font-family: "Outfit", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at 12% 18%, rgba(86, 244, 255, 0.25), transparent 55%),
-        radial-gradient(circle at 80% 22%, rgba(161, 100, 255, 0.28), transparent 60%),
-        radial-gradient(circle at 24% 78%, rgba(156, 255, 108, 0.2), transparent 65%),
-        linear-gradient(160deg, #02030a, #0c0f2b 55%, #05060f 90%);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    main {
-      flex: 1;
-      width: 100%;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .visually-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0 0 0 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .noise-overlay {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-      opacity: 0.04;
-      mix-blend-mode: screen;
-      z-index: 1;
-    }
-
-    .aurora, .aurora-secondary {
-      position: fixed;
-      pointer-events: none;
-      border-radius: 999px;
-      filter: blur(160px);
-      opacity: 0.55;
-      z-index: 0;
-    }
-
-    .aurora {
-      top: -18%;
-      left: -20%;
-      width: 60vw;
-      height: 55vh;
-      background: radial-gradient(circle, rgba(86, 244, 255, 0.55) 0%, rgba(86, 244, 255, 0) 70%);
-    }
-
-    .aurora-secondary {
-      bottom: -22%;
-      right: -10%;
-      width: 45vw;
-      height: 50vh;
-      background: radial-gradient(circle, rgba(161, 100, 255, 0.45) 0%, rgba(161, 100, 255, 0) 80%);
-    }
-
-    .page-shell {
-      position: relative;
-      z-index: 2;
-      width: min(1200px, 92vw);
-      margin: 0 auto;
-      padding: 40px 0 80px;
-      display: flex;
-      flex-direction: column;
-      gap: 120px;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 40px;
-      position: sticky;
-      top: 0;
-      padding: 16px 0 10px;
-      z-index: 12;
-      isolation: isolate;
-      transition: transform 0.3s ease;
-    }
-
-    header::before {
-      content: "";
-      position: absolute;
-      inset: -6px -28px;
-      border-radius: 999px;
-      background: rgba(16, 19, 35, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 24px 48px rgba(5, 10, 35, 0.35);
-      backdrop-filter: blur(22px);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: -1;
-    }
-
-    header.is-stuck::before,
-    body.nav-open header::before {
-      opacity: 1;
-    }
-
-    header.is-stuck {
-      transform: translateY(-6px);
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 18px;
-      border-radius: 999px;
-      background: rgba(16, 19, 35, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 20px 40px rgba(8, 15, 45, 0.38);
-      backdrop-filter: blur(16px);
-    }
-
-    .brand svg {
-      width: 32px;
-      height: 32px;
-      color: var(--accent-cyan);
-    }
-
-    .primary-nav {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      flex-wrap: wrap;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-
-    .primary-nav a {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      padding: 10px 18px;
-      border-radius: 999px;
-      transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
-      border: 1px solid transparent;
-    }
-
-    .primary-nav a:hover,
-    .primary-nav a:focus-visible {
-      color: var(--text-main);
-      background: rgba(86, 244, 255, 0.08);
-      border-color: rgba(86, 244, 255, 0.25);
-    }
-
-    .mobile-menu-toggle {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(16, 19, 35, 0.55);
-      color: var(--text-main);
-      cursor: pointer;
-      transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
-    }
-
-    .mobile-menu-toggle:hover,
-    .mobile-menu-toggle:focus-visible {
-      transform: translateY(-1px);
-      border-color: rgba(86, 244, 255, 0.45);
-      background: rgba(16, 19, 35, 0.82);
-    }
-
-    .mobile-menu-toggle[aria-expanded="true"] {
-      border-color: rgba(86, 244, 255, 0.45);
-      background: rgba(16, 19, 35, 0.82);
-    }
-
-    .toggle-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .toggle-icon svg {
-      width: 22px;
-      height: 22px;
-    }
-
-    .mobile-menu-toggle .toggle-icon--close {
-      display: none;
-    }
-
-    .mobile-menu-toggle[aria-expanded="true"] .toggle-icon--menu {
-      display: none;
-    }
-
-    .mobile-menu-toggle[aria-expanded="true"] .toggle-icon--close {
-      display: inline-flex;
-    }
-
-    .nav-cta {
-      display: none;
-    }
-
-    .nav-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(5, 6, 15, 0.62);
-      backdrop-filter: blur(18px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      z-index: 11;
-    }
-
-    .nav-overlay.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .glass-panel {
-      background: var(--bg-glass);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      padding: clamp(28px, 4vw, 48px);
-      box-shadow: var(--shadow-glass);
-      backdrop-filter: blur(24px);
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 50px;
-      align-items: center;
-      position: relative;
-      isolation: isolate;
-      overflow: hidden;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: 12% 40% -18% -18%;
-      background: radial-gradient(circle at top, rgba(86, 244, 255, 0.18), transparent 65%),
-        radial-gradient(circle at bottom right, rgba(161, 100, 255, 0.18), transparent 60%);
-      opacity: 0.8;
-      filter: blur(45px);
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .floating-orbs {
-      position: absolute;
-      inset: -140px -60px 0;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .floating-orbs span {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(0.5px);
-      opacity: 0.65;
-      mix-blend-mode: screen;
-      animation: orbFloat 16s ease-in-out infinite;
-    }
-
-    .floating-orbs .orb-cyan {
-      width: 220px;
-      height: 220px;
-      top: 12%;
-      left: 6%;
-      background: radial-gradient(circle, rgba(86, 244, 255, 0.65), transparent 70%);
-      animation-delay: -2s;
-    }
-
-    .floating-orbs .orb-lilac {
-      width: 160px;
-      height: 160px;
-      bottom: 12%;
-      right: 14%;
-      background: radial-gradient(circle, rgba(161, 100, 255, 0.55), transparent 65%);
-      animation-delay: -6s;
-    }
-
-    .floating-orbs .orb-lime {
-      width: 130px;
-      height: 130px;
-      bottom: 22%;
-      left: 36%;
-      background: radial-gradient(circle, rgba(156, 255, 108, 0.45), transparent 60%);
-      animation-delay: -10s;
-    }
-
-    @keyframes orbFloat {
-      0%,
-      100% {
-        transform: translate3d(0, 0, 0) scale(1);
-      }
-      33% {
-        transform: translate3d(14px, -12px, 0) scale(1.05);
-      }
-      66% {
-        transform: translate3d(-18px, 10px, 0) scale(0.97);
-      }
-    }
-
-    @keyframes buttonSheen {
-      0% {
-        transform: translateX(-120%) skewX(-18deg);
-      }
-      50% {
-        transform: translateX(120%) skewX(-18deg);
-      }
-      100% {
-        transform: translateX(120%) skewX(-18deg);
-      }
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      background: rgba(86, 244, 255, 0.12);
-      border: 1px solid rgba(86, 244, 255, 0.24);
-      color: var(--accent-cyan);
-      font-size: 0.75rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-    }
-
-    .hero h1 {
-      font-size: clamp(2.6rem, 5vw, 4.3rem);
-      font-weight: 600;
-      line-height: 1.05;
-      margin: 18px 0 22px;
-    }
-
-    .hero p {
-      font-size: clamp(1rem, 1.5vw, 1.2rem);
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 32px;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .button-primary,
-    .button-secondary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 14px 26px;
-      border-radius: 999px;
-      font-weight: 600;
-      font-size: 1rem;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
-    }
-
-    .button-primary {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-lilac));
-      color: #031019;
-      box-shadow: 0 18px 36px rgba(86, 244, 255, 0.25);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .button-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 24px 44px rgba(161, 100, 255, 0.35);
-    }
-
-    .button-primary::after {
-      content: "";
-      position: absolute;
-      inset: -20%;
-      background: linear-gradient(120deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 50%);
-      transform: translateX(-120%) skewX(-18deg);
-      opacity: 0.6;
-      animation: buttonSheen 4s linear infinite;
-    }
-
-    .button-secondary {
-      border-color: rgba(255, 255, 255, 0.18);
-      background: rgba(16, 19, 35, 0.45);
-      color: var(--text-muted);
-    }
-
-    .button-secondary:hover {
-      color: var(--text-main);
-      border-color: rgba(86, 244, 255, 0.35);
-      background: rgba(16, 19, 35, 0.7);
-    }
-
-    .hero-media {
-      position: relative;
-      padding: 28px;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      background: linear-gradient(145deg, rgba(16, 24, 46, 0.95), rgba(16, 19, 35, 0.65));
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: var(--shadow-glass);
-    }
-
-    .hero-media::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 20% 30%, rgba(86, 244, 255, 0.35), transparent 60%),
-                  radial-gradient(circle at 80% 70%, rgba(161, 100, 255, 0.3), transparent 70%);
-      opacity: 0.7;
-    }
-
-    .hero-media img {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 35px 60px rgba(5, 12, 35, 0.4);
-    }
-
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 20px;
-    }
-
-    .metric-card {
-      padding: 24px;
-      border-radius: var(--radius-md);
-      background: linear-gradient(135deg, rgba(16, 19, 35, 0.7), rgba(16, 19, 35, 0.45));
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(18px);
-      box-shadow: 0 22px 45px rgba(5, 10, 35, 0.38);
-    }
-
-    .metric-card span {
-      display: block;
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: rgba(86, 244, 255, 0.65);
-      margin-bottom: 8px;
-    }
-
-    .metric-card strong {
-      font-size: 2rem;
-      font-weight: 600;
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    .metric-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }
-
-    .section-heading {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 40px;
-    }
-
-    .section-heading h2 {
-      font-size: clamp(2.1rem, 3.8vw, 3rem);
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .section-heading p {
-      color: var(--text-muted);
-      max-width: 640px;
-      line-height: 1.6;
-    }
-
-    .services-grid {
-      display: grid;
-      gap: 28px;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    }
-
-    .service-card {
-      background: linear-gradient(160deg, rgba(17, 24, 42, 0.85), rgba(15, 20, 33, 0.55));
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: var(--radius-md);
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(18px);
-      box-shadow: 0 24px 50px rgba(4, 10, 32, 0.38);
-    }
-
-    .service-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(86, 244, 255, 0.12), transparent 60%);
-      opacity: 0.8;
-      pointer-events: none;
-    }
-
-    .service-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(86, 244, 255, 0.18);
-      border: 1px solid rgba(86, 244, 255, 0.3);
-      color: var(--accent-cyan);
-      margin-bottom: 18px;
-    }
-
-    .service-card h3 {
-      font-size: 1.4rem;
-      margin-bottom: 12px;
-      font-weight: 600;
-    }
-
-    .service-card p {
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
-
-    .service-card ul {
-      padding-left: 20px;
-      margin: 0;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    .case-studies {
-      display: grid;
-      gap: 30px;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
-
-    .case-card {
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      position: relative;
-      background: rgba(16, 19, 35, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: var(--shadow-glass);
-      backdrop-filter: blur(20px);
-      min-height: 360px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-
-    .case-card picture,
-    .case-card img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.78;
-    }
-
-    .case-card .case-content {
-      position: relative;
-      padding: 30px;
-      background: linear-gradient(180deg, transparent 0%, rgba(5, 6, 15, 0.9) 75%);
-    }
-
-    .case-card span {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: rgba(5, 6, 15, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: rgba(86, 244, 255, 0.85);
-      font-size: 0.75rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-
-    .case-card h3 {
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-      color: var(--text-main);
-    }
-
-    .case-card p {
-      color: var(--text-muted);
-      margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .testimonial-section {
-      display: grid;
-      gap: 24px;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
-
-    .testimonial-card {
-      padding: 32px;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: linear-gradient(160deg, rgba(16, 19, 35, 0.85), rgba(16, 19, 35, 0.5));
-      box-shadow: 0 24px 50px rgba(3, 8, 25, 0.4);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .testimonial-card::before {
-      content: "“";
-      position: absolute;
-      top: 24px;
-      left: 30px;
-      font-size: 4rem;
-      font-weight: 700;
-      color: rgba(86, 244, 255, 0.25);
-    }
-
-    .testimonial-card p {
-      margin: 24px 0 18px 0;
-      color: var(--text-main);
-      line-height: 1.6;
-      font-size: 1.05rem;
-    }
-
-    .testimonial-card footer {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .is-disabled {
-      opacity: 0.45;
-      pointer-events: none;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(5, 6, 15, 0.82);
-      backdrop-filter: blur(20px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 24px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      z-index: 80;
-    }
-
-    .modal.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal-panel {
-      width: min(1040px, 95vw);
-      background: var(--bg-glass);
-      border: 1px solid var(--border-glass);
-      border-radius: 32px;
-      box-shadow: var(--shadow-glass);
-      padding: clamp(28px, 4vw, 48px);
-      transform: translateY(24px);
-      transition: transform 0.3s ease;
-      height: min(860px, calc(100vh - 64px));
-      max-height: calc(100vh - 48px);
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-
-    .modal-panel::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px;
-      background: linear-gradient(140deg, rgba(86, 244, 255, 0.4), rgba(161, 100, 255, 0.42), rgba(156, 255, 108, 0.35));
-      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      mask-composite: exclude;
-      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      pointer-events: none;
-      opacity: 0.75;
-    }
-
-    .modal-panel::after {
-      content: "";
-      position: absolute;
-      inset: -35% -20% 45% -40%;
-      background: radial-gradient(circle at top left, rgba(86, 244, 255, 0.25), transparent 65%),
-        radial-gradient(circle at top right, rgba(161, 100, 255, 0.2), transparent 60%);
-      opacity: 0.7;
-      filter: blur(60px);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .modal-panel > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    .modal.active .modal-panel {
-      transform: translateY(0);
-    }
-
-    body.modal-open,
-    body.nav-open {
-      overflow: hidden;
-    }
-
-    .modal-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .modal-brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .modal-brand svg {
-      width: 28px;
-      height: 28px;
-      color: var(--accent-cyan);
-    }
-
-    .modal-eyebrow {
-      display: inline-block;
-      font-size: 0.7rem;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: rgba(86, 244, 255, 0.7);
-      margin-bottom: 10px;
-    }
-
-    .modal-headline {
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
-      font-weight: 600;
-      line-height: 1.2;
-      margin: 0;
-      max-width: 32rem;
-    }
-
-    .icon-button {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(16, 19, 35, 0.6);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-main);
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-    }
-
-    .icon-button:hover {
-      transform: translateY(-2px);
-      border-color: rgba(86, 244, 255, 0.55);
-      background: rgba(16, 19, 35, 0.85);
-    }
-
-    .icon-button i {
-      width: 20px;
-      height: 20px;
-    }
-
-    .stepper {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 12px 20px;
-      border-radius: 999px;
-      background: rgba(16, 19, 35, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .stepper > div {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      min-width: 110px;
-    }
-
-    .step-dot {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      color: var(--text-muted);
-      background: rgba(16, 19, 35, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-    }
-
-    .step-dot.active {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-lilac));
-      border-color: transparent;
-      color: #02030a;
-    }
-
-    .step-line {
-      flex: 1;
-      height: 2px;
-      background: linear-gradient(90deg, rgba(86, 244, 255, 0.4), rgba(161, 100, 255, 0.4));
-      opacity: 0.5;
-    }
-
-    .step-label {
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      transition: color 0.2s ease;
-    }
-
-    .step-label.active {
-      color: var(--accent-cyan);
-    }
-
-    .modal-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.8fr);
-      gap: 32px;
-      align-items: flex-start;
-      flex: 1;
-      min-height: 0;
-    }
-
-    .modal-content {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      min-height: 0;
-    }
-
-    .step-panels {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      min-height: 0;
-      overflow-y: auto;
-      padding-right: 6px;
-      padding-bottom: 24px;
-      scroll-behavior: smooth;
-    }
-
-    .step-panels::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .step-panels::-webkit-scrollbar-thumb {
-      background: rgba(86, 244, 255, 0.2);
-      border-radius: 4px;
-    }
-
-    .step-panel {
-      display: none;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .step-panel.active {
-      display: flex;
-    }
-
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .field-eyebrow {
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: rgba(86, 244, 255, 0.7);
-    }
-
-    .option-grid {
-      display: grid;
-      gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-
-    .quote-option {
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(16, 19, 35, 0.55);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      text-align: left;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease, color 0.2s ease;
-    }
-
-    .quote-option:hover {
-      border-color: rgba(86, 244, 255, 0.45);
-      color: var(--text-main);
-    }
-
-    .quote-option .option-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(86, 244, 255, 0.16);
-      color: var(--accent-cyan);
-    }
-
-    .quote-option h3 {
-      font-size: 1.05rem;
-      margin: 0;
-      color: var(--text-main);
-    }
-
-    .quote-option p {
-      margin: 0;
-      line-height: 1.45;
-    }
-
-    .quote-option.is-active {
-      border-color: rgba(86, 244, 255, 0.65);
-      background: rgba(86, 244, 255, 0.12);
-      color: var(--text-main);
-      box-shadow: 0 14px 32px rgba(86, 244, 255, 0.22);
-    }
-
-    .pill-group {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 12px;
-    }
-
-    .pill-option {
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 12px 16px;
-      background: rgba(16, 19, 35, 0.55);
-      color: var(--text-muted);
-      font-weight: 600;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
-    }
-
-    .pill-option:hover {
-      border-color: rgba(86, 244, 255, 0.45);
-      color: var(--text-main);
-    }
-
-    .pill-option.is-active {
-      border-color: rgba(86, 244, 255, 0.65);
-      background: rgba(86, 244, 255, 0.12);
-      color: var(--text-main);
-      box-shadow: 0 12px 30px rgba(86, 244, 255, 0.22);
-    }
-
-    .range-field {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .range-output {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .checkbox-grid {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-
-    .checkbox-card {
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(16, 19, 35, 0.5);
-      padding: 16px;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      cursor: pointer;
-      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
-    }
-
-    .checkbox-card:hover {
-      border-color: rgba(161, 100, 255, 0.45);
-    }
-
-    .checkbox-card input {
-      margin-top: 4px;
-    }
-
-    .checkbox-card span {
-      display: block;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-
-    .checkbox-card p {
-      margin: 4px 0 0;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .input-field,
-    .select-field,
-    .textarea-field {
-      width: 100%;
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(16, 19, 35, 0.55);
-      color: var(--text-main);
-      padding: 14px 18px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .input-field::placeholder,
-    .textarea-field::placeholder {
-      color: rgba(208, 214, 239, 0.55);
-    }
-
-    .select-field {
-      appearance: none;
-      background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23f5f7ff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polyline points="6 9 12 15 18 9"/></svg>');
-      background-repeat: no-repeat;
-      background-position: calc(100% - 18px) 50%;
-      background-size: 16px;
-      padding-right: 44px;
-    }
-
-    .input-field:focus,
-    .select-field:focus,
-    .textarea-field:focus {
-      outline: none;
-      border-color: rgba(86, 244, 255, 0.55);
-      box-shadow: 0 0 0 3px rgba(86, 244, 255, 0.15);
-      background: rgba(16, 19, 35, 0.85);
-    }
-
-    .textarea-field {
-      resize: vertical;
-      min-height: 140px;
-    }
-
-    .dual-field-grid {
-      display: grid;
-      gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-
-    .quote-footer {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-top: auto;
-      padding: 18px;
-      padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: linear-gradient(180deg, rgba(16, 19, 35, 0.24) 0%, rgba(16, 19, 35, 0.78) 45%, rgba(16, 19, 35, 0.92) 100%);
-      box-shadow: 0 -18px 38px rgba(5, 10, 35, 0.45);
-      backdrop-filter: blur(22px);
-      flex-shrink: 0;
-    }
-
-    .quote-footer-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .button-ghost {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 20px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(16, 19, 35, 0.4);
-      color: var(--text-muted);
-      font-weight: 600;
-      cursor: pointer;
-      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
-    }
-
-    .button-ghost:hover {
-      border-color: rgba(86, 244, 255, 0.45);
-      color: var(--text-main);
-      background: rgba(16, 19, 35, 0.7);
-    }
-
-    .button-ghost.is-disabled {
-      opacity: 0.4;
-      pointer-events: none;
-    }
-
-    .quote-footer-actions .button-primary,
-    .quote-footer-actions .button-secondary {
-      width: 100%;
-    }
-
-    .estimate-summary {
-      border-radius: 28px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(16, 19, 35, 0.55);
-      padding: 26px;
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    }
-
-    .estimate-summary header span {
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: rgba(86, 244, 255, 0.65);
-    }
-
-    .estimate-summary header h3 {
-      margin: 12px 0 6px;
-      font-size: 2.2rem;
-    }
-
-    .estimate-summary header p {
-      margin: 0;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .estimate-breakdown {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-height: 320px;
-      overflow-y: auto;
-      padding-right: 6px;
-    }
-
-    .estimate-breakdown::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .estimate-breakdown::-webkit-scrollbar-thumb {
-      background: rgba(161, 100, 255, 0.24);
-      border-radius: 4px;
-    }
-
-    .estimate-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 14px 18px;
-      border-radius: 18px;
-      background: rgba(16, 19, 35, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .estimate-row span:last-child {
-      color: var(--accent-cyan);
-      font-weight: 600;
-    }
-
-    .estimate-note {
-      display: flex;
-      gap: 14px;
-      padding: 18px;
-      border-radius: 20px;
-      background: rgba(86, 244, 255, 0.08);
-      border: 1px solid rgba(86, 244, 255, 0.2);
-      color: var(--text-main);
-      align-items: flex-start;
-    }
-
-    .estimate-note .note-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(86, 244, 255, 0.16);
-      color: var(--accent-cyan);
-    }
-
-    .toast {
-      position: fixed;
-      right: 32px;
-      bottom: 32px;
-      z-index: 90;
-      width: min(320px, 90vw);
-      border-radius: 22px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(16, 19, 35, 0.85);
-      box-shadow: 0 24px 48px rgba(5, 10, 35, 0.55);
-      padding: 18px;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .toast-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid transparent;
-    }
-
-    .toast.success .toast-icon {
-      background: rgba(76, 209, 149, 0.18);
-      border-color: rgba(76, 209, 149, 0.4);
-      color: #4cd195;
-    }
-
-    .toast.error .toast-icon {
-      background: rgba(255, 107, 129, 0.18);
-      border-color: rgba(255, 107, 129, 0.4);
-      color: #ff6b81;
-    }
-
-    .toast strong {
-      display: block;
-      font-size: 1rem;
-      color: var(--text-main);
-    }
-
-    .toast p {
-      margin: 4px 0 0;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .form-note {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    @media (min-width: 640px) {
-      .quote-footer {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .quote-footer-actions {
-        flex-direction: row;
-      }
-
-      .quote-footer-actions .button-primary,
-      .quote-footer-actions .button-secondary {
-        width: auto;
-      }
-    }
-
-    @media (max-width: 1100px) {
-      .modal-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: minmax(0, 1fr) auto;
-        gap: 24px;
-      }
-
-      .estimate-summary {
-        max-height: 280px;
-        overflow-y: auto;
-      }
-
-      .estimate-summary::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .estimate-summary::-webkit-scrollbar-thumb {
-        background: rgba(161, 100, 255, 0.24);
-        border-radius: 4px;
-      }
-    }
-
-    @media (max-width: 720px) {
-      .modal {
-        padding: calc(16px + env(safe-area-inset-top, 0px)) 14px 0;
-        align-items: flex-end;
-      }
-
-      .modal-panel {
-        padding: 28px 20px 24px;
-        width: 100%;
-        height: 100vh;
-        max-height: 100vh;
-        border-radius: 28px 28px 0 0;
-        gap: 28px;
-      }
-
-      .modal-grid {
-        gap: 20px;
-      }
-
-      .step-panels {
-        padding-right: 0;
-      }
-
-      .stepper {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 18px;
-        padding: 18px;
-      }
-
-      .stepper > div {
-        min-width: 0;
-      }
-
-      .step-line {
-        width: 100%;
-      }
-
-      .toast {
-        right: 16px;
-        left: 16px;
-        width: auto;
-      }
-
-      .quote-footer {
-        padding: 16px;
-        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-        border-radius: 20px;
-        box-shadow: 0 -12px 28px rgba(5, 10, 35, 0.4);
-      }
-    }
-
-    .cta {
-      text-align: center;
-      padding: clamp(32px, 4vw, 48px);
-      background: linear-gradient(140deg, rgba(86, 244, 255, 0.15), rgba(161, 100, 255, 0.18));
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-glass);
-    }
-
-    .cta h2 {
-      font-size: clamp(2rem, 4vw, 3.1rem);
-      margin-bottom: 18px;
-    }
-
-    .cta p {
-      color: var(--text-muted);
-      max-width: 540px;
-      margin: 0 auto 28px auto;
-      line-height: 1.6;
-    }
-
-    footer {
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 48px 0 56px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .footer-grid {
-      display: grid;
-      gap: 32px;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      width: min(1200px, 92vw);
-      margin: 0 auto;
-    }
-
-    .footer-brand {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .footer-brand p {
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    .footer-links {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      color: var(--text-muted);
-    }
-
-    .footer-links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      border-radius: 12px;
-      background: rgba(16, 19, 35, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: background 0.25s ease, color 0.25s ease;
-    }
-
-    .footer-links a:hover {
-      background: rgba(86, 244, 255, 0.12);
-      color: var(--text-main);
-    }
-
-    .footer-meta {
-      color: rgba(208, 214, 239, 0.55);
-      font-size: 0.85rem;
-      margin-top: 18px;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
-    }
-
-    @media (max-width: 900px) {
-      header {
-        flex-wrap: wrap;
-        gap: 24px;
-      }
-
-      .primary-nav {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .page-shell {
-        gap: 96px;
-      }
-    }
-
-    @media (max-width: 760px) {
-      header {
-        flex-wrap: nowrap;
-        gap: 16px;
-        align-items: center;
-      }
-
-      .mobile-menu-toggle {
-        display: inline-flex;
-      }
-
-      .primary-nav {
-        position: fixed;
-        top: 18px;
-        right: 18px;
-        width: min(320px, 88vw);
-        flex-direction: column;
-        gap: 12px;
-        align-items: stretch;
-        padding: 22px;
-        border-radius: 28px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        background: rgba(16, 19, 35, 0.92);
-        box-shadow: 0 28px 60px rgba(5, 10, 35, 0.65);
-        backdrop-filter: blur(26px);
-        transform: translateY(-12px) scale(0.96);
-        opacity: 0;
-        pointer-events: none;
-        max-height: calc(100vh - 56px);
-        overflow-y: auto;
-        z-index: 14;
-      }
-
-      .primary-nav a,
-      .primary-nav .nav-cta {
-        width: 100%;
-      }
-
-      .primary-nav a {
-        justify-content: center;
-      }
-
-      .primary-nav .nav-cta {
-        display: inline-flex;
-      }
-
-      .primary-nav.is-open {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        pointer-events: auto;
-      }
-
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .hero::after {
-        inset: 5% 0 -10% -24%;
-      }
-
-      .floating-orbs {
-        inset: -100px -20px -40px;
-      }
-
-      .floating-orbs .orb-cyan {
-        width: 180px;
-        height: 180px;
-      }
-
-      .floating-orbs .orb-lilac {
-        right: 10%;
-      }
-
-      .floating-orbs .orb-lime {
-        left: 28%;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .hero {
-        gap: 36px;
-      }
-
-      .page-shell {
-        padding: 32px 0 72px;
-      }
-
-      .button-primary,
-      .button-secondary {
-        width: 100%;
-      }
-
-      .metrics-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .metric-card {
-        padding: 22px;
-      }
-
-      .services-grid,
-      .case-studies,
-      .option-grid,
-      .dual-field-grid,
-      .checkbox-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-media {
-        padding: 18px;
-      }
-
-      .modal-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .footer-links {
-        gap: 16px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SI-Web | Web Development Agency</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide icons for a sleek look -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- Google tag (gtag.js) - ADDED GOOGLE ANALYTICS -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YW9WN4489T"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YW9WN4489T');
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #1a1a2e; /* Deep Navy */
+            --accent-color: #00d2ff; /* Electric Blue */
+            --text-color: #e4e4e7;  /* Light Gray */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            scroll-behavior: smooth;
+        }
+
+        /* Custom utility for smooth transitions */
+        .transition-default {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Header backdrop effect */
+        .header-scrolled {
+            background-color: rgba(26, 26, 46, 0.95); /* Slightly opaque dark navy */
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Hero text animation */
+        @keyframes fadeInSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animated-hero {
+            animation: fadeInSlideUp 1s ease-out both;
+        }
+        
+        /* Ensure animations are staggered */
+        .animated-hero:nth-child(1) { animation-delay: 0.1s; }
+        .animated-hero:nth-child(2) { animation-delay: 0.3s; }
+        .animated-hero:nth-child(3) { animation-delay: 0.5s; }
+
+        /* Background Blob Animation */
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        /* Quote Modal Styles: Digital Spawn Animation */
+        
+        /* 1. Define the inner content box appearance transition */
+        .modal-content-box {
+            /* Aggressive cubic-bezier for a sharp pop-in effect */
+            transition: all 0.3s cubic-bezier(0.1, 0.9, 0.3, 1.2); 
+        }
+
+        /* 2. Outer container controls backdrop fade and sets initial state for inner box */
+        /* We explicitly remove old transforms/transitions from the backdrop container */
+        .modal-enter {
+            opacity: 0;
+            transform: none; 
+            transition: opacity 0.3s; /* Only opacity for the backdrop */
+        }
+        .modal-enter-active, .modal-exit {
+            opacity: 1;
+            transform: none;
+            transition: opacity 0.3s; 
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: none;
+            transition: opacity 0.3s;
+        }
+
+        /* 3. Initial State (before enter) for inner box */
+        .modal-enter .modal-content-box {
+            opacity: 0;
+            transform: scale(0.75); /* Smaller start for sharper pop */
+        }
+        
+        /* 4. Active Enter State (CSS transition handles move to final state) for inner box */
+        .modal-enter-active .modal-content-box {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* 5. Exit State for inner box */
+        .modal-exit-active .modal-content-box {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.2s ease-in;
+        }
+
+
+        /* Custom radio button styling */
+        .custom-radio input:checked + label {
+            border-color: var(--accent-color);
+            background-color: rgba(0, 210, 255, 0.1);
+        }
+        
+        /* UPDATED: Input Error Styling for validation - Changed to pure red */
+        .input-error {
+            border-color: #ff0000 !important; /* Pure Red for border */
+            box-shadow: 0 0 0 2px #ff0000, inset 0 0 5px rgba(255, 0, 0, 0.3);
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        /* UPDATED: Error Styling for radio/checkbox containers - Changed to pure red */
+        .error-group-border {
+            border: 2px solid #ff0000 !important;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            border-radius: 0.75rem; /* rounded-xl */
+            padding: 0.5rem; /* Add padding to contain grid nicely */
+        }
+
+
+        /* New Typing Cursor Animation */
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+        #typewriter-text {
+            border-right-color: white !important; /* Ensure cursor is visible */
+            animation: blink 0.7s step-end infinite;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        /* Input Focus Styling */
+        .input-text:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.5);
+            outline: none;
+        }
+
+        /* --- IFRAME SNAPSHOT STYLING --- */
+        .iframe-container {
+            /* Create a viewport for the iframe */
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 0.75rem; /* Matches the card's rounded-xl */
+        }
+
+        .iframe-snapshot {
+            /* Transform the iframe to look like a scaled-down desktop view */
+            width: 1500px; /* Original width of the site content (e.g., desktop view) */
+            height: 1000px; /* Original height */
+            
+            /* UPDATED: Centering logic */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: 50% 50%; /* Scale from the center */
+            transform: translate(-50%, -50%) scale(0.32); /* Center before scaling, then scale */
+            
+            border: none;
+            pointer-events: none; /* Crucial: disables all interaction (clicks/scrolling) */
+        }
+
+        .iframe-overlay {
+            /* Invisible barrier to ensure no interaction bleeds through */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10; /* Above the iframe */
+            background: transparent;
+        }
+
+        /* --- MODAL SCROLL FIXES --- */
+        /* 1. Ensure the outer container allows itself to be scrollable if the modal is too big for the viewport */
+        #quote-modal {
+            /* Added min-height: 100vh to ensure it covers the full screen regardless of content height */
+            min-height: 100vh;
+            /* Changed items-start to items-center to center the modal vertically if there is extra space */
+            align-items: center; 
+            /* Removed overflow-y: auto from modal, relying on body height and inner element scroll */
+        }
+        
+        /* 2. Ensure the inner modal box takes up maximum height for scrollable content */
+        .modal-content-box {
+            /* Changed max-w-lg to max-w-xl for a wider form content area */
+            max-width: 38rem;
+            /* Added explicit max height and set height to 100% to fill vertical space */
+            height: auto;
+            max-height: calc(100vh - 64px); /* Max height with some margin top/bottom */
+            display: flex;
+            flex-direction: column;
+            
+            /* IMPORTANT: Removed my-auto from here as it messes with fixed height on mobile view */
+        }
+        
+        /* 3. Create the scrollable area below the header/progress bar */
+        #quote-form {
+            /* Allow the form itself to flex and take up remaining space */
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for flex children */
+            overflow: hidden;
+        }
+
+        /* 4. The step content wrapper is what actually scrolls */
+        #step-1-content, #step-2-content, #step-3-content {
+            /* IMPORTANT: Add overflow-y: auto and padding-right to the step content itself */
+            overflow-y: auto;
+            padding-right: 0.5rem; /* Space for the scrollbar */
+            flex: 1;
+            min-height: 0; /* Fixes overflow issue in nested flex layouts */
+            padding-bottom: 0.5rem; /* Add padding here so sticky footer doesn't overlap text */
+        }
+
+        /* 5. Sticky Footer Fixes for Mobile/Desktop */
+        .quote-footer {
+            /* Ensure the footer is sticky at the bottom of the form */
+            position: sticky;
+            bottom: 0;
+            background-color: var(--primary-color);
+            z-index: 20; /* Keep buttons above scrolling content */
+            margin-top: 0;
+            padding-top: 1rem;
+            padding-bottom: 0; /* Remove bottom padding here, keep it inside the button section */
+            
+            /* Style adjustments for a clean sticky look */
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Mobile specific adjustments to ensure space below fixed buttons */
+        @media (max-width: 640px) {
+            #quote-modal {
+                /* On small screens, force the modal panel to occupy the upper part of the screen */
+                align-items: flex-end;
+                padding-top: 2rem;
+                padding-bottom: 0;
+            }
+            .modal-content-box {
+                /* Mobile full height takeover */
+                max-height: calc(100vh - 32px); /* Allow more space */
+                border-radius: 1rem 1rem 0 0;
+                padding-top: 1.5rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+                padding-bottom: 0; /* Remove bottom padding here */
+                width: 100%;
+            }
+
+            /* Adjust padding on the scrollable content to stop scrolling under the footer */
+            #step-1-content, #step-2-content, #step-3-content {
+                padding-bottom: 120px; /* Add extra space at the bottom to prevent content from being hidden behind the sticky footer */
+            }
+
+            .quote-footer {
+                /* Restore the mobile fixed style for better UX */
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                border-radius: 0;
+                padding: 1rem; /* Uniform padding */
+                padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+                background-color: var(--primary-color);
+                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
+                border-top: 1px solid rgba(255, 255, 255, 0.15);
+            }
+            
+            /* Hide the price preview on small mobile screens to prioritize buttons */
+            #quote-price-preview {
+                display: none;
+            }
+
+        }
+    </style>
 </head>
-<body id="top">
-  <div class="noise-overlay"></div>
-  <div class="aurora"></div>
-  <div class="aurora-secondary"></div>
+<body>
 
-  <div class="page-shell">
-    <header>
-      <a href="#top" class="brand">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 3l9 5-9 5-9-5 9-5z" />
-          <path d="M21 8v6l-9 5-9-5V8" />
-          <path d="M12 13V8" />
-        </svg>
-        <span>Setton Source</span>
-      </a>
-      <button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" data-toggle-nav>
-        <span class="visually-hidden">Toggle navigation</span>
-        <span class="toggle-icon toggle-icon--menu" aria-hidden="true"><i data-lucide="menu"></i></span>
-        <span class="toggle-icon toggle-icon--close" aria-hidden="true"><i data-lucide="x"></i></span>
-      </button>
-      <nav id="primary-navigation" class="primary-nav" aria-label="Primary" data-nav>
-        <a href="#services">Services</a>
-        <a href="#case-studies">Work</a>
-        <a href="#testimonials">Testimonials</a>
-        <a href="#contact">Contact</a>
-        <button type="button" class="button-primary nav-cta" data-open-quote>Start instant quote</button>
-      </nav>
+    <!-- Header: Transparent and Fixed -->
+    <header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-default py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <!-- UPDATED: Increased logo size to w-12 h-12 -->
+            <a href="#" class="flex items-center space-x-2 text-2xl font-black text-white hover:text-cyan-400 transition-default">
+                <img 
+                    src="https://raw.githubusercontent.com/Setton-Source/Setton-Source/refs/heads/main/assets/lgo.png" 
+                    alt="SI-Web Logo" 
+                    class="w-12 h-12 object-contain"
+                />
+                <span>SI-Web<span class="text-[var(--accent-color)]">.</span></span>
+            </a>
+            <nav class="hidden md:flex space-x-8 font-medium">
+                <!-- REMOVED DEEP LINKS -->
+            </nav>
+            <button id="open-quote-modal" class="py-2 px-6 bg-[var(--accent-color)] text-[var(--primary-color)] font-bold rounded-full shadow-lg hover:shadow-[0_0_15px_rgba(0,210,255,0.7)] transition-default transform hover:scale-105">
+                Get Instant Quote
+            </button>
+        </div>
     </header>
 
-    <div class="nav-overlay" data-nav-overlay></div>
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="relative min-h-screen flex items-center justify-center p-6 pt-32 overflow-hidden">
+            <!-- Background Gradient/Blob Effect -->
+            <div class="absolute inset-0 bg-gradient-to-br from-[var(--primary-color)] to-[#11111f] opacity-90"></div>
+            <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-[var(--accent-color)] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
 
-    <section class="hero">
-      <div class="floating-orbs" aria-hidden="true">
-        <span class="orb-cyan"></span>
-        <span class="orb-lilac"></span>
-        <span class="orb-lime"></span>
-      </div>
-      <div class="hero-copy">
-        <span class="hero-eyebrow">Design. Build. Launch.</span>
-        <h1>Glassmorphism-first digital experiences engineered to convert.</h1>
-        <p>
-          We pair cinematic interfaces with bulletproof product strategy. From lightning-fast marketing launches to complex platform overhauls, we ship outcomes that feel otherworldly—and perform down to the decimal.
-        </p>
-        <div class="hero-actions">
-          <button type="button" class="button-primary" data-open-quote>Start instant quote</button>
-          <a href="#contact" class="button-secondary">Book a discovery call</a>
-          <a href="#case-studies" class="button-secondary">Browse launch stories</a>
-        </div>
-      </div>
-      <div class="hero-media">
-        <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1080&q=80" alt="Laptop showcasing futuristic interface" />
-      </div>
-    </section>
-
-    <section class="glass-panel">
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <span>Average launch time</span>
-          <strong>4–6 weeks</strong>
-          <p>Streamlined discovery, weekly sprints, and obsessively tracked deliverables keep momentum high.</p>
-        </div>
-        <div class="metric-card">
-          <span>Performance lift</span>
-          <strong>+31%</strong>
-          <p>Clients see conversion and retention spikes thanks to tight CRO loops and analytics baked in.</p>
-        </div>
-        <div class="metric-card">
-          <span>Platforms shipped</span>
-          <strong>42+</strong>
-          <p>Scaling startups and modern enterprises trust Setton Source with launches and revamps.</p>
-        </div>
-        <div class="metric-card">
-          <span>Support rating</span>
-          <strong>9.8/10</strong>
-          <p>Ongoing success sprints ensure learnings turn into fresh experiments after launch.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="services">
-      <div class="section-heading">
-        <span class="hero-eyebrow">Capabilities</span>
-        <h2>Everything you need to craft luminous products and stories.</h2>
-        <p>Multidisciplinary teams blend product strategy, motion artistry, and high-grade engineering to deliver experiences that feel like the future, while remaining fast, maintainable, and measurable.</p>
-      </div>
-      <div class="services-grid">
-        <article class="service-card">
-          <div class="service-icon">🚀</div>
-          <h3>Signature Launch Systems</h3>
-          <p>Modular, animation-rich marketing systems that scale with your GTM, ready for CMS integration from day one.</p>
-          <ul>
-            <li>Hero storytelling with parallax, video, and dynamic art direction.</li>
-            <li>Component libraries with automated theming and A/B-ready layouts.</li>
-            <li>SEO, analytics, and conversion tracking wired in at launch.</li>
-          </ul>
-        </article>
-        <article class="service-card">
-          <div class="service-icon">🧠</div>
-          <h3>Product Platform Experience</h3>
-          <p>Design systems, onboarding flows, and retention loops that keep customers returning—and referring friends.</p>
-          <ul>
-            <li>UX research, customer mapping, and data-backed experimentation.</li>
-            <li>Glass dashboards, realtime states, and delightful micro-interactions.</li>
-            <li>Progressive enhancements for mobile, desktop, and in-product portals.</li>
-          </ul>
-        </article>
-        <article class="service-card">
-          <div class="service-icon">🤝</div>
-          <h3>Lifecycle & Growth Ops</h3>
-          <p>From CRM journeys to product-led onboarding, we architect life-cycle programs that convert curiosity into advocacy.</p>
-          <ul>
-            <li>Automations and triggered messaging via HubSpot, Customer.io, and Braze.</li>
-            <li>Experimentation pods for pricing, packaging, and paywall funnels.</li>
-            <li>Revenue analytics dashboards tailored to your leadership KPIs.</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section id="case-studies">
-      <div class="section-heading">
-        <span class="hero-eyebrow">Launch Stories</span>
-        <h2>Projects that shimmer without sacrificing performance.</h2>
-        <p>We partner with founders, marketing teams, and product leads to fuse visual drama with pragmatic systems. Explore a few of our recent transformations.</p>
-      </div>
-      <div class="case-studies">
-        <article class="case-card">
-          <picture>
-            <img src="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1200&q=80" alt="Abstract holographic interface" />
-          </picture>
-          <div class="case-content">
-            <span>Fintech SaaS</span>
-            <h3>Meridian — From legacy dashboards to a glass-fluid analytics OS.</h3>
-            <p>Reimagined their investor analytics tool with modular glass surfaces, resulting in a 38% increase in enterprise demos.</p>
-          </div>
-        </article>
-        <article class="case-card">
-          <picture>
-            <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80" alt="Modern architectural lobby" />
-          </picture>
-          <div class="case-content">
-            <span>Luxury Hospitality</span>
-            <h3>Lumina Resorts — A cinematic booking journey.</h3>
-            <p>Crafted an immersive booking experience with realtime itinerary previews, bumping direct reservations by 29%.</p>
-          </div>
-        </article>
-        <article class="case-card">
-          <picture>
-            <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80" alt="Developers collaborating in futuristic workspace" />
-          </picture>
-          <div class="case-content">
-            <span>Developer Tools</span>
-            <h3>OpsForge — Narrative-driven product education.</h3>
-            <p>Built a living knowledge base with animated diagrams and AI-powered onboarding, shrinking time-to-value by half.</p>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section id="testimonials">
-      <div class="section-heading">
-        <span class="hero-eyebrow">Client Notes</span>
-        <h2>Teams love how we blend drama with dependability.</h2>
-        <p>Transparent collaboration, weekly insight reviews, and a calm, confident hand across design, engineering, and growth.</p>
-      </div>
-      <div class="testimonial-section">
-        <article class="testimonial-card">
-          <p>“Setton Source orchestrated a full relaunch without a single missed milestone. Their taste level is unreal, but what sold our board was how tightly they measured impact. We saw lift day one.”</p>
-          <footer>
-            <strong>Jamie Albright</strong>
-            <span>CMO, Meridian Analytics</span>
-          </footer>
-        </article>
-        <article class="testimonial-card">
-          <p>“They understand how to make digital feel tactile. Every touchpoint is glassy, responsive, and anchored by data. Our NPS jumped 12 points in the first month post-launch.”</p>
-          <footer>
-            <strong>Chloe Reyes</strong>
-            <span>Founder, Lumina Hospitality Group</span>
-          </footer>
-        </article>
-        <article class="testimonial-card">
-          <p>“Working with Setton Source felt like unlocking a secret level. Their team just quietly over-delivers—from strategy sprints to refined handoff documentation. Support has been impeccable.”</p>
-          <footer>
-            <strong>Isaac Park</strong>
-            <span>Product Lead, OpsForge</span>
-          </footer>
-        </article>
-      </div>
-    </section>
-
-    <section id="contact" class="cta">
-      <h2>Ready for a glass-smooth launch?</h2>
-      <p>Share your goals and we’ll assemble a bespoke roadmap with timeline, investment, and the experiments we’d run from week one. Expect a reply in under twelve hours.</p>
-      <div class="hero-actions" style="justify-content: center;">
-        <button type="button" class="button-primary" data-open-quote>Start instant quote</button>
-        <a href="mailto:hello@settonsource.com" class="button-secondary">hello@settonsource.com</a>
-        <a href="https://cal.com" class="button-secondary" target="_blank" rel="noopener">Schedule a session</a>
-      </div>
-    </section>
-  </div>
-
-  <footer>
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <a href="#top" class="brand" style="width: fit-content;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3l9 5-9 5-9-5 9-5z" />
-            <path d="M21 8v6l-9 5-9-5V8" />
-            <path d="M12 13V8" />
-          </svg>
-          <span>Setton Source</span>
-        </a>
-        <p>We design and engineer luminous digital platforms with translucency, motion, and measurable outcomes baked in from day one.</p>
-        <div class="footer-meta">© 2025 Setton Source. Built with clarity, curiosity, and caffeine.</div>
-      </div>
-      <div class="footer-links">
-        <strong>Studio</strong>
-        <a href="#services">Capabilities</a>
-        <a href="#case-studies">Launch stories</a>
-        <a href="#testimonials">Client love</a>
-      </div>
-      <div class="footer-links">
-        <strong>Connect</strong>
-        <a href="mailto:hello@settonsource.com">Email</a>
-        <a href="https://www.linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.instagram.com" target="_blank" rel="noopener">Instagram</a>
-      </div>
-      <div class="footer-links">
-        <strong>Resources</strong>
-        <a href="#">Case studies library</a>
-        <a href="#">Press kit</a>
-        <a href="#">Support portal</a>
-      </div>
-    </div>
-  </footer>
-
-  <div id="quote-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="quote-modal-title">
-    <div class="modal-panel">
-      <div class="modal-header">
-        <div>
-          <div class="modal-brand">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3l9 5-9 5-9-5 9-5z" />
-              <path d="M21 8v6l-9 5-9-5V8" />
-              <path d="M12 13V8" />
-            </svg>
-            <span>Setton Source</span>
-          </div>
-          <span class="modal-eyebrow">Instant quote flow</span>
-          <h2 id="quote-modal-title" class="modal-headline">Map the build in three guided steps.</h2>
-        </div>
-        <button type="button" class="icon-button" data-close-modal aria-label="Close instant quote">
-          <i data-lucide="x"></i>
-        </button>
-      </div>
-      <div class="stepper">
-        <div>
-          <div class="step-dot active" data-step-dot="1">1</div>
-          <span class="step-label active" data-step-label="1">Functionality</span>
-        </div>
-        <span class="step-line"></span>
-        <div>
-          <div class="step-dot" data-step-dot="2">2</div>
-          <span class="step-label" data-step-label="2">Design DNA</span>
-        </div>
-        <span class="step-line"></span>
-        <div>
-          <div class="step-dot" data-step-dot="3">3</div>
-          <span class="step-label" data-step-label="3">Contact &amp; Context</span>
-        </div>
-      </div>
-      <form id="quote-form" novalidate>
-        <div class="modal-grid">
-          <div class="modal-content">
-            <div class="step-panels">
-              <div class="step-panel active" data-step-panel="1">
-                <div class="field-group">
-                  <span class="field-eyebrow">Project type</span>
-                  <div class="option-grid">
-                    <button type="button" class="quote-option project-type-option" data-project-type="landing" aria-pressed="false">
-                      <span class="option-icon"><i data-lucide="sparkles"></i></span>
-                      <h3>Launch Page</h3>
-                      <p>Single page or microsite momentum.</p>
-                    </button>
-                    <button type="button" class="quote-option project-type-option" data-project-type="marketing" aria-pressed="false">
-                      <span class="option-icon"><i data-lucide="layers"></i></span>
-                      <h3>Marketing Site</h3>
-                      <p>Multi-page presence &amp; storytelling.</p>
-                    </button>
-                    <button type="button" class="quote-option project-type-option" data-project-type="ecommerce" aria-pressed="false">
-                      <span class="option-icon"><i data-lucide="shopping-bag"></i></span>
-                      <h3>E-commerce</h3>
-                      <p>Storefronts, subscriptions, funnels.</p>
-                    </button>
-                    <button type="button" class="quote-option project-type-option" data-project-type="webapp" aria-pressed="false">
-                      <span class="option-icon"><i data-lucide="blocks"></i></span>
-                      <h3>Web App / Portal</h3>
-                      <p>Dashboards, portals, internal tools.</p>
-                    </button>
-                  </div>
+            <div class="z-10 text-center max-w-4xl space-y-8">
+                <p class="text-xl text-zinc-400 animated-hero">— Your Foundation for Digital Growth</p>
+                <!-- Updated to SI-Web -->
+                <h1 class="6xl sm:text-7xl lg:text-9xl font-extrabold text-white leading-tight animated-hero">
+                    SI-<span class="text-[var(--accent-color)] block md:inline-block">WEB</span>
+                </h1>
+                
+                <!-- Typing Indicator Text Area -->
+                <div class="h-10 text-2xl font-semibold text-zinc-300 animated-hero mx-auto max-w-full overflow-hidden">
+                    <span id="typewriter-text" class="border-r-2 border-zinc-300 pr-1"></span>
                 </div>
-                <div class="dual-field-grid">
-                  <label class="range-field">
-                    <span class="field-eyebrow">Core pages</span>
-                    <input type="range" id="pages" min="1" max="12" step="1" value="3" aria-describedby="pages-output">
-                    <div class="range-output">
-                      <span>1</span>
-                      <span id="pages-output">3 pages</span>
-                      <span>12</span>
-                    </div>
-                  </label>
-                  <div class="field-group">
-                    <span class="field-eyebrow">Backend &amp; integrations</span>
-                    <div class="pill-group" role="group" aria-label="Backend requirements">
-                      <button type="button" class="pill-option backend-option" data-backend="no" aria-pressed="false">No</button>
-                      <button type="button" class="pill-option backend-option" data-backend="yes" aria-pressed="false">Yes</button>
-                    </div>
-                    <p class="form-note">APIs, auth, dashboards, automations.</p>
-                  </div>
-                </div>
-                <div class="field-group">
-                  <span class="field-eyebrow">Feature boosters</span>
-                  <div class="checkbox-grid">
-                    <label class="checkbox-card" for="feature-ecommerce">
-                      <input type="checkbox" id="feature-ecommerce" />
-                      <div>
-                        <span>Payments &amp; commerce</span>
-                        <p>Subscriptions, checkout flows, or gated offers.</p>
-                      </div>
-                    </label>
-                    <label class="checkbox-card" for="feature-admin">
-                      <input type="checkbox" id="feature-admin" />
-                      <div>
-                        <span>Admin / CMS</span>
-                        <p>Manageable content, data tools, and insights.</p>
-                      </div>
-                    </label>
-                    <label class="checkbox-card" for="feature-support">
-                      <input type="checkbox" id="feature-support" />
-                      <div>
-                        <span>Live support suite</span>
-                        <p>Chat, help centers, and customer success flows.</p>
-                      </div>
-                    </label>
-                    <label class="checkbox-card" for="feature-automation">
-                      <input type="checkbox" id="feature-automation" />
-                      <div>
-                        <span>Automation &amp; CRM</span>
-                        <p>Lifecycle journeys, CRM sync, and analytics boosts.</p>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
 
-              <div class="step-panel" data-step-panel="2">
-                <div class="dual-field-grid">
-                  <label class="field-group">
-                    <span class="field-eyebrow">Design tone</span>
-                    <select id="design-tone" class="select-field">
-                      <option value="sleek">Sleek &amp; minimal</option>
-                      <option value="vibrant">Vibrant &amp; playful</option>
-                      <option value="editorial">Editorial &amp; premium</option>
-                      <option value="experimental">Experimental &amp; bold</option>
-                    </select>
-                    <p class="form-note">Helps align art direction and typography.</p>
-                  </label>
-                  <label class="field-group">
-                    <span class="field-eyebrow">Interaction level</span>
-                    <select id="interaction-level" class="select-field">
-                      <option value="balanced">Balanced</option>
-                      <option value="minimal">Minimal motion</option>
-                      <option value="immersive">High-immersion</option>
-                    </select>
-                    <p class="form-note">Choose how much motion &amp; polish you want.</p>
-                  </label>
-                </div>
-                <div class="dual-field-grid">
-                  <label class="field-group">
-                    <span class="field-eyebrow">Logo ready to use?</span>
-                    <select id="logo-status" class="select-field">
-                      <option value="yes">Yes, ready</option>
-                      <option value="no">Need help</option>
-                    </select>
-                    <p class="form-note">We can include a rapid refresh if you need one.</p>
-                  </label>
-                  <label class="field-group">
-                    <span class="field-eyebrow">Do you already own a URL?</span>
-                    <select id="url-status" class="select-field">
-                      <option value="live">I have one</option>
-                      <option value="buy">Need to purchase</option>
-                    </select>
-                    <p class="form-note">We’ll secure domains and hosting if you don’t.</p>
-                  </label>
-                </div>
-                <label class="field-group">
-                  <span class="field-eyebrow">Link to current site or inspiration (optional)</span>
-                  <input type="url" id="project-url" class="input-field" placeholder="https://" />
-                </label>
-              </div>
-
-              <div class="step-panel" data-step-panel="3">
-                <div class="dual-field-grid">
-                  <label class="field-group">
-                    <span class="field-eyebrow">Your name</span>
-                    <input type="text" id="name" name="name" class="input-field" placeholder="Jordan Founder" required />
-                  </label>
-                  <label class="field-group">
-                    <span class="field-eyebrow">Email</span>
-                    <input type="email" id="email" name="email" class="input-field" placeholder="you@brand.com" required />
-                  </label>
-                  <label class="field-group">
-                    <span class="field-eyebrow">Phone</span>
-                    <input type="tel" id="phone" name="phone" class="input-field" placeholder="(555) 123-4567" required />
-                  </label>
-                  <label class="field-group">
-                    <span class="field-eyebrow">Company / Brand</span>
-                    <input type="text" id="project-name" name="project-name" class="input-field" placeholder="NovaLabs" required />
-                  </label>
-                </div>
-                <label class="field-group">
-                  <span class="field-eyebrow">Timeline</span>
-                  <select id="timeline" class="select-field">
-                    <option value="standard">Standard (6–8 weeks)</option>
-                    <option value="accelerated">Accelerated (4–6 weeks)</option>
-                    <option value="rapid">Rapid sprint (2–4 weeks)</option>
-                  </select>
-                </label>
-                <label class="field-group">
-                  <span class="field-eyebrow">Project goals &amp; comments</span>
-                  <textarea id="project-description" class="textarea-field" rows="4" placeholder="Share the story, KPI, or inspiration we should know about..."></textarea>
-                </label>
-              </div>
-            </div>
-
-            <div class="quote-footer">
-              <button type="button" id="prev-step" class="button-ghost is-disabled">
-                <i data-lucide="arrow-left"></i>
-                <span>Previous</span>
-              </button>
-              <div class="quote-footer-actions">
-                <button type="button" id="next-step" class="button-primary">
-                  <span>Next step</span>
-                  <i data-lucide="arrow-right"></i>
+                <button id="hero-quote-button" class="mt-8 py-3 px-10 text-lg bg-white text-[var(--primary-color)] font-extrabold rounded-lg shadow-xl hover:bg-[var(--accent-color)] hover:text-white transition-default transform hover:scale-105 animated-hero">
+                    Launch Your Project — Get Instant Quote
                 </button>
-                <button type="submit" id="submit-button" class="button-primary hidden">
-                  <span>Submit quote</span>
-                  <i data-lucide="send"></i>
+            </div>
+        </section>
+
+        <!-- My Work Section -->
+        <section id="work" class="py-20 lg:py-32 px-6">
+            <div class="container mx-auto">
+                <h2 class="text-4xl lg:text-5xl font-extrabold text-center mb-16 text-white">My Work</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+                    <!-- Project 1: Second Hand Cell (IFRAME SNAPSHOT) -->
+                    <a href="https://secondhandcell.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
+                        <div class="h-48 overflow-hidden relative">
+                            <div class="iframe-container transition-default group-hover:scale-110">
+                                <iframe src="https://secondhandcell.com" class="iframe-snapshot" title="Second Hand Cell Preview"></iframe>
+                                <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Second Hand Cell</h3>
+                            <p class="text-zinc-400 text-sm mt-2">Mobile E-commerce Platform</p>
+                            <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
+                                Visit Site <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Project 2: YDE Seniors (IFRAME SNAPSHOT) -->
+                    <a href="https://ydeseniors.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
+                         <div class="h-48 overflow-hidden relative">
+                            <div class="iframe-container transition-default group-hover:scale-110">
+                                <iframe src="https://ydeseniors.com" class="iframe-snapshot" title="YDE Seniors Preview"></iframe>
+                                <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">YDE Seniors</h3>
+                            <p class="text-zinc-400 text-sm mt-2">Educational / School Portal</p>
+                            <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
+                                Visit Site <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Project 3: Binyan Shalem (IFRAME SNAPSHOT) -->
+                    <a href="https://binyan-shalem.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
+                        <div class="h-48 overflow-hidden relative">
+                            <div class="iframe-container transition-default group-hover:scale-110">
+                                <iframe src="https://binyan-shalem.com" class="iframe-snapshot" title="Binyan Shalem Preview"></iframe>
+                                <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Binyan Shalem</h3>
+                            <p class="text-zinc-400 text-sm mt-2">Non-profit/Organizational Site</p>
+                            <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
+                                Visit Site <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Project 4: Torat Yosef Raffle (IFRAME SNAPSHOT) -->
+                    <a href="https://toratyosefsummerraffle.com" target="_blank" class="block group rounded-xl overflow-hidden shadow-2xl bg-[#2a2a44] hover:shadow-[0_0_20px_rgba(0,210,255,0.4)] transition-default transform hover:-translate-y-2">
+                        <div class="h-48 overflow-hidden relative">
+                            <div class="iframe-container transition-default group-hover:scale-110">
+                                <iframe src="https://toratyosefsummerraffle.com" class="iframe-snapshot" title="Torat Yosef Raffle Preview"></iframe>
+                                <div class="iframe-overlay"></div> <!-- Invisible overlay for non-interactivity -->
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white group-hover:text-[var(--accent-color)] transition-default">Torat Yosef Raffle</h3>
+                            <p class="text-zinc-400 text-sm mt-2">Fundraising/Raffle Site</p>
+                            <span class="inline-flex items-center text-sm mt-4 text-[var(--accent-color)] group-hover:text-white transition-default">
+                                Visit Site <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>        
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 lg:py-32 px-6 bg-[#11111f] text-center">
+            <div class="container mx-auto max-w-3xl">
+                <h2 class="text-4xl lg:text-5xl font-extrabold mb-6 text-white">Ready to build something amazing?</h2>
+                <p class="text-xl text-zinc-400 mb-10">
+                    Your next high-performing website is just a quote away.
+                </p>
+                <button id="footer-quote-button" class="py-3 px-10 text-lg bg-[var(--accent-color)] text-[var(--primary-color)] font-extrabold rounded-lg shadow-xl hover:shadow-[0_0_20px_rgba(0,210,255,0.9)] transition-default transform hover:scale-105">
+                    Start My Project Quote
                 </button>
-              </div>
             </div>
-          </div>
+        </section>
+    </main>
 
-          <aside class="estimate-summary">
-            <header>
-              <span>Live estimate</span>
-              <h3 id="estimate-total">$0</h3>
-              <p>Totals update as you adjust the scope.</p>
-            </header>
-            <div class="estimate-breakdown" id="estimate-breakdown"></div>
-            <div class="estimate-note">
-              <span class="note-icon"><i data-lucide="sparkles"></i></span>
-              <div class="form-note">Need something extra? Add notes in Step 3—we’ll include it in the follow-up scope.</div>
-            </div>
-          </aside>
+    <!-- Footer -->
+    <footer class="py-8 text-center text-zinc-500 text-sm bg-black">
+        <div class="container mx-auto flex justify-center items-center space-x-6">
+            <span>&copy; 2025 SI-Web. Built with precision and passion.</span>
+            <!-- ADMIN LINK -->
+            <a href="admin.html" class="text-zinc-600 hover:text-[var(--accent-color)] transition-default flex items-center">
+                <i data-lucide="lock" class="w-4 h-4 mr-1"></i> Admin
+            </a>
         </div>
-      </form>
+    </footer>
+
+    <!-- Quote Generation Modal -->
+    <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 flex justify-center items-start py-8 px-4 hidden modal-exit overflow-y-auto">
+        <div class="bg-[var(--primary-color)] rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-8 my-auto modal-content-box transition-default">
+            
+            <!-- Progress Bar (NEW) -->
+            <div class="w-full bg-zinc-700 rounded-full h-2.5 mb-6 flex-shrink-0">
+                <div id="quote-progress-bar" class="bg-[var(--accent-color)] h-2.5 rounded-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
+            </div>
+            
+            <div class="flex justify-between items-center mb-6 border-b border-zinc-700 pb-4 flex-shrink-0">
+                <h3 class="text-3xl font-bold text-white">Project Quote — Step <span id="current-step-display">1</span>/3</h3>
+                <button id="close-quote-modal" class="text-zinc-400 hover:text-[var(--accent-color)] transition-default">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Quote Form Steps -->
+            <form id="quote-form" class="space-y-0">
+                
+                <!-- This container holds all step content and is the only element that scrolls -->
+                <div id="step-1-content" class="space-y-6">
+                    
+                    <!-- 1. Project Type (NEW) -->
+                    <div>
+                        <label class="block text-lg font-semibold mb-3 text-zinc-300">1. What is the primary purpose of your site?</label>
+                        <div id="project-type-group" class="grid grid-cols-2 sm:grid-cols-3 gap-3 custom-radio">
+                            <input type="radio" id="type-fundraiser" name="projectType" value="Fundraiser/Event" class="hidden">
+                            <label for="type-fundraiser" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Fundraiser/Event</label>
+
+                            <input type="radio" id="type-shop" name="projectType" value="E-commerce/Shop" data-cost="300" class="hidden">
+                            <label for="type-shop" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Shop Site</label>
+
+                            <input type="radio" id="type-portfolio" name="projectType" value="Portfolio/Brochure" class="hidden">
+                            <label for="type-portfolio" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Portfolio</label>
+
+                            <input type="radio" id="type-info" name="projectType" value="Informational" class="hidden"> <!-- REMOVED DEFAULT CHECK -->
+                            <label for="type-info" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Informational</label>
+                            
+                            <input type="radio" id="type-custom" name="projectType" value="Custom App" data-cost="900" class="hidden">
+                            <label for="type-custom" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">Custom App</label>
+                        </div>
+                    </div>
+
+
+                    <!-- 2. Number of Pages (CLEAN LABELS) -->
+                    <div>
+                        <label class="block text-lg font-semibold mb-3 text-zinc-300">2. How many unique pages will your site require?</label>
+                        <div id="pages-group" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 custom-radio">
+                            <!-- 1 Page: $1,000 (BASE) -->
+                            <input type="radio" id="pages-1" name="pages" value="1" data-cost="0" class="hidden"> <!-- REMOVED DEFAULT CHECK -->
+                            <label for="pages-1" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">1 Page</label>
+
+                            <!-- 3 Pages: $1,500 (+$500) -->
+                            <input type="radio" id="pages-3" name="pages" value="3" data-cost="400" class="hidden">
+                            <label for="pages-3" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">3 Pages</label>
+
+                            <!-- 5 Pages: $2,500 (+$1500) -->
+                            <input type="radio" id="pages-5" name="pages" value="5" data-cost="1000" class="hidden">
+                            <label for="pages-5" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">5 Pages</label>
+
+                            <!-- 7 Pages: $3,000 (+$2000) -->
+                            <input type="radio" id="pages-7" name="pages" value="7" data-cost="1600" class="hidden">
+                            <label for="pages-7" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">7 Pages</label>
+
+                            <!-- 10+ Pages: $5,000 (+$4000) -->
+                            <input type="radio" id="pages-10-plus" name="pages" value="10+" data-cost="2500" class="hidden">
+                            <label for="pages-10-plus" class="p-3 text-sm rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)] flex items-center justify-center">10+ Pages</label>
+                        </div>
+                    </div>
+
+                    <!-- 3. Backend/Database Requirement (WITH INFO BUTTON) -->
+                    <div>
+                        <div class="flex items-center mb-3">
+                            <label class="block text-lg font-semibold text-zinc-300">3. Will you require a backend/database?</label>
+                            <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="backend-info"></i>
+                        </div>
+                        <div id="backend-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
+                            The backend is the brain of your website. It's needed for features like user logins, storing product data, saving form entries, or handling any dynamic content (content that changes based on user actions or time).
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 custom-radio">
+                            <input type="radio" id="backend-no" name="backend" value="no" data-cost="0" class="hidden"> <!-- REMOVED DEFAULT CHECK -->
+                            <label for="backend-no" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">No Backend (Static)</label>
+
+                            <input type="radio" id="backend-yes" name="backend" value="yes" data-cost="1200" class="hidden">
+                            <label for="backend-yes" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">Yes, I need a Backend</label>
+                        </div>
+                    </div>
+
+                    <!-- 4. Site Type / Key Features (WITH INFO BUTTONS) -->
+                    <div>
+                        <label class="block text-lg font-semibold mb-3 text-zinc-300">4. Select the key features needed:</label>
+                        <div class="space-y-3">
+                            <div class="flex flex-col">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="feature-ecommerce" name="feature-ecommerce" data-cost="900" class="w-5 h-5 accent-[var(--accent-color)] rounded">
+                                    <label for="feature-ecommerce" class="ml-3 text-zinc-300">Store / Payment Gateway Integration</label>
+                                    <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="ecommerce-info"></i>
+                                </div>
+                                <div id="ecommerce-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
+                                    This covers setting up product listings, shopping carts, checkout logic, and connecting to services like PayPal or Stripe to securely accept payments.
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="feature-admin" name="feature-admin" data-cost="450" class="w-5 h-5 accent-[var(--accent-color)] rounded">
+                                    <label for="feature-admin" class="ml-3 text-zinc-300">Custom Admin/CMS Page</label>
+                                    <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="admin-info"></i>
+                                </div>
+                                <div id="admin-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
+                                    A Content Management System (CMS) or admin page lets you easily update text, change images, add blog posts, or modify products yourself without needing a developer for every little change.
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="feature-support" name="feature-support" data-cost="280" class="w-5 h-5 accent-[var(--accent-color)] rounded">
+                                    <label for="feature-support" class="ml-3 text-zinc-300">Customer Support / Live Chat Integration</label>
+                                    <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="support-info"></i>
+                                </div>
+                                <div id="support-info" class="info-box hidden mt-2 p-3 text-sm rounded-lg bg-[#3a3a5e] text-zinc-200">
+                                    Integrating a tool like Tidio, Zendesk, or a similar service to allow visitors to instantly chat with your team or send support requests directly from the website.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Color Scheme (WITH INFO BUTTON) -->
+                    <div>
+                        <div class="flex items-center mb-3">
+                            <label class="block text-lg font-semibold text-zinc-300">5. Do you have a defined color scheme?</label>
+                            <i data-lucide="help-circle" class="w-5 h-5 ml-2 cursor-pointer text-zinc-500 hover:text-white transition-colors" data-info-target="color-info"></i>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 custom-radio">
+                            <input type="radio" id="colors-yes" name="colors" value="yes" data-cost="0" class="hidden"> <!-- REMOVED DEFAULT CHECK -->
+                            <label for="colors-yes" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">Yes (Standard)</label>
+
+                            <input type="radio" id="colors-custom" name="colors" value="custom" data-cost="200" class="hidden">
+                            <label for="colors-custom" class="p-4 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">Custom Branding/Color Audit</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Contact Information -->
+                <div id="step-2-content" class="hidden space-y-4">
+                    <p class="text-lg font-semibold text-zinc-300 mb-4">Please provide your contact information to receive the quote summary.</p>
+                    
+                    <div>
+                        <label for="contact-name" class="block text-sm font-medium text-zinc-400 mb-1">Your Full Name (Required)</label>
+                        <input type="text" id="contact-name" name="contact-name" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+                    
+                    <div>
+                        <label for="contact-email" class="block text-sm font-medium text-zinc-400 mb-1">Email Address (Required)</label>
+                        <input type="email" id="contact-email" name="contact-email" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+
+                    <div>
+                        <label for="contact-phone" class="block text-sm font-medium text-zinc-400 mb-1">Phone Number (10 Digits Required)</label>
+                        <input type="tel" id="contact-phone" name="contact-phone" required pattern="\d{10}" title="Phone number must be exactly 10 digits" class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+                </div>
+
+                <!-- Step 3: Project Details -->
+                <div id="step-3-content" class="hidden space-y-4">
+                    <p class="text-lg font-semibold text-zinc-300 mb-4">Final project details.</p>
+                    
+                    <!-- 1. Project Name (REQUIRED) -->
+                    <div>
+                        <label for="project-name" class="block text-sm font-medium text-zinc-400 mb-1">Website Name/Business Name (Required)</label>
+                        <input type="text" id="project-name" name="project-name" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+                    
+                    <!-- 2. Project URL (REQUIRED) -->
+                    <div>
+                        <label for="project-url" class="block text-sm font-medium text-zinc-400 mb-1">Intended/Existing URL (Required)</label>
+                        <input type="url" id="project-url" name="project-url" required class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default">
+                    </div>
+
+                    <!-- 3. URL Ownership Status (NEW, REQUIRED) -->
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">URL Status (Domain Name Required)</label>
+                        <div id="url-status-group" class="grid grid-cols-2 gap-3 custom-radio">
+                            <input type="radio" id="url-owned" name="url-status" value="owned" data-cost="0" class="hidden">
+                            <label for="url-owned" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">I own the domain.</label>
+                            
+                            <input type="radio" id="url-buy" name="url-status" value="buy" data-cost="0" class="hidden">
+                            <label for="url-buy" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">Need help acquiring it.</label>
+                        </div>
+                    </div>
+
+                    <!-- 4. Project Description (NEW, REQUIRED) -->
+                    <div class="mt-4">
+                        <label for="project-description" class="block text-sm font-medium text-zinc-400 mb-1">Quick Site Description (Required)</label>
+                        <textarea id="project-description" name="project-description" rows="3" required placeholder="E.g., A sleek, mobile-first portfolio site for my photography business with a secure client login area." class="input-text w-full p-3 rounded-lg bg-[#2a2a44] border border-zinc-600 text-white placeholder-zinc-500 transition-default"></textarea>
+                    </div>
+
+                    <!-- Existing Logo Status -->
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">Do you have a company logo?</label>
+                        <div class="grid grid-cols-2 gap-3 custom-radio">
+                            <input type="radio" id="logo-yes" name="logo-status" value="yes" data-cost="0" class="hidden" checked>
+                            <label for="logo-yes" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer hover:border-[var(--accent-color)]">Yes, I have one.</label>
+                            
+                            <!-- $100 for logo creation service, label is clean -->
+                            <input type="radio" id="logo-no" name="logo-status" value="no" data-cost="250" class="hidden">
+                            <label for="logo-no" class="p-3 rounded-xl border-2 border-zinc-600 text-center cursor-pointer transition-default hover:border-[var(--accent-color)]">No, create one</label>
+                        </div>
+                        <p class="text-xs text-zinc-500 mt-2">Note: This is an estimate for a basic design. Complex branding will require a custom quote. The logo creation service adds $100 to your total.</p>
+                    </div>
+
+                </div>
+
+                <!-- Step Navigation and Quote Result -->
+                <div class="mt-8 pt-6 border-t border-zinc-700 quote-footer">
+                    <div id="navigation-buttons" class="flex justify-between items-center">
+                        <button type="button" id="prev-step" class="py-2 px-4 bg-zinc-600 text-white font-bold rounded-lg transition-default hover:bg-zinc-500 hidden">
+                            <i data-lucide="arrow-left" class="w-4 h-4 inline mr-2"></i> Back
+                        </button>
+                        
+                        <div id="quote-price-preview" class="text-center">
+                            <p class="text-lg font-medium text-zinc-300">Current Estimate:</p>
+                            <p id="quote-result" class="text-4xl font-extrabold text-[var(--accent-color)] mt-1">$1,199</p>
+                        </div>
+
+                        <button type="button" id="next-step" class="py-2 px-4 bg-[var(--accent-color)] text-[var(--primary-color)] font-bold rounded-lg transition-default hover:bg-cyan-400">
+                            Continue <i data-lucide="arrow-right" class="w-4 h-4 inline ml-2"></i>
+                        </button>
+
+                        <button type="submit" id="submit-quote" class="py-2 px-4 bg-green-500 text-[var(--primary-color)] font-bold rounded-lg transition-default hover:bg-green-400 hidden">
+                            Submit Quote
+                        </button>
+                    </div>
+
+                    <div id="submission-status" class="hidden text-center mt-6 p-4 rounded-lg bg-[#3a3a5e]">
+                        <p id="status-message" class="text-xl font-bold text-white mb-2"></p>
+                        <p id="final-price-display" class="text-4xl font-extrabold text-[var(--accent-color)] mb-4"></p>
+                        <p id="disclaimer-text" class="text-sm text-zinc-400">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 inline mr-1 text-yellow-500"></i>
+                            This is an ESTIMATE. The final price may fluctuate based on detailed scope requests, content readiness, and unforeseen technical complexity. We will contact you shortly to confirm the details.
+                        </p>
+                    </div>
+                </div>
+
+            </form>
+        </div>
     </div>
-  </div>
 
-  <div id="success-toast" class="toast success hidden" role="status" aria-live="polite">
-    <div class="toast-icon"><i data-lucide="check"></i></div>
-    <div>
-      <strong>Quote captured!</strong>
-      <p>We just synced your request to our admin dashboard. Expect a personal reply shortly.</p>
-    </div>
-  </div>
+    <!-- Firebase SDK Imports (MUST use type="module") -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- ADDED: ENABLE FIREBASE DEBUG LOGGING ---
+        setLogLevel('debug'); 
 
-  <div id="error-toast" class="toast error hidden" role="status" aria-live="assertive">
-    <div class="toast-icon"><i data-lucide="alert-triangle"></i></div>
-    <div>
-      <strong>Something went wrong</strong>
-      <p>Please try again or email hello@settonsource.com so we can assist manually.</p>
-    </div>
-  </div>
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Use provided config with fallback for safety
+        const userProvidedConfig = {
+            apiKey: "AIzaSyCcUMZmKwdOcUj4KszvTkPKlo-HmiVCXZU",
+            authDomain: "setton-source-68177.firebaseapp.com",
+            projectId: "setton-source-68177",
+            storageBucket: "setton-source-68177.firebasestorage.app",
+            messagingSenderId: "153708206059",
+            appId: "1:153708206059:web:14cc935233eee4ecdb72bae",
+            measurementId: "G-YW9WN4489T"
+        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userProvidedConfig;
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCcUMZmKwdOcUj4KszvTkPKlo-HmiVCXZU",
-      authDomain: "setton-source-68177.firebaseapp.com",
-      projectId: "setton-source-68177",
-      storageBucket: "setton-source-68177.firebasestorage.app",
-      messagingSenderId: "153708206059",
-      appId: "1:153708206059:web:14cc935233eee4ecdb72bae",
-      measurementId: "G-YW9WN4489T"
-    };
+        // Initialize Firebase
+        let app, auth, db, userId;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            // --- REVISED AUTH LOGIC FOR ROBUSTNESS using onAuthStateChanged ---
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    try {
+                        // Attempt anonymous sign-in if no user is found
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Authentication failed during initialization or fallback:", error);
+                    }
+                }
+                
+                // Set userId after successful sign-in or attempt
+                userId = auth.currentUser?.uid || 'anonymous-user';
+                console.log("Firebase Auth Ready. User ID:", userId);
+            });
+            // --- END REVISED AUTH LOGIC ---
 
-    const pricingMatrix = {
-      landing: { label: "Launch Page", base: 850, includedPages: 1, perPage: 150 },
-      marketing: { label: "Marketing Site", base: 1600, includedPages: 3, perPage: 200 },
-      ecommerce: { label: "E-commerce", base: 2500, includedPages: 4, perPage: 450 },
-      webapp: { label: "Web App / Portal", base: 3200, includedPages: 4, perPage: 500 },
-    };
-
-    const timelinePricing = {
-      standard: { label: "Standard", multiplier: 1 },
-      accelerated: { label: "Accelerated", multiplier: 1.18 },
-      rapid: { label: "Rapid Sprint", multiplier: 1.32 },
-    };
-
-    const backendCost = 950;
-    const featurePricing = {
-      "feature-ecommerce": { label: "Payments & commerce", cost: 600 },
-      "feature-admin": { label: "Admin / CMS", cost: 500 },
-      "feature-support": { label: "Live support suite", cost: 280 },
-      "feature-automation": { label: "Automation & CRM", cost: 500 },
-    };
-    const logoRefreshCost = 50;
-    const domainSetupCost = 50;
-
-    const projectTypeButtons = Array.from(document.querySelectorAll('.project-type-option'));
-    const backendButtons = Array.from(document.querySelectorAll('.backend-option'));
-    const pagesRange = document.getElementById('pages');
-    const pagesOutput = document.getElementById('pages-output');
-    const estimateTotal = document.getElementById('estimate-total');
-    const estimateBreakdown = document.getElementById('estimate-breakdown');
-    const form = document.getElementById('quote-form');
-    const submitButton = document.getElementById('submit-button');
-    const successToast = document.getElementById('success-toast');
-    const errorToast = document.getElementById('error-toast');
-    const openQuoteButtons = Array.from(document.querySelectorAll('[data-open-quote]'));
-    const quoteModal = document.getElementById('quote-modal');
-    const closeModalButtons = Array.from(document.querySelectorAll('[data-close-modal]'));
-    const stepPanels = Array.from(document.querySelectorAll('[data-step-panel]'));
-    const stepPanelsContainer = document.querySelector('.step-panels');
-    const stepDots = Array.from(document.querySelectorAll('[data-step-dot]'));
-    const stepLabels = Array.from(document.querySelectorAll('[data-step-label]'));
-    const prevStepButton = document.getElementById('prev-step');
-    const nextStepButton = document.getElementById('next-step');
-    const body = document.body;
-    const headerElement = document.querySelector('header');
-    const primaryNav = document.querySelector('[data-nav]');
-    const navToggle = document.querySelector('[data-toggle-nav]');
-    const navOverlay = document.querySelector('[data-nav-overlay]');
-    const navInteractiveElements = primaryNav ? Array.from(primaryNav.querySelectorAll('a, button')) : [];
-
-    let selectedProjectType = 'marketing';
-    let backendRequirement = 'no';
-    let currentStep = 1;
-
-    function updateHeaderState() {
-      if (!headerElement) return;
-      const shouldStick = window.scrollY > 12 || (primaryNav && primaryNav.classList.contains('is-open'));
-      headerElement.classList.toggle('is-stuck', shouldStick);
-    }
-
-    function setNavOpen(open) {
-      if (!primaryNav || !navToggle) return;
-      primaryNav.classList.toggle('is-open', open);
-      navToggle.setAttribute('aria-expanded', String(open));
-      body.classList.toggle('nav-open', open);
-      if (navOverlay) {
-        navOverlay.classList.toggle('is-visible', open);
-      }
-      updateHeaderState();
-    }
-
-    function toggleNav() {
-      if (!primaryNav) return;
-      const shouldOpen = !primaryNav.classList.contains('is-open');
-      setNavOpen(shouldOpen);
-    }
-
-    navToggle?.addEventListener('click', () => {
-      toggleNav();
-    });
-
-    navOverlay?.addEventListener('click', () => {
-      setNavOpen(false);
-    });
-
-    navInteractiveElements.forEach((element) => {
-      element.addEventListener('click', () => {
-        if (window.matchMedia('(max-width: 760px)').matches) {
-          setNavOpen(false);
+        } catch (e) {
+            console.error("Firebase initialization error:", e);
         }
-      });
-    });
 
-    window.addEventListener('resize', () => {
-      if (window.matchMedia('(min-width: 761px)').matches) {
-        setNavOpen(false);
-      } else {
-        updateHeaderState();
-      }
-    });
+        // ------------------
+        // DOM Elements and State
+        // ------------------
+        const quoteModal = document.getElementById('quote-modal');
+        const openButtons = document.querySelectorAll('#open-quote-modal, #hero-quote-button, #footer-quote-button');
+        const closeButton = document.getElementById('close-quote-modal');
+        const quoteForm = document.getElementById('quote-form');
+        const quoteResult = document.getElementById('quote-result');
+        const stepDisplay = document.getElementById('current-step-display');
+        const prevStepBtn = document.getElementById('prev-step');
+        const nextStepBtn = document.getElementById('next-step');
+        const submitQuoteBtn = document.getElementById('submit-quote');
+        const statusDiv = document.getElementById('submission-status');
+        const statusMessage = document.getElementById('status-message');
+        const finalPriceDisplay = document.getElementById('final-price-display');
+        const pricePreview = document.getElementById('quote-price-preview');
+        const progressBar = document.getElementById('quote-progress-bar');
+        
+        // NEW ELEMENTS for validation targeting
+        const projectTypeGroup = document.getElementById('project-type-group'); // NEW
+        const pagesGroup = document.getElementById('pages-group');
+        const urlStatusGroup = document.getElementById('url-status-group');
+        const disclaimerText = document.getElementById('disclaimer-text');
 
-    window.addEventListener('scroll', updateHeaderState, { passive: true });
 
-    updateHeaderState();
+        const stepContents = [
+            document.getElementById('step-1-content'),
+            document.getElementById('step-2-content'),
+            document.getElementById('step-3-content')
+        ];
+        let currentStep = 0; // 0-indexed
 
-    const formatCurrency = (value) => new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0,
-    }).format(Math.round(value));
+        // Base Price for a simple 1-page static site is $1000
+        const BASE_PRICE = 1199; // Premium base price
 
-    function highlightSelection(collection, activeButton) {
-      collection.forEach((button) => {
-        const isActive = button === activeButton;
-        button.classList.toggle('is-active', isActive);
-        button.setAttribute('aria-pressed', String(isActive));
-      });
-    }
+        // ------------------
+        // 1. Header Scroll Logic (Kept from previous version)
+        // ------------------
+        const header = document.getElementById('main-header');
+        const scrollThreshold = 50;
 
-    projectTypeButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        selectedProjectType = button.dataset.projectType;
-        highlightSelection(projectTypeButtons, button);
-        updateEstimate();
-      });
-    });
-
-    backendButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        backendRequirement = button.dataset.backend;
-        highlightSelection(backendButtons, button);
-        updateEstimate();
-      });
-    });
-
-    pagesRange.addEventListener('input', () => {
-      pagesOutput.textContent = `${pagesRange.value} ${pagesRange.value === '1' ? 'page' : 'pages'}`;
-      updateEstimate();
-    });
-
-    document.querySelectorAll('input[type="checkbox"], select').forEach((input) => {
-      input.addEventListener('change', updateEstimate);
-    });
-
-    function updateEstimate() {
-      const matrix = pricingMatrix[selectedProjectType];
-      const pages = Number(pagesRange.value);
-      const timeline = document.getElementById('timeline').value;
-      const logoStatus = document.getElementById('logo-status').value;
-      const urlStatus = document.getElementById('url-status').value;
-
-      let total = matrix.base;
-      const breakdownItems = [{ label: matrix.label, cost: matrix.base }];
-
-      if (pages > matrix.includedPages) {
-        const extraPages = pages - matrix.includedPages;
-        const extraCost = extraPages * matrix.perPage;
-        total += extraCost;
-        breakdownItems.push({ label: `Additional pages (${extraPages})`, cost: extraCost });
-      }
-
-      if (backendRequirement === 'yes') {
-        total += backendCost;
-        breakdownItems.push({ label: 'Backend & integrations', cost: backendCost });
-      }
-
-      Object.entries(featurePricing).forEach(([id, details]) => {
-        const checkbox = document.getElementById(id);
-        if (checkbox.checked) {
-          total += details.cost;
-          breakdownItems.push({ label: details.label, cost: details.cost });
+        function updateHeader() {
+            if (window.scrollY > scrollThreshold) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
         }
-      });
 
-      if (logoStatus === 'no') {
-        total += logoRefreshCost;
-        breakdownItems.push({ label: 'Rapid brand refresh', cost: logoRefreshCost });
-      }
+        window.addEventListener('scroll', updateHeader);
+        updateHeader();
 
-      if (urlStatus === 'buy') {
-        total += domainSetupCost;
-        breakdownItems.push({ label: 'Domain & hosting setup', cost: domainSetupCost });
-      }
+        // ------------------
+        // 2. Typing Indicator Logic (Kept from previous version)
+        // ------------------
+        const typewriterTextElement = document.getElementById('typewriter-text');
+        const phrases = [
+            "Architecting High-Impact Web Solutions.",
+            "Designing Sleek, Modern Portfolios.",
+            "Building Complex E-commerce Platforms.",
+            "SI-Web: Your Digital Foundation."
+        ];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
 
-      const timelineDetails = timelinePricing[timeline];
-      if (timelineDetails.multiplier > 1) {
-        const preTimelineTotal = total;
-        total *= timelineDetails.multiplier;
-        breakdownItems.push({ label: `${timelineDetails.label} delivery uplift`, cost: total - preTimelineTotal });
-      }
+        function typeWriter() {
+            const currentPhrase = phrases[phraseIndex];
+            let displayText = currentPhrase;
 
-      estimateTotal.textContent = formatCurrency(total);
-      renderBreakdown(breakdownItems);
-      return Math.round(total);
-    }
+            if (isDeleting) {
+                displayText = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                displayText = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+            }
 
-    function renderBreakdown(items) {
-      estimateBreakdown.innerHTML = '';
-      if (!items.length) {
-        const emptyMessage = document.createElement('p');
-        emptyMessage.className = 'form-note';
-        emptyMessage.textContent = 'Adjust inputs to see a detailed breakdown.';
-        estimateBreakdown.appendChild(emptyMessage);
-        return;
-      }
+            typewriterTextElement.textContent = displayText;
 
-      const fragment = document.createDocumentFragment();
-      items.forEach((item) => {
-        const row = document.createElement('div');
-        row.className = 'estimate-row';
-        row.innerHTML = `<span>${item.label}</span><span>${formatCurrency(item.cost)}</span>`;
-        fragment.appendChild(row);
-      });
-      estimateBreakdown.appendChild(fragment);
-    }
+            let typingSpeed = 70;
+            
+            if (isDeleting) {
+                typingSpeed = 30;
+            }
 
-    function toggleToast(toastElement, show) {
-      if (!toastElement) return;
-      if (show) {
-        toastElement.classList.remove('hidden');
-        requestAnimationFrame(() => toastElement.classList.add('show'));
-        setTimeout(() => toggleToast(toastElement, false), 5200);
-      } else {
-        toastElement.classList.remove('show');
-        setTimeout(() => {
-          toastElement.classList.add('hidden');
-        }, 220);
-      }
-    }
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                typingSpeed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                typingSpeed = 500;
+            }
 
-    function showStep(step) {
-      const totalSteps = stepPanels.length;
-      currentStep = Math.max(1, Math.min(step, totalSteps));
-      stepPanels.forEach((panel, index) => {
-        panel.classList.toggle('active', index === currentStep - 1);
-      });
-      stepDots.forEach((dot, index) => {
-        dot.classList.toggle('active', index <= currentStep - 1);
-      });
-      stepLabels.forEach((label, index) => {
-        label.classList.toggle('active', index === currentStep - 1);
-      });
-
-      if (stepPanelsContainer) {
-        stepPanelsContainer.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      const atStart = currentStep === 1;
-      const atEnd = currentStep === totalSteps;
-      prevStepButton.disabled = atStart;
-      prevStepButton.classList.toggle('is-disabled', atStart);
-      nextStepButton.classList.toggle('hidden', atEnd);
-      submitButton.classList.toggle('hidden', !atEnd);
-    }
-
-    function resetFormState() {
-      form.reset();
-      selectedProjectType = 'marketing';
-      backendRequirement = 'no';
-      const defaultProjectButton = projectTypeButtons.find((btn) => btn.dataset.projectType === selectedProjectType);
-      const defaultBackendButton = backendButtons.find((btn) => btn.dataset.backend === backendRequirement);
-      highlightSelection(projectTypeButtons, defaultProjectButton);
-      highlightSelection(backendButtons, defaultBackendButton);
-      pagesRange.value = '3';
-      pagesOutput.textContent = '3 pages';
-      showStep(1);
-      updateEstimate();
-    }
-
-    function openModal() {
-      setNavOpen(false);
-      resetFormState();
-      quoteModal.classList.remove('hidden');
-      requestAnimationFrame(() => quoteModal.classList.add('active'));
-      body.classList.add('modal-open');
-      quoteModal.setAttribute('aria-hidden', 'false');
-      if (stepPanelsContainer) {
-        stepPanelsContainer.scrollTop = 0;
-      }
-    }
-
-    function closeModal() {
-      quoteModal.classList.remove('active');
-      body.classList.remove('modal-open');
-      quoteModal.setAttribute('aria-hidden', 'true');
-      setTimeout(() => {
-        if (!quoteModal.classList.contains('active')) {
-          quoteModal.classList.add('hidden');
+            setTimeout(typeWriter, typingSpeed);
         }
-      }, 220);
-    }
+        
+        setTimeout(typeWriter, 1000); 
+        
+        // ------------------
+        // 3. Quote Modal & Step Logic
+        // ------------------
+        
+        // Helper function for non-validation related alerts (like Firebase errors)
+        function alertUser(message, color) {
+            statusDiv.classList.remove('hidden');
+            // Remove all existing background colors
+            statusDiv.classList.remove('bg-green-600/50', 'bg-yellow-600/50', 'bg-red-600/50', 'bg-[#3a3a5e]'); 
+            // Apply error background
+            statusDiv.classList.add(color === 'red' ? 'bg-red-600/50' : 'bg-yellow-600/50');
+            statusMessage.textContent = message;
+            finalPriceDisplay.textContent = '';
+            
+            // Hide the legal disclaimer during error alerts
+            disclaimerText.classList.add('hidden'); 
+            
+            setTimeout(() => { 
+                statusDiv.classList.add('hidden');
+                // Re-enable disclaimer for the next time submission-status is used for success
+                disclaimerText.classList.remove('hidden'); 
+            }, 3000);
+        }
 
-    openQuoteButtons.forEach((button) => {
-      button.addEventListener('click', openModal);
-    });
+        function updateStepDisplay() {
+            // Hide all step content, then show the current one
+            stepContents.forEach((step, index) => {
+                step.classList.add('hidden');
+                if (index === currentStep) {
+                    step.classList.remove('hidden');
+                }
+            });
 
-    closeModalButtons.forEach((button) => {
-      button.addEventListener('click', closeModal);
-    });
+            // Update header text (1/3, 2/3, 3/3)
+            stepDisplay.textContent = currentStep + 1;
+            
+            // Update progress bar
+            const progress = ((currentStep + 1) / stepContents.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // Handle navigation buttons visibility
+            prevStepBtn.classList.toggle('hidden', currentStep === 0);
+            nextStepBtn.classList.toggle('hidden', currentStep === stepContents.length - 1);
+            submitQuoteBtn.classList.toggle('hidden', currentStep !== stepContents.length - 1);
+            pricePreview.classList.toggle('hidden', currentStep === stepContents.length - 1);
+            
+            // Recalculate quote to update preview
+            calculateQuote();
+            // Clear status message when navigating steps
+            statusDiv.classList.add('hidden');
+        }
+        
+        function validateStep(stepIndex) {
+            let isValid = true;
+            let firstInvalidElement = null;
 
-    quoteModal.addEventListener('click', (event) => {
-      if (event.target === quoteModal) {
-        closeModal();
-      }
-    });
+            // Helper to remove all error styles
+            const removeErrors = () => {
+                // Remove input text errors
+                quoteForm.querySelectorAll('.input-text').forEach(el => el.classList.remove('input-error'));
+                // Remove group container errors
+                [projectTypeGroup, pagesGroup, urlStatusGroup].forEach(el => el && el.classList.remove('error-group-border'));
+                
+                // Get the elements containing the radio button groups for Q3 and Q5 by looking for their closest wrapper div.grid
+                const backendGroup = document.getElementById('backend-no')?.closest('div.grid');
+                const colorsGroup = document.getElementById('colors-yes')?.closest('div.grid');
+                if (backendGroup) backendGroup.classList.remove('error-group-border');
+                if (colorsGroup) colorsGroup.classList.remove('error-group-border');
+            };
+            
+            // Clear all existing error styles at the start
+            removeErrors();
+            
+            // Clear submission status message if visible
+            statusDiv.classList.add('hidden');
 
-    document.addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape') return;
-      if (quoteModal.classList.contains('active')) {
-        closeModal();
-      }
-      if (primaryNav && primaryNav.classList.contains('is-open')) {
-        setNavOpen(false);
-      }
-    });
 
-    nextStepButton.addEventListener('click', () => {
-      showStep(currentStep + 1);
-      updateEstimate();
-    });
+            if (stepIndex === 0) { // Step 1: Site Requirements
+                const projectTypeSelected = quoteForm.querySelector('input[name="projectType"]:checked'); // NEW Check
+                const pagesSelected = quoteForm.querySelector('input[name="pages"]:checked');
+                const backendSelected = quoteForm.querySelector('input[name="backend"]:checked'); // Q3 Check
+                const colorsSelected = quoteForm.querySelector('input[name="colors"]:checked'); // Q5 Check
+                
+                // Get radio group wrappers for validation highlighting
+                const backendGroup = document.getElementById('backend-no').closest('div.grid');
+                const colorsGroup = document.getElementById('colors-yes').closest('div.grid');
+                
+                // 1. Project Type check
+                if (!projectTypeSelected) {
+                    isValid = false;
+                    projectTypeGroup.classList.add('error-group-border');
+                    if (!firstInvalidElement) firstInvalidElement = projectTypeGroup;
+                }
+                
+                // 2. Pages check
+                if (!pagesSelected) {
+                    isValid = false;
+                    if (!firstInvalidElement) firstInvalidElement = pagesGroup;
+                    pagesGroup.classList.add('error-group-border');
+                }
+                
+                // 3. Backend check
+                if (!backendSelected) {
+                    isValid = false;
+                    if (!firstInvalidElement) firstInvalidElement = backendGroup;
+                    backendGroup.classList.add('error-group-border');
+                }
+                
+                // 5. Color Scheme check
+                if (!colorsSelected) {
+                    isValid = false;
+                    if (!firstInvalidElement) firstInvalidElement = colorsGroup;
+                    colorsGroup.classList.add('error-group-border');
+                }
+            }
 
-    prevStepButton.addEventListener('click', () => {
-      if (currentStep > 1) {
-        showStep(currentStep - 1);
-      }
-    });
+            if (stepIndex === 1) { // Step 2: Contact Information
+                const nameInput = document.getElementById('contact-name');
+                const emailInput = document.getElementById('contact-email');
+                const phoneInput = document.getElementById('contact-phone');
+                const phoneRegex = /^\d{10}$/; // Exactly 10 digits
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    async function handleSubmit(event) {
-      event.preventDefault();
-      submitButton.disabled = true;
-      submitButton.classList.add('is-disabled');
+                // 1. Name
+                if (!nameInput.value) {
+                    isValid = false;
+                    nameInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = nameInput;
+                }
+                // 2. Email
+                if (!emailInput.value || !emailRegex.test(emailInput.value)) {
+                    isValid = false;
+                    emailInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = emailInput;
+                }
+                // 3. Phone (length 10)
+                if (!phoneInput.value || !phoneRegex.test(phoneInput.value)) {
+                    isValid = false;
+                    phoneInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = phoneInput;
+                }
+            }
+            
+            if (stepIndex === 2) { // Step 3: Project Details
+                const projectNameInput = document.getElementById('project-name');
+                const projectUrlInput = document.getElementById('project-url');
+                const projectDescriptionTextarea = document.getElementById('project-description');
+                const urlStatusSelected = quoteForm.querySelector('input[name="url-status"]:checked');
+                
+                // 1. Project Name (required)
+                if (!projectNameInput.value) {
+                    isValid = false;
+                    projectNameInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = projectNameInput;
+                }
+                
+                // 2. Project URL (required, basic check)
+                if (!projectUrlInput.value) {
+                    isValid = false;
+                    projectUrlInput.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = projectUrlInput;
+                }
+                
+                // 3. Project Description (required)
+                if (!projectDescriptionTextarea.value) {
+                    isValid = false;
+                    projectDescriptionTextarea.classList.add('input-error');
+                    if (!firstInvalidElement) firstInvalidElement = projectDescriptionTextarea;
+                }
 
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const projectName = document.getElementById('project-name').value.trim();
-      const projectDescription = document.getElementById('project-description').value.trim();
-      const projectUrl = document.getElementById('project-url').value.trim();
-      const urlStatus = document.getElementById('url-status').value;
-      const logoStatus = document.getElementById('logo-status').value;
-      const timeline = document.getElementById('timeline').value;
-      const pages = Number(pagesRange.value);
-      const designTone = document.getElementById('design-tone').value;
-      const interactionLevel = document.getElementById('interaction-level').value;
+                // 4. URL Status (required)
+                if (!urlStatusSelected) {
+                    isValid = false;
+                    urlStatusGroup.classList.add('error-group-border');
+                    if (!firstInvalidElement) firstInvalidElement = urlStatusGroup;
+                }
+            }
+            
+            if (!isValid && firstInvalidElement) {
+                // Focus on the first invalid element if validation failed
+                firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // If it's an input/textarea, focus it
+                if (firstInvalidElement.tagName === 'INPUT' || firstInvalidElement.tagName === 'TEXTAREA') {
+                     firstInvalidElement.focus(); 
+                }
+            }
+            
+            return isValid;
+        }
 
-      const finalEstimate = updateEstimate();
-      const now = new Date();
+        function changeStep(direction) {
+            const nextStep = currentStep + direction;
+            
+            if (direction > 0 && currentStep < stepContents.length - 1) {
+                if (!validateStep(currentStep)) return;
+            }
 
-      const data = {
-        name,
-        email,
-        phone,
-        projectName,
-        projectDescription,
-        projectType: pricingMatrix[selectedProjectType].label,
-        projectTypeKey: selectedProjectType,
-        pages,
-        backend: backendRequirement,
-        timeline,
-        timelineLabel: timelinePricing[timeline].label,
-        urlStatus,
-        projectUrl: projectUrl || 'N/A',
-        logoStatus,
-        designTone,
-        interactionLevel,
-        finalEstimate,
-        timestamp: now.toISOString(),
-        humanTimestamp: now.toLocaleString(),
-        userId: crypto.randomUUID(),
-        'feature-ecommerce': document.getElementById('feature-ecommerce').checked ? 'on' : 'off',
-        'feature-admin': document.getElementById('feature-admin').checked ? 'on' : 'off',
-        'feature-support': document.getElementById('feature-support').checked ? 'on' : 'off',
-        'feature-automation': document.getElementById('feature-automation').checked ? 'on' : 'off',
-      };
+            if (nextStep >= 0 && nextStep < stepContents.length) {
+                currentStep = nextStep;
+                updateStepDisplay();
+            }
+        }
 
-      try {
-        await addDoc(collection(db, 'quotes'), data);
-        toggleToast(errorToast, false);
-        toggleToast(successToast, true);
-        closeModal();
-        resetFormState();
-      } catch (error) {
-        console.error('Error saving quote:', error);
-        toggleToast(successToast, false);
-        toggleToast(errorToast, true);
-      } finally {
-        submitButton.disabled = false;
-        submitButton.classList.remove('is-disabled');
-      }
-    }
 
-    form.addEventListener('submit', handleSubmit);
+        prevStepBtn.addEventListener('click', () => changeStep(-1));
+        nextStepBtn.addEventListener('click', () => changeStep(1));
 
-    resetFormState();
+        // Modal Open/Close Logic (with digital spawn animation)
+        function openModal() {
+            currentStep = 0; // Reset to step 1 on open
+            updateStepDisplay();
+            statusDiv.classList.add('hidden');
+            quoteModal.classList.remove('hidden', 'modal-exit-active');
+            quoteModal.classList.add('flex', 'modal-enter');
+            setTimeout(() => {
+                quoteModal.classList.remove('modal-enter');
+                quoteModal.classList.add('modal-enter-active');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+            calculateQuote();
+        }
 
-    if (window.lucide) {
-      window.lucide.createIcons();
-    }
+        function closeModal() {
+            quoteModal.classList.remove('modal-enter-active');
+            quoteModal.classList.add('modal-exit-active');
+            setTimeout(() => {
+                quoteModal.classList.add('hidden');
+                quoteModal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300);
+        }
 
-    const adminCode = 'admin';
-    let typedKeys = '';
-    const adminUrl = '/admin';
+        openButtons.forEach(button => {
+            button.addEventListener('click', openModal);
+        });
+        closeButton.addEventListener('click', closeModal);
+        quoteModal.addEventListener('click', (e) => {
+            if (e.target.id === 'quote-modal') {
+                closeModal();
+            }
+        });
 
-    document.addEventListener('keydown', (event) => {
-      const key = event.key.toLowerCase();
-      if (key.length === 1 && key >= 'a' && key <= 'z') {
-        typedKeys += key;
-      } else {
-        typedKeys = '';
-      }
+        // ------------------
+        // 4. Quote Calculation and Submission Logic
+        // ------------------
+        function calculateQuote() {
+            let totalCost = BASE_PRICE;
 
-      if (typedKeys.length > adminCode.length) {
-        typedKeys = typedKeys.substring(typedKeys.length - adminCode.length);
-      }
+            // Get all radio/checkbox inputs from all steps
+            const inputs = quoteForm.querySelectorAll('input[type="radio"], input[type="checkbox"]');
 
-      if (typedKeys === adminCode) {
-        window.location.href = adminUrl;
-        typedKeys = '';
-      }
-    });
-  </script>
+            inputs.forEach(input => {
+                const cost = parseInt(input.getAttribute('data-cost') || '0', 10);
+
+                if (input.type === 'radio' && input.checked) {
+                    // Cost is added for page count, backend, colors, logo status, and PROJECT TYPE
+                    if (['projectType', 'pages', 'backend', 'colors', 'logo-status'].includes(input.name)) {
+                        totalCost += cost;
+                    }
+                } else if (input.type === 'checkbox' && input.checked) {
+                    // Cost is added for feature checkboxes
+                    totalCost += cost;
+                }
+            });
+
+            // Format the result as currency
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            });
+
+            const formattedCost = formatter.format(totalCost);
+            quoteResult.textContent = formattedCost;
+            return { raw: totalCost, formatted: formattedCost };
+        }
+
+        async function submitQuote(e) {
+            e.preventDefault();
+            
+            // Final step validation
+            if (!validateStep(currentStep)) return;
+            
+            // Check if userId is available (authentication complete)
+            if (!db || !userId) {
+                alertUser('System is not authenticated. Please wait a moment and try again.', 'red');
+                return;
+            }
+
+            const quoteData = {};
+            const cost = calculateQuote();
+
+            // 1. Gather Quote Details (Step 1)
+            const step1Fields = quoteForm.querySelectorAll('#step-1-content input[type="radio"]:checked, #step-1-content input[type="checkbox"]:checked');
+            step1Fields.forEach(input => {
+                quoteData[input.name] = input.value;
+            });
+
+            // 2. Gather Contact Details (Step 2)
+            quoteData.name = document.getElementById('contact-name').value;
+            quoteData.email = document.getElementById('contact-email').value;
+            quoteData.phone = document.getElementById('contact-phone').value;
+
+            // 3. Gather Project Details (Step 3)
+            quoteData.projectName = document.getElementById('project-name').value;
+            quoteData.projectUrl = document.getElementById('project-url').value;
+            quoteData.urlStatus = quoteForm.querySelector('input[name="url-status"]:checked')?.value || 'N/A';
+            quoteData.projectDescription = document.getElementById('project-description').value;
+            quoteData.logoStatus = quoteForm.querySelector('input[name="logo-status"]:checked').value;
+            
+            // 4. Add Final Price and Metadata
+            quoteData.finalEstimate = cost.raw;
+            quoteData.formattedEstimate = cost.formatted; // Add formatted value for easier debugging/display
+            quoteData.timestamp = new Date().toISOString();
+            quoteData.userId = userId;
+
+            // Show loading message
+            submitQuoteBtn.disabled = true;
+            submitQuoteBtn.textContent = 'Submitting...';
+            statusDiv.classList.add('hidden');
+
+            try {
+                // Write to public collection using 'quotes' instead of 'artifacts'
+                const collectionPath = `quotes/${appId}/public/data/quotes`;
+                const docRef = await addDoc(collection(db, collectionPath), quoteData);
+                
+                // Success
+                console.log(`Firestore Write Success: Document written with ID: ${docRef.id} to collection: ${collectionPath}`);
+                statusMessage.textContent = 'Quote Submitted Successfully!';
+                finalPriceDisplay.textContent = `Final Estimate: ${cost.formatted}`;
+                statusDiv.classList.remove('hidden');
+                statusDiv.classList.remove('bg-yellow-600/50', 'bg-red-600/50');
+                statusDiv.classList.add('bg-green-600/50');
+                
+                // Ensure disclaimer is visible on SUCCESS
+                disclaimerText.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error("Error writing document to Firestore: ", error);
+                alertUser('Submission Failed (Database Error). Please try again.', 'red');
+            } finally {
+                submitQuoteBtn.disabled = false;
+                submitQuoteBtn.textContent = 'Submit Quote';
+            }
+        }
+
+        // Attach event listeners
+        quoteForm.addEventListener('change', calculateQuote);
+        quoteForm.addEventListener('submit', submitQuote);
+
+        // ------------------
+        // 5. Info Toggle Logic 
+        // ------------------
+        function setupInfoToggles() {
+            // Attach listener to all elements with the info-target attribute
+            document.querySelectorAll('[data-info-target]').forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    // Ensure the click targets the actual <i> element or its close ancestor
+                    const targetElement = e.currentTarget; 
+
+                    const targetId = targetElement.getAttribute('data-info-target');
+                    const infoBox = document.getElementById(targetId);
+
+                    if (infoBox) {
+                        // Hide all other info boxes
+                        document.querySelectorAll('.info-box').forEach(box => {
+                            if (box.id !== targetId) {
+                                box.classList.add('hidden');
+                            }
+                        });
+                        // Toggle the clicked one
+                        infoBox.classList.toggle('hidden');
+                    }
+                });
+            });
+        }
+        
+        // --- Secret Code Logic (H A N N A H) ---
+        const SECRET_CODE = ['h', 'a', 'n', 'n', 'a', 'h'];
+        let keyPressHistory = [];
+
+        document.addEventListener('keydown', (e) => {
+            // Check if focus is outside of an input field
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return; 
+            }
+            
+            const key = e.key.toLowerCase();
+            
+            if (key.length === 1 && key.match(/[a-z]/)) {
+                keyPressHistory.push(key);
+                
+                // Keep history limited to the length of the secret code
+                if (keyPressHistory.length > SECRET_CODE.length) {
+                    keyPressHistory.shift();
+                }
+                
+                // Check for the match
+                if (keyPressHistory.length === SECRET_CODE.length && keyPressHistory.every((val, index) => val === SECRET_CODE[index])) {
+                    console.log("Secret Admin Code Activated! Redirecting...");
+                    keyPressHistory = []; 
+                    window.location.href = 'admin.html';
+                }
+            } else {
+                // If a non-alphabetic key is pressed, reset the sequence
+                keyPressHistory = [];
+            }
+        });
+        
+        // --- Consolidated DOMContentLoaded Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Initialize Lucide Icons (must run first)
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // 2. Setup Info Toggles (Now that icons are rendered)
+            setupInfoToggles();
+
+            // 3. Initial calculation
+            calculateQuote();
+        });
+    </script>
 </body>
 </html>
